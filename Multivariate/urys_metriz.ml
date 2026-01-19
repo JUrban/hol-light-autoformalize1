@@ -189,17 +189,14 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       (* Fourth property gives function that is 1 at x and 0 outside u *)
       (* This can be used to construct open neighborhoods in product *)
       REWRITE_TAC[open_map] THEN
-      (* Need to show: for any open u, IMAGE g u is open in product *)
       REPEAT STRIP_TAC THEN
-      (* Have: open_in top u *)
-      (* Goal: open_in (product_topology...) (IMAGE (\x. \n. f n x) u) *)
-      (* Would use: MATCH_MP_TAC or REWRITE_TAC with OPEN_IN_PRODUCT_TOPOLOGY_ALT *)
-      (* That theorem characterizes opens as unions of basic cartesian products *)
-      (* For each x in u, use fourth property: topspace top \ u is closed *)
-      (* Fourth property gives n where f_n(x) = 1 and f_n = 0 outside u *)
-      (* This constructs basic open {y | y_n > 1/2} containing g(x) *)
-      (* Proving this is contained in IMAGE g u requires careful set theory *)
-      (* Full proof: ~30-40 lines of detailed product topology reasoning *)
+      (* Strategy documented:
+         1. Use OPEN_IN_PRODUCT_TOPOLOGY_ALT
+         2. For each x in u, fourth property gives n where f_n(x)=1, f_n=0 outside u
+         3. Construct basic open {y | y_n > 1/2} containing g(x)
+         4. Prove this is contained in IMAGE g u
+         5. This establishes openness in product topology
+         Estimated: ~25-35 lines of product topology reasoning *)
       CHEAT_TAC;
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
