@@ -64,10 +64,14 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   SUBGOAL_THEN `COUNTABLE (b CROSS b:(A->bool#A->bool)->bool)` ASSUME_TAC THENL
    [MATCH_MP_TAC COUNTABLE_CROSS THEN ASM_REWRITE_TAC[];
     ALL_TAC] THEN
-  (* Now enumerate: either empty or can use COUNTABLE_AS_IMAGE *)
-  (* The complete construction requires choosing appropriate pairs,
-     applying Urysohn/completely_regular to each, and proving properties *)
-  (* This is substantial infrastructure (~50-80 lines) *)
+  (* Now would enumerate the pairs with COUNTABLE_AS_IMAGE *)
+  (* and construct functions from them *)
+  (* The complete construction requires:
+     - Case analysis on whether b CROSS b is empty
+     - If non-empty, use COUNTABLE_AS_IMAGE to enumerate pairs
+     - For each pair, apply Urysohn or completely_regular
+     - Prove all four required properties
+     This is substantial infrastructure (~50-70 lines) *)
   CHEAT_TAC);;
 
 (* Helper: embedding into product of [0,1] *)
