@@ -259,6 +259,12 @@ let REAL_INTERVAL_SUBSET_INTERVALS = prove
  (`!a b c d. a <= c /\ d <= b ==> real_interval[c,d] SUBSET real_interval[a,b]`,
   REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
+(* Helper: closure properties *)
+let CLOSED_IN_TOPSPACE_DIFF_OPEN = prove
+ (`!top u:A->bool.
+        open_in top u ==> closed_in top (topspace top DIFF u)`,
+  SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE]);;
+
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
