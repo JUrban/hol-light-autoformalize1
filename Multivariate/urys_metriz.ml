@@ -1441,3 +1441,92 @@ let UNION_SING_LEFT = prove
 let UNION_SING_RIGHT = prove
  (`!s x. s UNION {x} = x INSERT s`,
   SET_TAC[]);;
+
+(* Helper: insert into empty *)
+let INSERT_EMPTY = prove
+ (`!x. x INSERT {} = {x}`,
+  SET_TAC[]);;
+
+(* Helper: insert idempotent *)
+let INSERT_INSERT = prove
+ (`!x s. x INSERT (x INSERT s) = x INSERT s`,
+  SET_TAC[]);;
+
+(* Helper: not in empty *)
+let NOT_IN_EMPTY_ALT = prove
+ (`!x. ~(x IN {})`,
+  REWRITE_TAC[NOT_IN_EMPTY]);;
+
+(* Helper: in univ *)
+let IN_UNIV_ALT = prove
+ (`!x. x IN (:A)`,
+  REWRITE_TAC[IN_UNIV]);;
+
+(* Helper: univ not empty *)
+let UNIV_NOT_EMPTY = prove
+ (`~((:A) = {})`,
+  SET_TAC[IN_UNIV]);;
+
+(* Helper: subset univ *)
+let SUBSET_UNIV_ALT = prove
+ (`!s. s SUBSET (:A)`,
+  REWRITE_TAC[SUBSET_UNIV]);;
+
+(* Helper: image union *)
+let IMAGE_UNION_ALT = prove
+ (`!f s t. IMAGE f (s UNION t) = IMAGE f s UNION IMAGE f t`,
+  SET_TAC[]);;
+
+(* Helper: image inter subset *)
+let IMAGE_INTER_SUBSET = prove
+ (`!f s t. IMAGE f (s INTER t) SUBSET (IMAGE f s) INTER (IMAGE f t)`,
+  SET_TAC[]);;
+
+(* Helper: preimage basic *)
+let IN_PREIMAGE = prove
+ (`!f s x. x IN {y | f y IN s} <=> f x IN s`,
+  SET_TAC[]);;
+
+(* Helper: function extensionality *)
+let FUN_EQ = prove
+ (`!f g. (!x. f x = g x) <=> f = g`,
+  REWRITE_TAC[FUN_EQ_THM]);;
+
+(* Helper: composition associativity *)
+let o_ASSOC = prove
+ (`!f g h. f o (g o h) = (f o g) o h`,
+  REWRITE_TAC[o_ASSOC]);;
+
+(* Helper: composition with identity left *)
+let o_ID_LEFT = prove
+ (`!f. (\x. x) o f = f`,
+  REWRITE_TAC[FUN_EQ_THM; o_THM]);;
+
+(* Helper: composition with identity right *)
+let o_ID_RIGHT = prove
+ (`!f. f o (\x. x) = f`,
+  REWRITE_TAC[FUN_EQ_THM; o_THM]);;
+
+(* Helper: injection definition *)
+let INJECTIVE_ALT = prove
+ (`!f. (!x y. f x = f y ==> x = y) <=>
+       (!x y. ~(x = y) ==> ~(f x = f y))`,
+  MESON_TAC[]);;
+
+(* Helper: surjection definition *)
+let SURJECTIVE_DEF = prove
+ (`!f:A->B. (!y. ?x. f x = y) <=> IMAGE f (:A) = (:B)`,
+  REWRITE_TAC[EXTENSION; IN_IMAGE; IN_UNIV] THEN MESON_TAC[]);;
+
+(* Helper: bijection *)
+let BIJECTIVE_DEF = prove
+ (`!f:A->B. (!x y. f x = f y ==> x = y) /\ (!y. ?x. f x = y) <=>
+            (!x y. f x = f y <=> x = y) /\ (!y. ?x. f x = y)`,
+  MESON_TAC[]);;
+
+
+(* Helper: forall in insert *)
+let FORALL_IN_INSERT = prove
+ (`!P x s. (!y. y IN (x INSERT s) ==> P y) <=>
+           P x /\ (!y. y IN s ==> P y)`,
+  SET_TAC[]);;
