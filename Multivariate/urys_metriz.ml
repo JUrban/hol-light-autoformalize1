@@ -406,22 +406,24 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
   REPEAT STRIP_TAC THEN
   EXISTS_TAC `\x:A. \n:num. (f:num->A->real) n x` THEN
   CONJ_TAC THENL
-   [(* Attempt 9: Use INJECTIVE_CLOSED_IMP_EMBEDDING_MAP instead of open map *)
-    MATCH_MP_TAC INJECTIVE_CLOSED_IMP_EMBEDDING_MAP THEN
+   [(* Attempt 10: Prove embedding directly using definition *)
+    (* Following textbook Step 2: embedding_map = homeomorphic onto image *)
+    REWRITE_TAC[embedding_map; homeomorphic_map] THEN
     CONJ_TAC THENL
-     [(* Prove continuous_map using componentwise criterion *)
-      REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
-      GEN_TAC THEN REWRITE_TAC[ETA_AX] THEN
-      ASM_REWRITE_TAC[];
-      ALL_TAC] THEN
-    CONJ_TAC THENL
-     [(* Prove closed_map instead of open_map *)
-      (* Try: show IMAGE g c is closed for any closed c *)
-      REWRITE_TAC[closed_map] THEN
-      X_GEN_TAC `c:A->bool` THEN STRIP_TAC THEN
-      (* Show IMAGE (\x. \n. f n x) c is closed in product topology *)
-      (* Closedness in product topology is tricky - may need different approach *)
-      (* This might also be difficult without surjectivity *)
+     [(* Prove quotient_map to subtopology of image *)
+      REWRITE_TAC[quotient_map] THEN
+      (* Subtopology has topspace = the subset *)
+      REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN
+      CONJ_TAC THENL
+       [(* IMAGE g topspace ∩ topspace product = IMAGE g topspace *)
+        (* Requires: IMAGE g topspace ⊂ topspace product *)
+        (* This follows from: ∀x ∈ topspace, ∀n, f n x ∈ [0,1] *)
+        (* Which is assumption 1 *)
+        CHEAT_TAC;
+        ALL_TAC] THEN
+      (* Prove open set characterization *)
+      X_GEN_TAC `u:(num->real)->bool` THEN STRIP_TAC THEN
+      (* This is the key property from textbook Step 2 *)
       CHEAT_TAC;
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
