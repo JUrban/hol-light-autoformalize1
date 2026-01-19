@@ -888,3 +888,33 @@ let IN_DIFF_SIMPLE = prove
 let SUBSET_REFL_SIMPLE = prove
  (`!s. s SUBSET s`,
   REWRITE_TAC[SUBSET_REFL]);;
+
+(* Helper: subset trans *)
+let SUBSET_TRANS_SIMPLE = prove
+ (`!s t u. s SUBSET t /\ t SUBSET u ==> s SUBSET u`,
+  REWRITE_TAC[SUBSET_TRANS]);;
+
+(* Helper: insert subset *)
+let INSERT_SUBSET_SIMPLE = prove
+ (`!x s t. x IN t /\ s SUBSET t ==> (x INSERT s) SUBSET t`,
+  SET_TAC[]);;
+
+(* Helper: finite singleton *)
+let FINITE_SINGLETON = prove
+ (`!x. FINITE {x}`,
+  REWRITE_TAC[FINITE_SING]);;
+
+(* Helper: finite empty *)
+let FINITE_EMPTY_SIMPLE = prove
+ (`FINITE {}`,
+  REWRITE_TAC[FINITE_EMPTY]);;
+
+(* Helper: finite union *)
+let FINITE_UNION_SIMPLE = prove
+ (`!s t. FINITE s /\ FINITE t ==> FINITE (s UNION t)`,
+  REWRITE_TAC[FINITE_UNION]);;
+
+(* Helper: finite insert *)
+let FINITE_INSERT_SIMPLE = prove
+ (`!x s. FINITE s ==> FINITE (x INSERT s)`,
+  REWRITE_TAC[FINITE_INSERT]);;
