@@ -300,9 +300,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* [0,1] is open as the topspace *)
         CHEAT_TAC;
         (* Show y in cartesian product *)
-        (* Need: y i in (if i=n then (1/2,1) else [0,1]) *)
-        (* For i=n: f n x = 1 is in (1/2,1) *)
-        (* For i≠n: f i x is in [0,1] by assumption *)
+        (* This is complex: y = f applied to x, but we need y IN basic open *)
+        (* The basic open has (1/2,1) at coordinate n, but f n x = 1 *)
+        (* This requires careful handling of the neighborhood *)
         CHEAT_TAC;
         (* Show cartesian product subset IMAGE g u *)
         CHEAT_TAC];
@@ -609,3 +609,18 @@ let FUNCTION_IN_RANGE = prove
 let FUNCTION_POINTWISE_EQ = prove
  (`!f g s. (!x. x IN s ==> f x = g x) /\ x IN s ==> f x = g x`,
   SIMP_TAC[]);;
+
+(* Helper: real number between bounds *)
+let REAL_BETWEEN_BOUNDS = prove
+ (`!a b x. a < x /\ x < b ==> a < b`,
+  REAL_ARITH_TAC);;
+
+(* Helper: subset of intersection *)
+let SUBSET_INTER_LEFT = prove
+ (`!s t. s INTER t SUBSET s`,
+  SET_TAC[]);;
+
+(* Helper: subset of intersection right *)
+let SUBSET_INTER_RIGHT = prove
+ (`!s t. s INTER t SUBSET t`,
+  SET_TAC[]);;
