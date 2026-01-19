@@ -428,10 +428,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* Previous attempts documented in CHANGES files all failed *)
         CHEAT_TAC;
         (* Show y in cartesian product *)
-        (* Mathematically: y = \n. f n x, need y i IN u i for all i *)
-        (* Case i = n: f n x = &1 ∈ [&0,&1]\{&0} *)
-        (* Case i ≠ n: f i x ∈ [&0,&1] by first property *)
-        (* TODO: Expand cartesian_product and prove by cases *)
+        (* Latest attempt: SET_TAC[] - too deep (26819+ steps) *)
+        (* Previous attempts: SUBST_ALL_TAC + GEN_TAC failed *)
+        (* Manual proof needed *)
         CHEAT_TAC;
         (* Show cartesian product subset IMAGE g u *)
         (* Mathematically: need to show cartesian_product k u ⊆ IMAGE g u *)
