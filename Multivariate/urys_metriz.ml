@@ -1,5 +1,16 @@
 (* work.ml *)
 
+(* This is a debugging tactic DEBUG_GOAL_TAC - do not remove *)
+let debug_goal_string (asl,w) =
+  let buf = Buffer.create 1024 in
+  let fmt = Format.formatter_of_buffer buf in
+  pp_print_goal fmt (asl,w);  (* if available *)
+  Format.pp_print_flush fmt ();
+  Buffer.contents buf;;
+
+let DEBUG_GOAL_TAC : tactic =
+  fun (asl,w as g) -> failwith ("GOAL:\n" ^ debug_goal_string g);;
+
 (* Urysohn Metrization Theorem:
    A topological space is metrizable if and only if it is
    regular, second countable, and Hausdorff *)
@@ -2584,3 +2595,13 @@ let IN_UNIV_ALT = prove
 let FORALL_IN_UNIV = prove
  (`!P. (!x. x IN UNIV ==> P x) <=> (!x. P x)`,
   REWRITE_TAC[IN_UNIV]);;
+
+(* Helper: implication chain *)
+let IMP_CHAIN = prove
+ (`!p q r. (p ==> q) /\ (q ==> r) ==> (p ==> r)`,
+  MESON_TAC[]);;
+
+(* Helper: conjunction introduction *)
+let CONJ_INTRO = prove
+ (`!p q. p ==> q ==> p /\ q`,
+  MESON_TAC[]);;
