@@ -312,7 +312,7 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
         X_GEN_TAC `i:num` THEN
         REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV] THEN
-        (* TODO: Still needs right tactics combination *)
+        (* TODO: Interval inequality - needs specialized proof *)
         CHEAT_TAC;
         (* Show each component is open *)
         CHEAT_TAC;
@@ -1048,3 +1048,58 @@ let INSERT_UNION = prove
 let IN_INSERT_SIMPLE = prove
  (`!x y s. x IN (y INSERT s) <=> x = y \/ x IN s`,
   REWRITE_TAC[IN_INSERT]);;
+
+(* Helper: subset insert *)
+let SUBSET_INSERT_DELETE = prove
+ (`!x s. s SUBSET (x INSERT s)`,
+  SET_TAC[]);;
+
+(* Helper: real le antisym *)
+let REAL_LE_ANTISYM_SIMPLE = prove
+ (`!x y. x <= y /\ y <= x ==> x = y`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real lt irrefl *)
+let REAL_LT_IRREFL_SIMPLE = prove
+ (`!x. ~(x < x)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real lt trans *)
+let REAL_LT_TRANS_SIMPLE = prove
+ (`!x y z. x < y /\ y < z ==> x < z`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real le trans *)
+let REAL_LE_TRANS_SIMPLE = prove
+ (`!x y z. x <= y /\ y <= z ==> x <= z`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real lt le *)
+let REAL_LT_IMP_LE = prove
+ (`!x y. x < y ==> x <= y`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real add comm *)
+let REAL_ADD_COMM_SIMPLE = prove
+ (`!x y. x + y = y + x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real mul comm *)
+let REAL_MUL_COMM_SIMPLE = prove
+ (`!x y. x * y = y * x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real add assoc *)
+let REAL_ADD_ASSOC_SIMPLE = prove
+ (`!x y z. (x + y) + z = x + (y + z)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real add lid *)
+let REAL_ADD_LID_SIMPLE = prove
+ (`!x. &0 + x = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real add rid *)
+let REAL_ADD_RID_SIMPLE = prove
+ (`!x. x + &0 = x`,
+  REAL_ARITH_TAC);;
