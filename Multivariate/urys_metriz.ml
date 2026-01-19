@@ -296,9 +296,10 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
         X_GEN_TAC `i:num` THEN DISCH_TAC THEN
         ASM_REWRITE_TAC[] THEN
-        REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN
-        (* real_interval(1/2,1) ≠ real_interval[0,1] ∩ (:real) *)
-        (* Goal structure complex, needs careful handling of set equality *)
+        REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV] THEN
+        (* TODO: Show (if i=n then interval(1/2,1) else interval[0,1]) ≠ interval[0,1] implies i=n *)
+        (*       When i<>n: LHS = interval[0,1] = RHS, contradiction *)
+        (*       When i=n: LHS = interval(1/2,1) ≠ interval[0,1] *)
         CHEAT_TAC;
         (* Show each component is open *)
         (* (1/2,1) is open by OPEN_IN_UNIT_INTERVAL_SUBINTERVAL *)
