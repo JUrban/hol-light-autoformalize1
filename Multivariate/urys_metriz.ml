@@ -141,18 +141,21 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
                - completely_regular (hence separating functions exist)
                - countable basis b
      Approach: enumerate basis pairs, construct functions from them *)
-  (* First, b CROSS b is countable *)
-  SUBGOAL_THEN `COUNTABLE (b CROSS b:(A->bool#A->bool)->bool)` ASSUME_TAC THENL
-   [MATCH_MP_TAC COUNTABLE_CROSS THEN ASM_REWRITE_TAC[];
-    ALL_TAC] THEN
-  (* Strategy for completing this proof:
-     1. Enumerate relevant pairs using COUNTABLE_AS_IMAGE
-     2. For each pair type, use appropriate helper:
-        - Point pairs: COMPLETELY_REGULAR_HAUSDORFF_POINT_FUNCTIONS
-        - Point-set pairs: completely_regular + COMPLEMENT_UNIT_INTERVAL
-     3. Merge into single num->A->real family
-     4. Prove four properties from construction
-     Estimated: ~50-70 lines of enumeration and merging *)
+  (* Strategy from Munkres topology.tex §34:
+     For pairs (Bn, Bm) where Bn ⊆ Bm from countable basis,
+     use Urysohn to get function that is 1 on Bn and 0 outside Bm.
+     Since basis is countable, and we use pairs from basis, we get
+     countably many functions. These functions separate points and
+     closed sets as required. *)
+
+  (* Key insight: b × b is countable, so pairs from it are countable *)
+  (* For each valid pair, completely_regular gives us a function *)
+  (* We can enumerate these using COUNTABLE_AS_IMAGE on b × b *)
+  (* Then verify the four properties hold *)
+
+  (* TODO: This requires explicit construction using choice principles *)
+  (* and careful enumeration of the function family *)
+  (* Estimated: ~50-70 more lines to complete *)
   CHEAT_TAC);;
 
 (* Helper: explicit pairing function for enumeration *)
