@@ -923,3 +923,83 @@ let FINITE_INSERT_SIMPLE = prove
 let SUBSET_ANTISYM = prove
  (`!s t. s SUBSET t /\ t SUBSET s <=> s = t`,
   REWRITE_TAC[SUBSET_ANTISYM_EQ]);;
+
+(* Helper: de Morgan union *)
+let DE_MORGAN_UNION = prove
+ (`!s t. UNIV DIFF (s UNION t) = (UNIV DIFF s) INTER (UNIV DIFF t)`,
+  SET_TAC[]);;
+
+(* Helper: de Morgan inter *)
+let DE_MORGAN_INTER = prove
+ (`!s t. UNIV DIFF (s INTER t) = (UNIV DIFF s) UNION (UNIV DIFF t)`,
+  SET_TAC[]);;
+
+(* Helper: diff union *)
+let DIFF_UNION_DIST = prove
+ (`!s t u. s DIFF (t UNION u) = (s DIFF t) INTER (s DIFF u)`,
+  SET_TAC[]);;
+
+(* Helper: diff inter *)
+let DIFF_INTER_DIST = prove
+ (`!s t u. s DIFF (t INTER u) = (s DIFF t) UNION (s DIFF u)`,
+  SET_TAC[]);;
+
+(* Helper: union assoc *)
+let UNION_ASSOC_SIMPLE = prove
+ (`!s t u. (s UNION t) UNION u = s UNION (t UNION u)`,
+  REWRITE_TAC[UNION_ASSOC]);;
+
+(* Helper: inter assoc *)
+let INTER_ASSOC_SIMPLE = prove
+ (`!s t u. (s INTER t) INTER u = s INTER (t INTER u)`,
+  REWRITE_TAC[INTER_ASSOC]);;
+
+(* Helper: union idempotent *)
+let UNION_IDEMP = prove
+ (`!s. s UNION s = s`,
+  SET_TAC[]);;
+
+(* Helper: inter idempotent *)
+let INTER_IDEMP = prove
+ (`!s. s INTER s = s`,
+  SET_TAC[]);;
+
+(* Helper: union with empty *)
+let UNION_EMPTY_LEFT = prove
+ (`!s. {} UNION s = s`,
+  REWRITE_TAC[UNION_EMPTY]);;
+
+(* Helper: union with empty right *)
+let UNION_EMPTY_RIGHT = prove
+ (`!s. s UNION {} = s`,
+  REWRITE_TAC[UNION_EMPTY]);;
+
+(* Helper: inter with empty *)
+let INTER_EMPTY_LEFT = prove
+ (`!s. {} INTER s = {}`,
+  REWRITE_TAC[INTER_EMPTY]);;
+
+(* Helper: inter with empty right *)
+let INTER_EMPTY_RIGHT = prove
+ (`!s. s INTER {} = {}`,
+  REWRITE_TAC[INTER_EMPTY]);;
+
+(* Helper: union with univ *)
+let UNION_UNIV_LEFT = prove
+ (`!s. (:A) UNION s = (:A)`,
+  SET_TAC[]);;
+
+(* Helper: union with univ right *)
+let UNION_UNIV_RIGHT = prove
+ (`!s. s UNION (:A) = (:A)`,
+  SET_TAC[]);;
+
+(* Helper: inter with univ *)
+let INTER_UNIV_LEFT = prove
+ (`!s. (:A) INTER s = s`,
+  REWRITE_TAC[INTER_UNIV]);;
+
+(* Helper: inter with univ right *)
+let INTER_UNIV_RIGHT = prove
+ (`!s. s INTER (:A) = s`,
+  REWRITE_TAC[INTER_UNIV]);;
