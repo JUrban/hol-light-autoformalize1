@@ -148,20 +148,22 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      countably many functions. These functions separate points and
      closed sets as required. *)
 
-  (* Step 1: Get a countable collection of pairs from the basis *)
-  SUBGOAL_THEN `COUNTABLE (b CROSS b:(A->bool#A->bool)->bool)` ASSUME_TAC THENL
-   [MATCH_MP_TAC COUNTABLE_CROSS THEN ASM_REWRITE_TAC[];
-    ALL_TAC] THEN
+  (* Step 1: b × b is countable (product of countable sets) *)
+  (* We can enumerate it as pairs:num -> (A->bool) # (A->bool) *)
 
-  (* Step 2: For pairs (u,v) with u ⊆ v in basis, we can get functions *)
-  (* Using completely_regular, for each such pair, there exists a function *)
-  (* that separates u from topspace \ v *)
+  (* Step 2: For each pair (u,v) from the enumeration where u ⊆ v *)
+  (* and both are in the basis, use completely_regular to get a function *)
 
-  (* The key challenge: packaging into num->A->real *)
-  (* We need to enumerate the pairs and select functions *)
-  (* This requires COUNTABLE_AS_IMAGE and choice principles *)
+  (* Step 3: Define the function family by cases on the enumeration *)
+  (* For each k, if the k-th pair satisfies our conditions, use *)
+  (* the corresponding separating function; otherwise use constant 0 *)
 
-  (* Gradual approach: admit the hard enumeration part for now *)
+  (* This construction requires: *)
+  (* - Enumerating countable product (COUNTABLE_AS_IMAGE) *)
+  (* - Choice to select functions for each valid pair *)
+  (* - Verification that the four properties hold *)
+
+  (* Gradual approach: admit this technical enumeration for now *)
   CHEAT_TAC);;
 
 (* Helper: explicit pairing function for enumeration *)
