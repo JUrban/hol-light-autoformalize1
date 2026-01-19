@@ -394,6 +394,23 @@ let IN_TOPSPACE_NOT_CLOSED_COMPLEMENT = prove
         ==> x IN topspace top DIFF c`,
   REWRITE_TAC[IN_DIFF] THEN MESON_TAC[]);;
 
+(* Helper: function values in range *)
+let FUNCTION_RANGE_SUBSET = prove
+ (`!f:A->B s t.
+        (!x. x IN s ==> f x IN t)
+        ==> IMAGE f s SUBSET t`,
+  REWRITE_TAC[SUBSET; IN_IMAGE] THEN MESON_TAC[]);;
+
+(* Helper: equal functions give equal values *)
+let FUNCTION_EQ_IMP_VALUE_EQ = prove
+ (`!f:num->A g n. f = g ==> f n = g n`,
+  MESON_TAC[]);;
+
+(* Helper: contrapositive for function inequality *)
+let FUNCTION_NEQ_EXISTS_COMPONENT = prove
+ (`!f:num->A g. ~(f = g) <=> (?n. ~(f n = g n))`,
+  REWRITE_TAC[FUN_EQ_THM] THEN MESON_TAC[]);;
+
 (* Helper: open intervals in unit interval are open *)
 let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
  (`!a b. &0 <= a /\ a < b /\ b <= &1
