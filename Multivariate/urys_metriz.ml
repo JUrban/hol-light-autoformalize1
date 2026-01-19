@@ -243,6 +243,13 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
    defining custom pairing functions, per CLAUDE.md guidance to avoid
    duplicating library infrastructure. *)
 
+(* Note: SECOND_COUNTABLE_IMP_SEPARABLE_SPACE from metric.ml shows that
+   second-countable spaces have countable dense subsets. This could potentially
+   be useful for constructing the separating function family, as a countable
+   dense subset can be enumerated and used to index separation requirements.
+   The separable_space property gives ?c. COUNTABLE c /\ c SUBSET topspace /\
+   closure_of c = topspace. For future work on SEPARATING_FUNCTIONS. *)
+
 (* Helper: implication from conditional inequality *)
 let COND_NE_IMP = prove
  (`!b x y z. (~((if b then x else y) = z) ==> b) <=> b \/ (y = z)`,
