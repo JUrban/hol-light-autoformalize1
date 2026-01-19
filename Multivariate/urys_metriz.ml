@@ -763,3 +763,8 @@ let COND_EXPAND_EQ = prove
 let COND_NE_EXPAND = prove
  (`!b x y z. ~((if b then x else y) = z) <=> (b /\ ~(x = z)) \/ (~b /\ ~(y = z))`,
   MESON_TAC[]);;
+
+(* Helper: conditional set membership *)
+let IN_COND_SET_SIMPLE = prove
+ (`!b s t x. x IN (if b then s else t) <=> (b ==> x IN s) /\ (~b ==> x IN t)`,
+  MESON_TAC[]);;
