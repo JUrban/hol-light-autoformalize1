@@ -768,3 +768,23 @@ let COND_NE_EXPAND = prove
 let IN_COND_SET_SIMPLE = prove
  (`!b s t x. x IN (if b then s else t) <=> (b ==> x IN s) /\ (~b ==> x IN t)`,
   MESON_TAC[]);;
+
+(* Helper: unit interval contains specific points *)
+let UNIT_INTERVAL_ENDPOINTS = prove
+ (`&0 IN real_interval[&0,&1] /\ &1 IN real_interval[&0,&1]`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: 1/2 is in unit interval *)
+let HALF_IN_UNIT_INTERVAL_ALT = prove
+ (`&1 / &2 IN real_interval[&0,&1]`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: subset reflexivity *)
+let SUBSET_REFL_ALT = prove
+ (`!s. s SUBSET s`,
+  REWRITE_TAC[SUBSET]);;
+
+(* Helper: conditional equality cases *)
+let COND_EQ_CASES = prove
+ (`!b x y z. (if b then x else y) = z <=> b /\ x = z \/ ~b /\ y = z`,
+  MESON_TAC[]);;
