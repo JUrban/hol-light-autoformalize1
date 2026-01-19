@@ -271,6 +271,16 @@ let HALF_ONE_OPEN_IN_UNIT = prove
   MATCH_MP_TAC OPEN_IN_UNIT_INTERVAL_SUBINTERVAL THEN
   REAL_ARITH_TAC);;
 
+(* Helper: simple set lemma *)
+let SUBSET_UNION_LEFT = prove
+ (`!s t. s SUBSET s UNION t`,
+  SET_TAC[]);;
+
+(* Helper: simple set lemma *)
+let SUBSET_UNION_RIGHT = prove
+ (`!s t. t SUBSET s UNION t`,
+  SET_TAC[]);;
+
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
  (`!top:A topology f:num->A->real.
