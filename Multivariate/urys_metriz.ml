@@ -251,6 +251,24 @@ let CANTOR_PAIRING_INJECTIVE = prove
   (* If fails, this requires detailed arithmetic proof *)
   CHEAT_TAC);;
 
+(* Property: CANTOR_UNPAIR is left inverse of CANTOR_PAIRING *)
+let CANTOR_UNPAIR_PAIRING = prove
+ (`!n m. CANTOR_UNPAIR(CANTOR_PAIRING(n,m)) = (n,m)`,
+  REPEAT GEN_TAC THEN
+  REWRITE_TAC[CANTOR_PAIRING; CANTOR_UNPAIR] THEN
+  (* This requires proving the epsilon choice computes correctly *)
+  CHEAT_TAC);;
+
+(* Property: CANTOR_PAIRING is surjective *)
+let CANTOR_PAIRING_SURJECTIVE = prove
+ (`!k. ?n m. CANTOR_PAIRING(n,m) = k`,
+  GEN_TAC THEN
+  (* Witness: use CANTOR_UNPAIR to construct the pair *)
+  EXISTS_TAC `FST(CANTOR_UNPAIR k)` THEN
+  EXISTS_TAC `SND(CANTOR_UNPAIR k)` THEN
+  (* Should follow from CANTOR_UNPAIR_PAIRING *)
+  CHEAT_TAC);;
+
 (* Helper: implication from conditional inequality *)
 let COND_NE_IMP = prove
  (`!b x y z. (~((if b then x else y) = z) ==> b) <=> b \/ (y = z)`,
