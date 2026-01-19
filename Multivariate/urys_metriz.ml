@@ -73,7 +73,16 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
   REPEAT STRIP_TAC THEN
   EXISTS_TAC `\x:A. \n:num. (f:num->A->real) n x` THEN
   CONJ_TAC THENL
-   [CHEAT_TAC;  (* embedding_map part *)
+   [REWRITE_TAC[embedding_map; homeomorphic_map] THEN
+    CONJ_TAC THENL
+     [CHEAT_TAC;  (* quotient_map part - needs open map or similar *)
+      (* Injectivity *)
+      MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
+      EQ_TAC THENL [ALL_TAC; SIMP_TAC[]] THEN
+      ONCE_REWRITE_TAC[GSYM CONTRAPOS_THM] THEN
+      REWRITE_TAC[FUN_EQ_THM] THEN DISCH_TAC THEN
+      FIRST_X_ASSUM(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
+      ASM_REWRITE_TAC[] THEN MESON_TAC[]];
     REWRITE_TAC[]]);;
 
 (* Helper: [0,1] as a subspace of reals is metrizable *)
