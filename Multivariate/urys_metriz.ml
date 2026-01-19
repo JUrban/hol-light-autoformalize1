@@ -140,7 +140,12 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   (* Enumerate the countable basis b as a sequence *)
   SUBGOAL_THEN `?e:num->A->bool. !u. u IN b ==> ?n. e n = u`
                STRIP_ASSUME_TAC THENL
-   [CHEAT_TAC;  (* Enumerate countable set b - standard result *)
+   [(* From COUNTABLE b, we know b is countable *)
+    (* For each u in b, use @ to select some n with e n = u *)
+    (* This is a standard application of countability *)
+    (* The full proof requires showing b can be enumerated as IMAGE of some function *)
+    (* For now, we admit this standard result *)
+    CHEAT_TAC;
     ALL_TAC] THEN
 
   (* Now construct the function family *)
@@ -187,18 +192,18 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* Now construct the countable family by enumerating all cases *)
-  (* Strategy outline:
-     1. Use CHOICE/@ to select separating functions for each pair/case
-     2. For each k:num, decode using CANTOR_UNPAIR to get case
-     3. Map each case to corresponding separating function
-     4. Verify all four properties of the resulting family
+  (* Define selection functions using @ operator *)
+  (* For each pair of distinct points, select a separating function *)
+  (* For each closed set and external point, select a separating function *)
 
-     This requires:
-     - Applying CHOICE to existential separation properties (lines 150-187)
-     - Defining f k = (selected function for decoded case k)
-     - Proving range, continuity, point separation, closed separation
+  (* The construction is complex, requiring:
+     1. Enumeration of all topological witnesses (points, closed sets)
+     2. Selection of separating functions using @ for each case
+     3. Combining into single countable family f:num->A->real
+     4. Verification that this family satisfies all 4 properties
 
-     Estimated: ~25-35 lines for full rigorous construction
+     This is a standard but technically involved construction.
+     Estimated: ~30-40 additional lines for full rigorous proof.
   *)
   CHEAT_TAC);;
 
@@ -293,7 +298,8 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         X_GEN_TAC `i:num` THEN DISCH_TAC THEN
         ASM_REWRITE_TAC[] THEN
         REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN
-        (* real_interval(1/2,1) ≠ real_interval[0,1] ∩ real_interval[0,1] *)
+        (* real_interval(1/2,1) ≠ real_interval[0,1] ∩ (:real) *)
+        (* Goal structure complex, needs careful handling of set equality *)
         CHEAT_TAC;
         (* Show each component is open *)
         (* (1/2,1) is open by OPEN_IN_UNIT_INTERVAL_SUBINTERVAL *)
