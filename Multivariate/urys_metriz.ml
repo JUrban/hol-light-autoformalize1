@@ -2232,25 +2232,7 @@ let INSERT_NONEMPTY = prove
   SET_TAC[]);;
 
 (* Helper: union with universe *)
-let UNION_UNIV_RIGHT = prove
- (`!s. s UNION (:A) = (:A)`,
-  SET_TAC[]);;
-
-(* Helper: union with universe *)
-let UNION_UNIV_LEFT = prove
- (`!s. (:A) UNION s = (:A)`,
-  SET_TAC[]);;
-
 (* Helper: intersection with universe *)
-let INTER_UNIV_RIGHT = prove
- (`!s. s INTER (:A) = s`,
-  SET_TAC[]);;
-
-(* Helper: intersection with universe *)
-let INTER_UNIV_LEFT = prove
- (`!s. (:A) INTER s = s`,
-  SET_TAC[]);;
-
 (* Helper: diff with empty *)
 let DIFF_EMPTY_RIGHT = prove
  (`!s. s DIFF {} = s`,
