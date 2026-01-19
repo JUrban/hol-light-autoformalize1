@@ -280,6 +280,13 @@ let IN_DIFF_CONTRAPOS = prove
  (`!s t x:A. x IN s /\ ~(x IN t) ==> x IN s DIFF t`,
   REWRITE_TAC[IN_DIFF]);;
 
+(* Helper: subset and image *)
+let SUBSET_IMAGE_INJ = prove
+ (`!f:A->B s t. (!x y. x IN s /\ y IN s /\ f x = f y ==> x = y) /\
+                 t SUBSET s
+                 ==> (IMAGE f t SUBSET IMAGE f s)`,
+  REWRITE_TAC[SUBSET; IN_IMAGE] THEN MESON_TAC[]);;
+
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
