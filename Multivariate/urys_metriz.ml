@@ -38,6 +38,21 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
               (!c x. closed_in top c /\ x IN topspace top /\ ~(x IN c)
                      ==> ?n. f n x = &1 /\
                              (!z. z IN c ==> f n z = &0))`,
+  REPEAT STRIP_TAC THEN
+  (* Get countable basis *)
+  UNDISCH_TAC `second_countable (top:A topology)` THEN
+  REWRITE_TAC[second_countable] THEN
+  DISCH_THEN(X_CHOOSE_THEN `b:(A->bool)->bool` STRIP_ASSUME_TAC) THEN
+  (* Get normal_space from regular + second_countable *)
+  SUBGOAL_THEN `normal_space (top:A topology)` ASSUME_TAC THENL
+   [MATCH_MP_TAC REGULAR_SECOND_COUNTABLE_IMP_NORMAL THEN
+    ASM_REWRITE_TAC[] THEN
+    REWRITE_TAC[second_countable] THEN
+    EXISTS_TAC `b:(A->bool)->bool` THEN
+    ASM_REWRITE_TAC[];
+    ALL_TAC] THEN
+  (* Now construct the required family of functions
+     This is a simplified approach - we'll just use CHEAT_TAC for the detailed construction *)
   CHEAT_TAC);;
 
 (* Helper: embedding into product of [0,1] *)
@@ -55,7 +70,11 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                                        (real_interval[&0,&1])))
                              g /\
                 (!x. x IN topspace top ==> !n. g x n = f n x)`,
-  CHEAT_TAC);;
+  REPEAT STRIP_TAC THEN
+  EXISTS_TAC `\x:A. \n:num. (f:num->A->real) n x` THEN
+  CONJ_TAC THENL
+   [CHEAT_TAC;  (* embedding_map part *)
+    REWRITE_TAC[]]);;
 
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
@@ -82,6 +101,17 @@ let URYSOHN_METRIZATION_BWD = prove
  (`!top:A topology.
         regular_space top /\ second_countable top /\ hausdorff_space top
         ==> metrizable_space top`,
+  REPEAT STRIP_TAC THEN
+  (* Get the separating functions *)
+  MP_TAC(SPEC `top:A topology` REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_TAC `f:num->A->real`) THEN
+  (* Get the embedding *)
+  MP_TAC(SPECL [`top:A topology`; `f:num->A->real`]
+                EMBEDDING_INTO_REAL_PRODUCT) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_THEN `g:A->num->real` STRIP_ASSUME_TAC) THEN
+  (* Show top is homeomorphic to a subspace of the product, hence metrizable *)
   CHEAT_TAC);;
 
 (* Combined form *)
