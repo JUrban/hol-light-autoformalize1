@@ -423,8 +423,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         CHEAT_TAC;
         (* Prove open set characterization *)
         CHEAT_TAC];
-      (* Prove injectivity *)
-      CHEAT_TAC];
+      (* Prove injectivity: g injective since functions separate points *)
+      (* If g x = g y then !n. f n x = f n y, contradicting assumption 3 unless x=y *)
+      ASM_MESON_TAC[FUN_EQ_THM]];
     (* Prove final property: g x n = f n x where g = \x.\n. f n x *)
     REPEAT STRIP_TAC THEN BETA_TAC THEN REFL_TAC]);;
 
