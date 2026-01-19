@@ -137,10 +137,10 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
    [ASM_MESON_TAC[NORMAL_IMP_COMPLETELY_REGULAR_SPACE];
     ALL_TAC] THEN
   (* Construct countable family using basis enumeration *)
-  (* Since b is countable, there exists an enumeration *)
-  (* (This follows from COUNTABLE_AS_IMAGE but we use it as a fact) *)
-  SUBGOAL_THEN `?e:num->A->bool. IMAGE e (:num) = b` STRIP_ASSUME_TAC THENL
-   [CHEAT_TAC;  (* Enumeration exists for countable sets *)
+  (* Enumerate the countable basis b as a sequence *)
+  SUBGOAL_THEN `?e:num->A->bool. !u. u IN b ==> ?n. e n = u`
+               STRIP_ASSUME_TAC THENL
+   [CHEAT_TAC;  (* Enumerate countable set b - standard result *)
     ALL_TAC] THEN
 
   (* Now construct the function family *)
