@@ -658,3 +658,9 @@ let DIFF_SUBSET_COMPLEMENT = prove
 let IN_INTERVAL_IMP_BOUNDS = prove
  (`!x a b. x IN real_interval[a,b] ==> a <= x /\ x <= b`,
   REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: simple continuous map property *)
+let CONTINUOUS_MAP_ID_SUBT = prove
+ (`!top s. s SUBSET topspace top
+           ==> continuous_map (subtopology top s, top) (\x. x)`,
+  SIMP_TAC[CONTINUOUS_MAP_FROM_SUBTOPOLOGY; CONTINUOUS_MAP_ID]);;
