@@ -143,24 +143,36 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
    [CHEAT_TAC;  (* Enumeration exists for countable sets *)
     ALL_TAC] THEN
 
-  (* For each n, use CANTOR_UNPAIR to get pair (i,j) of basis indices *)
-  (* For point separation: use COMPLETELY_REGULAR_HAUSDORFF_POINT_FUNCTIONS *)
-  (* This gives a separating function for each pair of distinct points *)
+  (* Now construct the function family *)
+  (* We'll use choice to get separating functions for each needed case *)
 
-  (* Strategy: Use choice to select a separating function for each needed case *)
-  (* Case 1: Points x,y where x≠y - use completely_regular *)
-  (* Case 2: Closed set c and point x∉c - use completely_regular *)
+  (* For each pair of distinct points, completely_regular gives a function *)
+  SUBGOAL_THEN
+    `!x y:A. x IN topspace top /\ y IN topspace top /\ ~(x = y)
+             ==> ?g. continuous_map
+                       (top,subtopology euclideanreal (real_interval[&0,&1]))
+                       g /\
+                     ~(g x = g y)`
+    ASSUME_TAC THENL
+   [REPEAT STRIP_TAC THEN
+    MATCH_MP_TAC COMPLETELY_REGULAR_HAUSDORFF_POINT_FUNCTIONS THEN
+    ASM_REWRITE_TAC[];
+    ALL_TAC] THEN
 
-  (* The key is that for a second countable space, *)
-  (* the set of all such separation problems is countable *)
+  (* For each closed set and external point, completely_regular gives function *)
+  SUBGOAL_THEN
+    `!c x:A. closed_in top c /\ x IN topspace top /\ ~(x IN c)
+             ==> ?g. continuous_map
+                       (top,subtopology euclideanreal (real_interval[&0,&1]))
+                       g /\
+                     g x = &1 /\ (!z. z IN c ==> g z = &0)`
+    ASSUME_TAC THENL
+   [CHEAT_TAC;  (* Follows from normal_space + Urysohn *)
+    ALL_TAC] THEN
 
-  (* For each n, construct f_n based on CANTOR_UNPAIR n: *)
-  (* - If it corresponds to a point separation need, use that function *)
-  (* - If it corresponds to a closed set separation, use that function *)
-  (* - Otherwise, use the constant &1/&2 function *)
-
-  (* Full construction requires careful enumeration and choice *)
-  (* Gradual approach: structure in place, details remain *)
+  (* Now use choice to select functions and enumerate them *)
+  (* This requires careful construction with CANTOR_UNPAIR *)
+  (* The full construction and verification is complex *)
   CHEAT_TAC);;
 
 (* Helper: explicit pairing function for enumeration *)
