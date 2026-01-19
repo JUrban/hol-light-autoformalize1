@@ -2082,11 +2082,6 @@ let FINITE_UNION_SING = prove
  (`!s x. FINITE s ==> FINITE (s UNION {x})`,
   SIMP_TAC[FINITE_UNION; FINITE_SING]);;
 
-(* Helper: subset transitivity *)
-let SUBSET_TRANS_SIMPLE = prove
- (`!s t u. s SUBSET t /\ t SUBSET u ==> s SUBSET u`,
-  SET_TAC[]);;
-
 (* Helper: image composition *)
 let IMAGE_COMPOSE_GEN = prove
  (`!f g s. IMAGE f (IMAGE g s) = IMAGE (f o g) s`,
@@ -2124,28 +2119,8 @@ let REAL_ADD_AC_SIMPLE = prove
   REAL_ARITH_TAC);;
 
 (* Helper: real arithmetic *)
-let REAL_MUL_LZERO = prove
- (`!x. &0 * x = &0`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real arithmetic *)
-let REAL_MUL_RZERO = prove
- (`!x. x * &0 = &0`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real arithmetic *)
 let REAL_ADD_RZERO = prove
  (`!x. x + &0 = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real inequality *)
-let REAL_LE_REFL_SIMPLE = prove
- (`!x. x <= x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real inequality *)
-let REAL_LT_IMP_NE = prove
- (`!x y. x < y ==> ~(x = y)`,
   REAL_ARITH_TAC);;
 
 (* Helper: interval bounds *)
@@ -2217,11 +2192,6 @@ let CARTESIAN_PRODUCT_SUBSET_SIMPLE = prove
            ==> cartesian_product k f SUBSET cartesian_product k g`,
   REWRITE_TAC[cartesian_product; SUBSET; IN_ELIM_THM] THEN SET_TAC[]);;
 
-(* Helper: topspace subset *)
-let TOPSPACE_SUBTOPOLOGY_SUBSET = prove
- (`!top s. topspace (subtopology top s) SUBSET s`,
-  REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN SET_TAC[]);;
-
 (* Helper: element not in empty set *)
 let NOT_IN_EMPTY_SIMPLE = prove
  (`!x. ~(x IN {})`,
@@ -2252,11 +2222,6 @@ let IN_OPEN_INTERVAL_BOUNDS = prove
   REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
 (* Helper: nonempty has element *)
-(* Helper: subset antisymmetry *)
-let SUBSET_ANTISYM_SIMPLE = prove
- (`!s t. s SUBSET t /\ t SUBSET s ==> s = t`,
-  SET_TAC[]);;
-
 (* Helper: element in universal set *)
 let IN_UNIV_SIMPLE = prove
  (`!x:A. x IN (:A)`,
@@ -2273,11 +2238,6 @@ let REAL_LT_TOTAL = prove
   REAL_ARITH_TAC);;
 
 (* Helper: real comparisons *)
-let REAL_LE_LT = prove
- (`!x y. x <= y <=> x < y \/ x = y`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real comparisons *)
 let REAL_NOT_LT = prove
  (`!x y. ~(x < y) <=> y <= x`,
   REAL_ARITH_TAC);;
@@ -2285,26 +2245,6 @@ let REAL_NOT_LT = prove
 (* Helper: real comparisons *)
 let REAL_NOT_LE = prove
  (`!x y. ~(x <= y) <=> y < x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real inequality transitivity *)
-let REAL_LT_TRANS_SIMPLE = prove
- (`!x y z. x < y /\ y < z ==> x < z`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real inequality transitivity *)
-let REAL_LE_TRANS_SIMPLE = prove
- (`!x y z. x <= y /\ y <= z ==> x <= z`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real mixed transitivity *)
-let REAL_LTE_TRANS = prove
- (`!x y z. x < y /\ y <= z ==> x < z`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real mixed transitivity *)
-let REAL_LET_TRANS = prove
- (`!x y z. x <= y /\ y < z ==> x < z`,
   REAL_ARITH_TAC);;
 
 (* Helper: subset of intersection *)
