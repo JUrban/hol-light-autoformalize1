@@ -2052,3 +2052,77 @@ let REAL_INTERVAL_NONEMPTY_CLOSED = prove
 let DIFF_EQ_EMPTY = prove
  (`!s. s DIFF s = {}`,
   SET_TAC[]);;
+
+(* Helper: real division *)
+let REAL_DIV_1 = prove
+ (`!x. x / &1 = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real subtraction *)
+let REAL_SUB_REFL = prove
+ (`!x. x - x = &0`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real negation *)
+let REAL_NEG_0 = prove
+ (`--(&0) = &0`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real multiplication by one *)
+let REAL_MUL_LID = prove
+ (`!x. &1 * x = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real multiplication by one *)
+let REAL_MUL_RID = prove
+ (`!x. x * &1 = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: subset and element *)
+let SUBSET_ELEMENT = prove
+ (`!s t x. s SUBSET t /\ x IN s ==> x IN t`,
+  SET_TAC[]);;
+
+(* Helper: subset and image *)
+let IMAGE_SUBSET_SIMPLE = prove
+ (`!f s t. s SUBSET t ==> IMAGE f s SUBSET IMAGE f t`,
+  REWRITE_TAC[IMAGE_SUBSET]);;
+
+(* Helper: preimage of universal set *)
+let PREIMAGE_UNIV_SIMPLE = prove
+ (`!f. {x | f x IN (:real)} = (:A)`,
+  REWRITE_TAC[EXTENSION; IN_ELIM_THM; IN_UNIV]);;
+
+(* Helper: preimage subset *)
+let PREIMAGE_SUBSET_SIMPLE = prove
+ (`!f s t. s SUBSET t ==> {x | f x IN s} SUBSET {x | f x IN t}`,
+  REWRITE_TAC[SUBSET; IN_ELIM_THM] THEN SET_TAC[]);;
+
+(* Helper: continuous map composition is continuous *)
+let CONTINUOUS_MAP_COMPOSE_SIMPLE = prove
+ (`!top1 top2 top3 f g.
+     continuous_map (top1, top2) f /\
+     continuous_map (top2, top3) g
+     ==> continuous_map (top1, top3) (g o f)`,
+  REWRITE_TAC[CONTINUOUS_MAP_COMPOSE]);;
+
+(* Helper: image of empty set *)
+let IMAGE_EMPTY_SIMPLE = prove
+ (`!f. IMAGE f {} = {}`,
+  REWRITE_TAC[IMAGE_CLAUSES]);;
+
+(* Helper: finite empty set *)
+let FINITE_EMPTY_SIMPLE = prove
+ (`FINITE {}`,
+  REWRITE_TAC[FINITE_EMPTY]);;
+
+(* Helper: cartesian product subset *)
+let CARTESIAN_PRODUCT_SUBSET_SIMPLE = prove
+ (`!k f g. (!i. i IN k ==> f i SUBSET g i)
+           ==> cartesian_product k f SUBSET cartesian_product k g`,
+  REWRITE_TAC[cartesian_product; SUBSET; IN_ELIM_THM] THEN SET_TAC[]);;
+
+(* Helper: topspace subset *)
+let TOPSPACE_SUBTOPOLOGY_SUBSET = prove
+ (`!top s. topspace (subtopology top s) SUBSET s`,
+  REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN SET_TAC[]);;
