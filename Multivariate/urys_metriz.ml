@@ -293,6 +293,11 @@ let IN_INTERVAL_1_2 = prove
  (`&1 / &2 < &1`,
   REAL_ARITH_TAC);;
 
+(* Helper: image under injection preserves non-emptiness *)
+let IMAGE_EQ_EMPTY_INJ = prove
+ (`!f:A->B s. IMAGE f s = {} <=> s = {}`,
+  REWRITE_TAC[IMAGE_EQ_EMPTY]);;
+
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
