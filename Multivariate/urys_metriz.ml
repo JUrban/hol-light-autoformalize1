@@ -98,6 +98,10 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       ALL_TAC] THEN
     CONJ_TAC THENL
      [(* Prove open_map *)
+      (* Strategy: use fourth property to show images of open sets are open *)
+      (* For open u and x in u, topspace top \ u is closed *)
+      (* Fourth property gives function that is 1 at x and 0 outside u *)
+      (* This can be used to construct open neighborhoods in product *)
       CHEAT_TAC;
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
