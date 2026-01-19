@@ -464,6 +464,18 @@ let IMAGE_ID = prove
  (`!s:A->bool. IMAGE (\x. x) s = s`,
   REWRITE_TAC[IMAGE_ID]);;
 
+(* Helper: continuous map image in topspace *)
+let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
+ (`!top top' (f:A->B).
+        continuous_map (top,top') f
+        ==> IMAGE f (topspace top) SUBSET topspace top'`,
+  SIMP_TAC[CONTINUOUS_MAP]);;
+
+(* Helper: subset transitivity *)
+let SUBSET_TRANS_ALT = prove
+ (`!s:A->bool t u. s SUBSET t /\ t SUBSET u ==> s SUBSET u`,
+  REWRITE_TAC[SUBSET] THEN MESON_TAC[]);;
+
 (* Helper: open intervals in unit interval are open *)
 let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
  (`!a b. &0 <= a /\ a < b /\ b <= &1
