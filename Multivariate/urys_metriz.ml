@@ -206,21 +206,18 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (* Gradual partial approach per CLAUDE.md *)
-
-  (* The construction is complex: need to enumerate infinitely many pairs
-     and closed sets, then combine using choice. This requires machinery
-     beyond simple tactics. *)
+  (* Gradual approach per CLAUDE.md *)
 
   (* Attempts tried:
-     - SKOLEM_THM with ASSUME: "REWRITES_CONV" error
+     - SKOLEM_THM with ASSUME + REWRITE: "REWRITES_CONV" error
      - ASM_MESON_TAC: too deep (80266+ steps)
-     - Direct construction: requires pairing enumeration + choice combination *)
+     - SUBGOAL_THEN + MATCH_MP_TAC: wrong tactic for existence goal *)
 
-  (* TODO for future: Build explicit construction using:
-     1. CANTOR_PAIRING to enumerate pairs from N×N
-     2. Choice function extraction for each pair type
-     3. Combine into single family f:num->A->real *)
+  (* Required: explicit construction combining:
+     - Enumerated basis (have: e:num->A->bool)
+     - Point separation functions (have: existence for each pair)
+     - Closed set separation functions (have: existence for each pair)
+     Need: CANTOR_PAIRING to index all constraints, choice to select functions *)
 
   CHEAT_TAC);;
 
@@ -240,7 +237,17 @@ let CANTOR_UNPAIR = new_definition
 
 (* Note: Full bijectivity proofs would require ~30-40 lines *)
 (* These are standard results about Cantor pairing *)
-(* For now, definitions are available for use *)
+(* Gradual approach: prove basic properties step by step *)
+
+(* Property: CANTOR_PAIRING produces distinct values for distinct pairs *)
+let CANTOR_PAIRING_INJECTIVE = prove
+ (`!n1 m1 n2 m2. CANTOR_PAIRING(n1,m1) = CANTOR_PAIRING(n2,m2)
+                 ==> n1 = n2 /\ m1 = m2`,
+  REWRITE_TAC[CANTOR_PAIRING] THEN
+  REPEAT GEN_TAC THEN
+  DISCH_TAC THEN
+  (* Prove this using arithmetic properties *)
+  CHEAT_TAC);;
 
 (* Helper: implication from conditional inequality *)
 let COND_NE_IMP = prove
