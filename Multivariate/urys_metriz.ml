@@ -2201,3 +2201,83 @@ let IN_UNIV_SIMPLE = prove
 let UNIV_NONEMPTY = prove
  (`~((:A) = {})`,
   SET_TAC[IN_UNIV]);;
+
+(* Helper: real comparisons *)
+let REAL_LT_TOTAL = prove
+ (`!x y. x < y \/ x = y \/ y < x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real comparisons *)
+let REAL_LE_LT = prove
+ (`!x y. x <= y <=> x < y \/ x = y`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real comparisons *)
+let REAL_NOT_LT = prove
+ (`!x y. ~(x < y) <=> y <= x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real comparisons *)
+let REAL_NOT_LE = prove
+ (`!x y. ~(x <= y) <=> y < x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real inequality transitivity *)
+let REAL_LT_TRANS_SIMPLE = prove
+ (`!x y z. x < y /\ y < z ==> x < z`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real inequality transitivity *)
+let REAL_LE_TRANS_SIMPLE = prove
+ (`!x y z. x <= y /\ y <= z ==> x <= z`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real mixed transitivity *)
+let REAL_LTE_TRANS = prove
+ (`!x y z. x < y /\ y <= z ==> x < z`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real mixed transitivity *)
+let REAL_LET_TRANS = prove
+ (`!x y z. x <= y /\ y < z ==> x < z`,
+  REAL_ARITH_TAC);;
+
+(* Helper: subset of intersection *)
+let SUBSET_INTER_ABSORPTION = prove
+ (`!s t. s SUBSET t ==> s INTER t = s`,
+  SET_TAC[]);;
+
+(* Helper: subset of union *)
+let SUBSET_UNION_ABSORPTION = prove
+ (`!s t. s SUBSET t ==> s UNION t = t`,
+  SET_TAC[]);;
+
+(* Helper: diff and subset *)
+let DIFF_SUBSET = prove
+ (`!s t. s DIFF t SUBSET s`,
+  SET_TAC[]);;
+
+(* Helper: image and union *)
+let IMAGE_UNION_SIMPLE = prove
+ (`!f s t. IMAGE f (s UNION t) = IMAGE f s UNION IMAGE f t`,
+  REWRITE_TAC[IMAGE_UNION]);;
+
+(* Helper: image and intersection subset *)
+let IMAGE_INTER_SUBSET = prove
+ (`!f s t. IMAGE f (s INTER t) SUBSET IMAGE f s INTER IMAGE f t`,
+  SET_TAC[IN_IMAGE]);;
+
+(* Helper: preimage and union *)
+let PREIMAGE_UNION = prove
+ (`!f s t. {x | f x IN s UNION t} = {x | f x IN s} UNION {x | f x IN t}`,
+  REWRITE_TAC[EXTENSION; IN_ELIM_THM; IN_UNION]);;
+
+(* Helper: preimage and intersection *)
+let PREIMAGE_INTER = prove
+ (`!f s t. {x | f x IN s INTER t} = {x | f x IN s} INTER {x | f x IN t}`,
+  REWRITE_TAC[EXTENSION; IN_ELIM_THM; IN_INTER]);;
+
+(* Helper: preimage of empty *)
+let PREIMAGE_EMPTY = prove
+ (`!f. {x | f x IN {}} = {}`,
+  REWRITE_TAC[EXTENSION; IN_ELIM_THM; NOT_IN_EMPTY]);;
