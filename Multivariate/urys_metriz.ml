@@ -159,10 +159,19 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
 let CANTOR_PAIRING = new_definition
  `CANTOR_PAIRING (n:num,m:num) = (n + m) * (n + m + 1) DIV 2 + m`;;
 
-(* Note: CANTOR_PAIRING provides explicit bijection num#num -> num *)
-(* This can be used to enumerate countable products *)
-(* Full development of unpair and bijectivity properties: TODO *)
-(* For now, the definition is available for future use *)
+(* Helper: inverse of Cantor pairing *)
+(* For a given k, find the unique (n,m) such that CANTOR_PAIRING(n,m) = k *)
+(* We can compute this by finding the "diagonal" s = n+m, then extracting m *)
+let CANTOR_UNPAIR = new_definition
+ `CANTOR_UNPAIR k =
+    let s = @s. s * (s + 1) DIV 2 <= k /\ k < (s + 1) * (s + 2) DIV 2 in
+    let m = k - s * (s + 1) DIV 2 in
+    let n = s - m in
+    (n,m)`;;
+
+(* Note: Full bijectivity proofs would require ~30-40 lines *)
+(* These are standard results about Cantor pairing *)
+(* For now, definitions are available for use *)
 
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
