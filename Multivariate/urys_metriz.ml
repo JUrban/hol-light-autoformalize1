@@ -411,18 +411,16 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
     REWRITE_TAC[embedding_map; homeomorphic_map] THEN
     CONJ_TAC THENL
      [(* Prove quotient_map to subtopology of image *)
-      REWRITE_TAC[quotient_map] THEN
-      (* Subtopology has topspace = the subset *)
-      REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN
+      (* Use QUOTIENT_MAP_ONTO_IMAGE which combines IMAGE subset + open characterization *)
+      MATCH_MP_TAC QUOTIENT_MAP_ONTO_IMAGE THEN
       CONJ_TAC THENL
-       [(* IMAGE g topspace ∩ topspace product = IMAGE g topspace *)
-        (* Mathematically: follows from CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE *)
-        (* Attempted 7 approaches: MP_TAC+ANTS_TAC, MATCH_MP_TAC, ASM_SIMP_TAC, *)
-        (* MESON_TAC, STRIP_TAC, SUBGOAL_THEN+MESON, SUBGOAL_THEN+ACCEPT_TAC *)
-        (* All failed due to tactical issues, not mathematical problems *)
-        (* Per CLAUDE.md: don't get endlessly stuck, admit temporarily *)
-        CHEAT_TAC;
-        (* Prove open set characterization *)
+       [(* Prove IMAGE g topspace SUBSET topspace product *)
+        (* g continuous ==> IMAGE subset via CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE *)
+        MATCH_MP_TAC CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE THEN
+        REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
+        GEN_TAC THEN REWRITE_TAC[ETA_AX] THEN ASM_REWRITE_TAC[];
+        (* Prove open set characterization for quotient_map *)
+        (* Key textbook property: need to use separation of closed sets *)
         CHEAT_TAC];
       (* Prove injectivity: g injective since functions separate points *)
       (* If g x = g y then !n. f n x = f n y, contradicting assumption 3 unless x=y *)
