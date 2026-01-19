@@ -44,6 +44,19 @@ let CONTINUOUS_MAP_COMPLEMENT_UNIT_INTERVAL = prove
   (* This follows from continuity of affine maps and range preservation *)
   CHEAT_TAC);;
 
+(* Helper: normal space gives Urysohn functions for closed sets *)
+let NORMAL_SPACE_URYSOHN_FUNCTION = prove
+ (`!top c d:A->bool.
+        normal_space top /\ closed_in top c /\ closed_in top d /\ DISJOINT c d
+        ==> ?f. continuous_map
+                  (top,subtopology euclideanreal (real_interval[&0,&1])) f /\
+                (!x. x IN c ==> f x = &0) /\
+                (!x. x IN d ==> f x = &1)`,
+  REPEAT STRIP_TAC THEN
+  MP_TAC(ISPECL [`top:A topology`; `c:A->bool`; `d:A->bool`; `&0`; `&1`]
+                URYSOHN_LEMMA) THEN
+  ASM_REWRITE_TAC[REAL_POS]);;
+
 (* Helper: construct separating functions from countable basis *)
 let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
  (`!top:A topology.
