@@ -2281,3 +2281,28 @@ let PREIMAGE_INTER = prove
 let PREIMAGE_EMPTY = prove
  (`!f. {x | f x IN {}} = {}`,
   REWRITE_TAC[EXTENSION; IN_ELIM_THM; NOT_IN_EMPTY]);;
+
+(* Helper: topspace of euclideanreal *)
+let TOPSPACE_EUCLIDEANREAL_UNIV = prove
+ (`topspace euclideanreal = (:real)`,
+  REWRITE_TAC[TOPSPACE_EUCLIDEANREAL]);;
+
+(* Helper: real interval arithmetic *)
+let REAL_INTERVAL_LBOUND = prove
+ (`!a b x. x IN real_interval[a,b] ==> a <= x`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: real interval arithmetic *)
+let REAL_INTERVAL_UBOUND = prove
+ (`!a b x. x IN real_interval[a,b] ==> x <= b`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: membership in diff *)
+let IN_DIFF_SIMPLE = prove
+ (`!x s t. x IN s DIFF t <=> x IN s /\ ~(x IN t)`,
+  REWRITE_TAC[IN_DIFF]);;
+
+(* Helper: complement characterization *)
+let COMPLEMENT_SIMPLE = prove
+ (`!s t u. s = u DIFF t <=> !x. x IN s <=> x IN u /\ ~(x IN t)`,
+  REWRITE_TAC[EXTENSION; IN_DIFF]);;
