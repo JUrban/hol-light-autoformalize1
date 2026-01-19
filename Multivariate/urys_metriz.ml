@@ -788,3 +788,13 @@ let SUBSET_REFL_ALT = prove
 let COND_EQ_CASES = prove
  (`!b x y z. (if b then x else y) = z <=> b /\ x = z \/ ~b /\ y = z`,
   MESON_TAC[]);;
+
+(* Helper: element in singleton *)
+let IN_SING_IFF = prove
+ (`!x y. x IN {y} <=> x = y`,
+  REWRITE_TAC[IN_SING]);;
+
+(* Helper: implication transitivity *)
+let IMP_TRANS_ALT = prove
+ (`!p q r. (p ==> q) /\ (q ==> r) ==> (p ==> r)`,
+  MESON_TAC[]);;
