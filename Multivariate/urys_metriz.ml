@@ -186,11 +186,20 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
         ASM_SIMP_TAC[]]];
     ALL_TAC] THEN
 
-  (* Now use choice to select functions and enumerate them *)
-  (* Use choice axiom for separating functions *)
-  (* The construction requires selecting from existential statements *)
-  (* and enumerating them using a countable enumeration *)
-  (* This is standard but technically involved *)
+  (* Now construct the countable family by enumerating all cases *)
+  (* Strategy outline:
+     1. Use CHOICE/@ to select separating functions for each pair/case
+     2. For each k:num, decode using CANTOR_UNPAIR to get case
+     3. Map each case to corresponding separating function
+     4. Verify all four properties of the resulting family
+
+     This requires:
+     - Applying CHOICE to existential separation properties (lines 150-187)
+     - Defining f k = (selected function for decoded case k)
+     - Proving range, continuity, point separation, closed separation
+
+     Estimated: ~25-35 lines for full rigorous construction
+  *)
   CHEAT_TAC);;
 
 (* Helper: explicit pairing function for enumeration *)
