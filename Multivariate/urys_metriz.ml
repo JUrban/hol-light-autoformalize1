@@ -218,11 +218,13 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       (* Fourth property gives function that is 1 at x and 0 outside u *)
       (* This can be used to construct open neighborhoods in product *)
       REWRITE_TAC[open_map] THEN
-      REPEAT STRIP_TAC THEN
+      X_GEN_TAC `u:A->bool` THEN STRIP_TAC THEN
       (* Need to show: IMAGE g u is open in product topology *)
-      (* Strategy: Show for each point in IMAGE, there's a basic open containing it *)
-      (* We'll use the fourth property with the closed set topspace \ u *)
-      (* This approach works but requires careful product topology reasoning *)
+      (* Strategy: For each x in u, use fourth property with closed topspace \ u *)
+      (* This gives index n where f_n(x) = 1, f_n = 0 outside u *)
+      (* Then {w | w_n > 1/2} is a basic open containing g(x) *)
+      (* Must show this is contained in IMAGE g u - uses that f_n = 0 outside u *)
+      (* Requires detailed product topology and set theory reasoning *)
       CHEAT_TAC;
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
