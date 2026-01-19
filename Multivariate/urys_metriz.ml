@@ -2134,11 +2134,6 @@ let REAL_MUL_RZERO = prove
   REAL_ARITH_TAC);;
 
 (* Helper: real arithmetic *)
-let REAL_ADD_LZERO = prove
- (`!x. &0 + x = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real arithmetic *)
 let REAL_ADD_RZERO = prove
  (`!x. x + &0 = x`,
   REAL_ARITH_TAC);;
@@ -2153,11 +2148,6 @@ let REAL_LT_IMP_NE = prove
  (`!x y. x < y ==> ~(x = y)`,
   REAL_ARITH_TAC);;
 
-(* Helper: real inequality *)
-let REAL_LE_ANTISYM_SIMPLE = prove
- (`!x y. x <= y /\ y <= x ==> x = y`,
-  REAL_ARITH_TAC);;
-
 (* Helper: interval bounds *)
 let REAL_INTERVAL_NONEMPTY_CLOSED = prove
  (`!a b. ~(real_interval[a,b] = {}) <=> a <= b`,
@@ -2167,11 +2157,6 @@ let REAL_INTERVAL_NONEMPTY_CLOSED = prove
 let DIFF_EQ_EMPTY = prove
  (`!s. s DIFF s = {}`,
   SET_TAC[]);;
-
-(* Helper: real division *)
-let REAL_DIV_1 = prove
- (`!x. x / &1 = x`,
-  REAL_ARITH_TAC);;
 
 (* Helper: real subtraction *)
 let REAL_SUB_REFL = prove
@@ -2225,11 +2210,6 @@ let CONTINUOUS_MAP_COMPOSE_SIMPLE = prove
 let IMAGE_EMPTY_SIMPLE = prove
  (`!f. IMAGE f {} = {}`,
   REWRITE_TAC[IMAGE_CLAUSES]);;
-
-(* Helper: finite empty set *)
-let FINITE_EMPTY_SIMPLE = prove
- (`FINITE {}`,
-  REWRITE_TAC[FINITE_EMPTY]);;
 
 (* Helper: cartesian product subset *)
 let CARTESIAN_PRODUCT_SUBSET_SIMPLE = prove
@@ -2347,12 +2327,6 @@ let IMAGE_UNION_SIMPLE = prove
  (`!f s t. IMAGE f (s UNION t) = IMAGE f s UNION IMAGE f t`,
   REWRITE_TAC[IMAGE_UNION]);;
 
-(* Helper: image and intersection subset *)
-let IMAGE_INTER_SUBSET = prove
- (`!f s t. IMAGE f (s INTER t) SUBSET IMAGE f s INTER IMAGE f t`,
-  SET_TAC[IN_IMAGE]);;
-
-(* Helper: preimage and union *)
 (* Helper: topspace of euclideanreal *)
 let TOPSPACE_EUCLIDEANREAL_UNIV = prove
  (`topspace euclideanreal = (:real)`,
@@ -2424,21 +2398,6 @@ let DIFF_UNION_DISTRIB = prove
   SET_TAC[]);;
 
 (* Helper: real abs properties *)
-let REAL_ABS_0 = prove
- (`abs(&0) = &0`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real abs properties *)
-let REAL_ABS_NEG = prove
- (`!x. abs(--x) = abs(x)`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real abs properties *)
-let REAL_ABS_POS = prove
- (`!x. &0 <= abs(x)`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real abs properties *)
 let REAL_ABS_REFL = prove
  (`!x. abs(abs(x)) = abs(x)`,
   REAL_ARITH_TAC);;
@@ -2447,16 +2406,6 @@ let REAL_ABS_REFL = prove
 let REAL_ABS_TRIANGLE_SIMPLE = prove
  (`!x y. abs(x + y) <= abs(x) + abs(y)`,
   REAL_ARITH_TAC);;
-
-(* Helper: finite operations *)
-let FINITE_INSERT_SIMPLE = prove
- (`!x s. FINITE s ==> FINITE (x INSERT s)`,
-  REWRITE_TAC[FINITE_INSERT]);;
-
-(* Helper: finite operations *)
-let FINITE_UNION_SIMPLE = prove
- (`!s t. FINITE s /\ FINITE t ==> FINITE (s UNION t)`,
-  REWRITE_TAC[FINITE_UNION]);;
 
 (* Helper: finite operations *)
 let FINITE_INTER_SIMPLE = prove
