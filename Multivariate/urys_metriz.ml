@@ -375,6 +375,7 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* TODO: Prove {i | interval_i ≠ [0,1]} ⊆ {n} *)
         CHEAT_TAC;
         (* Show each component is open *)
+        (* TODO: Use HALF_ONE_OPEN_IN_UNIT for (1/2,1) case, OPEN_IN_TOPSPACE for [0,1] case *)
         CHEAT_TAC;
         (* Show y in cartesian product *)
         (* This is complex: y = f applied to x, but we need y IN basic open *)
