@@ -64,6 +64,22 @@ let NORMAL_SPACE_URYSOHN_FUNCTION = prove
                 URYSOHN_LEMMA) THEN
   ASM_REWRITE_TAC[REAL_POS]);;
 
+(* Helper: T3 + Hausdorff gives point separation via closed sets *)
+let T3_HAUSDORFF_POINT_SEPARATION = prove
+ (`!top x y:A.
+        regular_space top /\ hausdorff_space top /\
+        x IN topspace top /\ y IN topspace top /\ ~(x = y)
+        ==> ?c. closed_in top c /\ x IN c /\ ~(y IN c)`,
+  REPEAT STRIP_TAC THEN
+  FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [hausdorff_space]) THEN
+  DISCH_THEN(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_THEN `u:A->bool` (X_CHOOSE_THEN `v:A->bool`
+    STRIP_ASSUME_TAC)) THEN
+  EXISTS_TAC `topspace top DIFF v:A->bool` THEN
+  ASM_SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE; IN_DIFF] THEN
+  ASM SET_TAC[]);;
+
 (* Helper: construct separating functions from countable basis *)
 let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
  (`!top:A topology.
