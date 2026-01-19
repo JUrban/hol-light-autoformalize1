@@ -296,10 +296,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
         X_GEN_TAC `i:num` THEN
         REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV] THEN
-        (* TODO: Prove ~((if i=n then interval(1/2,1) else interval[0,1]) = interval[0,1]) ==> i=n *)
-        (*       Strategy: ASM_CASES_TAC on i=n, then both cases are straightforward *)
-        (*       Case i=n: goal becomes ~(interval(1/2,1) = interval[0,1]) ==> T *)
-        (*       Case i<>n: goal becomes ~(interval[0,1] = interval[0,1]) ==> i=n, antecedent false *)
+        (* TODO: Use COND_CASES_TAC to split on conditional *)
+        (*       After split: i=n gives ~(interval(1/2,1)=interval[0,1])=>n=n (trivial) *)
+        (*                   i<>n gives ~(interval[0,1]=interval[0,1])=>i=n (false antecedent) *)
         CHEAT_TAC;
         (* Show each component is open *)
         CHEAT_TAC;
@@ -724,3 +723,17 @@ let EMBEDDING_MAP_IMP_INJECTIVE = prove
                            ==> x = y)`,
   REWRITE_TAC[embedding_map; homeomorphic_map] THEN
   MESON_TAC[]);;
+
+(* Helper: nonempty interval *)
+let REAL_INTERVAL_NONEMPTY_OPEN = prove
+ (`!a b. a < b ==> ~(real_interval(a,b) = {})`,
+  REPEAT STRIP_TAC THEN
+  SUBGOAL_THEN `(a + b) / &2 IN real_interval(a,b)` MP_TAC THENL [
+    REWRITE_TAC[IN_REAL_INTERVAL] THEN ASM_REAL_ARITH_TAC;
+    ASM_REWRITE_TAC[NOT_IN_EMPTY]
+  ]);;
+
+(* Helper: open interval subset closed *)
+let REAL_INTERVAL_OPEN_SUBSET_CLOSED = prove
+ (`!a b. a < b ==> real_interval(a,b) SUBSET real_interval[a,b]`,
+  REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
