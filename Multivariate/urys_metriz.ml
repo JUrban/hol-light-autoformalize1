@@ -559,11 +559,6 @@ let IMAGE_EQ_EMPTY_INJ = prove
  (`!f:A->B s. IMAGE f s = {} <=> s = {}`,
   REWRITE_TAC[IMAGE_EQ_EMPTY]);;
 
-(* Helper: basic set theory for diff *)
-let SUBSET_DIFF_SUBSET = prove
- (`!s t u:A->bool. s SUBSET t /\ u SUBSET s ==> t DIFF s SUBSET t DIFF u`,
-  REWRITE_TAC[SUBSET; IN_DIFF] THEN MESON_TAC[]);;
-
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
