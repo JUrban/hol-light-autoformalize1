@@ -75,7 +75,7 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
   CONJ_TAC THENL
    [REWRITE_TAC[embedding_map; homeomorphic_map] THEN
     CONJ_TAC THENL
-     [CHEAT_TAC;  (* quotient_map part - needs open map or similar *)
+     [CHEAT_TAC;  (* quotient_map - requires showing preimage preserves opens *)
       (* Injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
       EQ_TAC THENL [ALL_TAC; SIMP_TAC[]] THEN
