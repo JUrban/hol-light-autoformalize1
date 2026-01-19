@@ -59,14 +59,15 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   (* We have: - normal_space (hence functions exist by Urysohn)
                - completely_regular (hence separating functions exist)
                - countable basis b
-     Approach: Use COUNTABLE_CROSS to show b CROSS b is countable,
-               then COUNTABLE_AS_IMAGE to enumerate it as IMAGE pairs (:num).
-               For each pair (u,v) = pairs(n), construct f(n) using
-               completely_regular_space or Urysohn lemma.
-               This requires additional infrastructure for:
-               - Handling the enumeration properly
-               - Selecting appropriate geometric conditions on pairs
-               - Proving the constructed family has required separation properties *)
+     Approach: enumerate basis pairs, construct functions from them *)
+  (* First, b CROSS b is countable *)
+  SUBGOAL_THEN `COUNTABLE (b CROSS b:(A->bool#A->bool)->bool)` ASSUME_TAC THENL
+   [MATCH_MP_TAC COUNTABLE_CROSS THEN ASM_REWRITE_TAC[];
+    ALL_TAC] THEN
+  (* Now enumerate: either empty or can use COUNTABLE_AS_IMAGE *)
+  (* The complete construction requires choosing appropriate pairs,
+     applying Urysohn/completely_regular to each, and proving properties *)
+  (* This is substantial infrastructure (~50-80 lines) *)
   CHEAT_TAC);;
 
 (* Helper: embedding into product of [0,1] *)
@@ -104,9 +105,12 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       (* This can be used to construct open neighborhoods in product *)
       REWRITE_TAC[open_map] THEN
       (* Need to show: for any open u, IMAGE g u is open in product *)
-      (* The image is in the product topology *)
-      (* This requires characterizing opens in product_topology *)
-      (* And showing IMAGE (\x. \n. f n x) u is one such open *)
+      REPEAT STRIP_TAC THEN
+      (* Have: open_in top u *)
+      (* Goal: open_in (product_topology...) (IMAGE (\x. \n. f n x) u) *)
+      (* The direct proof requires OPEN_IN_PRODUCT_TOPOLOGY_ALT *)
+      (* and constructing basic opens from the fourth property *)
+      (* This is substantial infrastructure (~30-40 lines) *)
       CHEAT_TAC;
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
