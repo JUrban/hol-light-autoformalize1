@@ -967,11 +967,6 @@ let EMPTY_SUBSET_SIMPLE = prove
  (`!s. {} SUBSET s`,
   REWRITE_TAC[EMPTY_SUBSET]);;
 
-(* Helper: subset union left *)
-let SUBSET_UNION_LEFT = prove
- (`!s t. s SUBSET (s UNION t)`,
-  SET_TAC[]);;
-
 (* Helper: subset union right *)
 let SUBSET_UNION_RIGHT = prove
  (`!s t. t SUBSET (s UNION t)`,
@@ -2119,11 +2114,6 @@ let INTER_EMPTY_LEFT = prove
 (* Helper: intersection with empty *)
 let INTER_EMPTY_RIGHT = prove
  (`!s. s INTER {} = {}`,
-  SET_TAC[]);;
-
-(* Helper: subset of union *)
-let SUBSET_UNION_LEFT = prove
- (`!s t. s SUBSET s UNION t`,
   SET_TAC[]);;
 
 (* Helper: subset of union *)
