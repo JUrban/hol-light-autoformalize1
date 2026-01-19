@@ -206,18 +206,22 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (* Strategy: Enumerate basis elements and construct functions based on them.
-     For complex choice + enumeration, use gradual approach per CLAUDE.md *)
+  (* Gradual partial approach per CLAUDE.md *)
 
-  (* TODO: Use CANTOR_PAIRING to enumerate:
-     - Pairs (m,n) for point separation using basis elements e m, e n
-     - Pairs (closed set index, basis element) for closed set separation
-     This requires:
-     1. Enumerating topspace (if possible) or working with basis
-     2. Using CHOICE to extract functions (SKOLEM_THM approach failed)
-     3. Combining with CANTOR_PAIRING for bijection ℕ ↔ ℕ×ℕ *)
+  (* The construction is complex: need to enumerate infinitely many pairs
+     and closed sets, then combine using choice. This requires machinery
+     beyond simple tactics. *)
 
-  (* Placeholder construction - admits the existence *)
+  (* Attempts tried:
+     - SKOLEM_THM with ASSUME: "REWRITES_CONV" error
+     - ASM_MESON_TAC: too deep (80266+ steps)
+     - Direct construction: requires pairing enumeration + choice combination *)
+
+  (* TODO for future: Build explicit construction using:
+     1. CANTOR_PAIRING to enumerate pairs from N×N
+     2. Choice function extraction for each pair type
+     3. Combine into single family f:num->A->real *)
+
   CHEAT_TAC);;
 
 (* Helper: explicit pairing function for enumeration *)
@@ -417,10 +421,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       REPEAT CONJ_TAC THENL
        [(* Show finitely many differ from topspace - only coordinate n differs *)
         (* Helper lemma FINITE_COND_INTERVAL_DIFF_ZERO exists and compiles *)
-        (* Latest attempt: MP_TAC helper + MATCH_MP_TAC FINITE_SUBSET - unsolved goals *)
-        (* Previous 10+ attempts all failed with various tactical errors *)
-        (* Mathematical approach confirmed correct by helper lemma *)
-        (* Tactical barrier: goal has lambda \i., helper has direct i *)
+        (* Latest attempt: MP_TAC + CONV_TAC BETA_CONV - unsolved goals *)
+        (* 15+ tactical approaches tried, all hit fundamental barriers *)
+        (* Mathematical correctness confirmed by helper lemma *)
         CHEAT_TAC;
         (* Show each component is open *)
         (* Latest attempt: ASM_CASES_TAC + ASM_SIMP_TAC + ASM_MESON_TAC *)
