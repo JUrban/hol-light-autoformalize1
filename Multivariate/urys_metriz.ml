@@ -207,22 +207,42 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
   (*
-     Standard approach requires:
-     1. Use countable basis b and enumeration e:num->A->bool
-     2. For each basis element U and points x,y with x IN U, y NOTIN U:
-        - Construct Urysohn function separating {x} from closure(topspace\U)
-     3. Similarly for closed sets using basis
-     4. Enumerate all such functions countably via CANTOR_PAIRING
-     5. Verify 4 properties:
-        a) Bounds [0,1]: follows from Urysohn construction
-        b) Continuity: each function is Urysohn, hence continuous
-        c) Point separation: for x≠y, use basis to find separating U,
-           then corresponding function separates x,y
-        d) Closed set separation: similar using basis
+     CONSTRUCTION APPROACH (for future work):
 
-     This requires ~30-40 lines of systematic construction and verification.
-     Key theorems needed: basis characterization, Urysohn for various sets,
-     properties of closure and interior in second-countable spaces.
+     Step 1: Use choice to select separating functions
+     ------------------------------------------------
+     A. For each pair (x,y) of distinct points:
+        Use completely_regular property to get function g with ~(g x = g y)
+        Select one such function via choice: select_point_fn x y
+
+     B. For each closed set c and external point x:
+        Use Urysohn property to get function g with g x = &1, g[c] = {&0}
+        Select one such function via choice: select_closed_fn c x
+
+     Step 2: Enumerate using CANTOR_PAIRING
+     --------------------------------------
+     Define f:num->A->real by cases on CANTOR_UNPAIR k = (i,j):
+     - Handle point separation cases (using select_point_fn)
+     - Handle closed set separation cases (using select_closed_fn)
+     - Ensure coverage of all necessary separations
+
+     Step 3: Verify the 4 properties
+     -------------------------------
+     Property 1 (Bounds): Each constructed function maps to [&0,&1]
+     Property 2 (Continuity): Each function is continuous (from Urysohn/completely_regular)
+     Property 3 (Point separation): For x ≠ y, use basis to find appropriate k
+     Property 4 (Closed set separation): For closed c and x ∉ c, use appropriate k
+
+     TACTICAL APPROACHES TO TRY:
+     - Use CHOOSE_TAC instead of STRIP_ASSUME_TAC for choice
+     - Break into smaller subgoals with individual lemmas
+     - Use MATCH_MP_TAC with library theorems about countable families
+     - Consider using library's existing countable_as_image theorem
+
+     This requires approximately 40-60 lines of systematic construction.
+     The mathematical content is straightforward (combining existing results),
+     but the tactical implementation requires care with choice principles and
+     enumeration verification.
   *)
   CHEAT_TAC);;
 
