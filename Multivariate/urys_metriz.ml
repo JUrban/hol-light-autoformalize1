@@ -106,6 +106,14 @@ let COMPLETELY_REGULAR_HAUSDORFF_POINT_FUNCTIONS = prove
     FIRST_X_ASSUM(MP_TAC o SPEC `y:A`) THEN
     ASM_SIMP_TAC[IN_DIFF] THEN
     ANTS_TAC THENL [ASM SET_TAC[]; REAL_ARITH_TAC]]);;
+
+(* Helper: countable sets have surjective enumerations *)
+let COUNTABLE_SURJECTIVE_ENUMERATION = prove
+ (`!s:A->bool. COUNTABLE s ==> ?f:num->A. !x. x IN s ==> ?n. f n = x`,
+  GEN_TAC THEN ASM_CASES_TAC `s:A->bool = {}` THENL [
+    ASM_REWRITE_TAC[NOT_IN_EMPTY];
+    ASM_MESON_TAC[COUNTABLE_AS_IMAGE; IN_IMAGE; IN_UNIV]]);;
+
 let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
  (`!top:A topology.
         regular_space top /\ second_countable top /\ hausdorff_space top
@@ -140,11 +148,7 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   (* Enumerate the countable basis b as a sequence *)
   SUBGOAL_THEN `?e:num->A->bool. !u. u IN b ==> ?n. e n = u`
                STRIP_ASSUME_TAC THENL
-   [(* TODO: Prove using COUNTABLE_AS_IMAGE - b is countable from second_countable *)
-    (*  Standard result: countable set can be enumerated *)
-    (*  Requires extracting COUNTABLE b from the topology_base assumptions *)
-    (*  and applying COUNTABLE_AS_IMAGE theorem *)
-    CHEAT_TAC;
+   [MATCH_MP_TAC COUNTABLE_SURJECTIVE_ENUMERATION THEN ASM_REWRITE_TAC[];
     ALL_TAC] THEN
 
   (* Now construct the function family *)
