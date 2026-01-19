@@ -737,3 +737,18 @@ let REAL_INTERVAL_NONEMPTY_OPEN = prove
 let REAL_INTERVAL_OPEN_SUBSET_CLOSED = prove
  (`!a b. a < b ==> real_interval(a,b) SUBSET real_interval[a,b]`,
   REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: conditional equality *)
+let COND_EXPAND_EQ = prove
+ (`!b x y z. (if b then x else y) = z <=> (b ==> x = z) /\ (~b ==> y = z)`,
+  MESON_TAC[]);;
+
+(* Helper: negation of conditional equality *)
+let COND_NE_EXPAND = prove
+ (`!b x y z. ~((if b then x else y) = z) <=> (b /\ ~(x = z)) \/ (~b /\ ~(y = z))`,
+  MESON_TAC[]);;
+
+(* Helper: implication from conditional inequality *)
+let COND_NE_IMP = prove
+ (`!b x y z. (~((if b then x else y) = z) ==> b) <=> b \/ (y = z)`,
+  MESON_TAC[]);;
