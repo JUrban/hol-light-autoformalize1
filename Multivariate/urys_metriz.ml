@@ -442,6 +442,28 @@ let IN_SING_EQ = prove
  (`!x:A y. x IN {y} <=> x = y`,
   REWRITE_TAC[IN_SING]);;
 
+(* Helper: conditional function application *)
+let COND_FUNCTION_APPLY = prove
+ (`!(f:num->A) g n m.
+        (if n = m then f n else g n) =
+        if n = m then f m else g n`,
+  MESON_TAC[]);;
+
+(* Helper: equality with lambda *)
+let LAMBDA_ETA = prove
+ (`!f:A->B. (\x. f x) = f`,
+  REWRITE_TAC[ETA_AX]);;
+
+(* Helper: function composition with lambda *)
+let LAMBDA_COMPOSE = prove
+ (`!f:B->C g:A->B x. (\y. f (g y)) x = f (g x)`,
+  REWRITE_TAC[]);;
+
+(* Helper: image under identity *)
+let IMAGE_ID = prove
+ (`!s:A->bool. IMAGE (\x. x) s = s`,
+  REWRITE_TAC[IMAGE_ID]);;
+
 (* Helper: open intervals in unit interval are open *)
 let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
  (`!a b. &0 <= a /\ a < b /\ b <= &1
