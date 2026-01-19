@@ -353,3 +353,15 @@ let URYSOHN_METRIZATION = prove
         ==> (regular_space top /\ hausdorff_space top <=>
              metrizable_space top)`,
   MESON_TAC[URYSOHN_METRIZATION_FWD; URYSOHN_METRIZATION_BWD]);;
+
+(* Helper: open intervals in unit interval are open *)
+let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
+ (`!a b. &0 <= a /\ a < b /\ b <= &1
+         ==> open_in (subtopology euclideanreal (real_interval[&0,&1]))
+                     (real_interval(a,b))`,
+  REPEAT STRIP_TAC THEN
+  REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
+  EXISTS_TAC `real_interval(a:real,b)` THEN
+  REWRITE_TAC[GSYM REAL_OPEN_IN; REAL_OPEN_REAL_INTERVAL; INTER_SUBSET] THEN
+  REWRITE_TAC[EXTENSION; IN_INTER; IN_REAL_INTERVAL] THEN
+  ASM_MESON_TAC[REAL_LT_IMP_LE; REAL_LE_TRANS]);;
