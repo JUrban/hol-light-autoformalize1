@@ -624,3 +624,13 @@ let SUBSET_INTER_LEFT = prove
 let SUBSET_INTER_RIGHT = prove
  (`!s t. s INTER t SUBSET t`,
   SET_TAC[]);;
+
+(* Helper: union and subset *)
+let SUBSET_UNION = prove
+ (`!s t u. s SUBSET u /\ t SUBSET u ==> (s UNION t) SUBSET u`,
+  SET_TAC[]);;
+
+(* Helper: element in union *)
+let IN_UNION_ALT = prove
+ (`!x s t. x IN (s UNION t) <=> x IN s \/ x IN t`,
+  SET_TAC[]);;
