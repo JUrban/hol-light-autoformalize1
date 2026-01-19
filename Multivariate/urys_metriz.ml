@@ -2635,3 +2635,18 @@ let EQ_SYM_SIMPLE = prove
 let EQ_TRANS_SIMPLE = prove
  (`!x y z. x = y /\ y = z ==> x = z`,
   MESON_TAC[]);;
+
+(* Helper: empty set has no elements *)
+let NOT_IN_EMPTY_SIMPLE = prove
+ (`!x. ~(x IN {})`,
+  REWRITE_TAC[NOT_IN_EMPTY]);;
+
+(* Helper: singleton characterization *)
+let IN_SING_SIMPLE = prove
+ (`!x y. x IN {y} <=> x = y`,
+  REWRITE_TAC[IN_SING]);;
+
+(* Helper: union membership *)
+let IN_UNION_SIMPLE = prove
+ (`!x s t. x IN (s UNION t) <=> x IN s \/ x IN t`,
+  REWRITE_TAC[IN_UNION]);;
