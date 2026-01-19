@@ -225,6 +225,11 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       ASM_REWRITE_TAC[] THEN MESON_TAC[]];
     REWRITE_TAC[]]);;
 
+(* Helper: basic fact about functions into [0,1] *)
+let IN_UNIT_INTERVAL_BOUNDS = prove
+ (`!x. x IN real_interval[&0,&1] <=> &0 <= x /\ x <= &1`,
+  REWRITE_TAC[IN_REAL_INTERVAL]);;
+
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
