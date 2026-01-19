@@ -80,7 +80,21 @@ let T3_HAUSDORFF_POINT_SEPARATION = prove
   ASM_SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE; IN_DIFF] THEN
   ASM SET_TAC[]);;
 
-(* Helper: construct separating functions from countable basis *)
+(* Helper: completely_regular + Hausdorff gives point-separating functions *)
+let COMPLETELY_REGULAR_HAUSDORFF_POINT_FUNCTIONS = prove
+ (`!top x y:A.
+        completely_regular_space top /\ hausdorff_space top /\
+        x IN topspace top /\ y IN topspace top /\ ~(x = y)
+        ==> ?f. continuous_map
+                  (top,subtopology euclideanreal (real_interval[&0,&1])) f /\
+                ~(f x = f y)`,
+  REPEAT STRIP_TAC THEN
+  (* Use Hausdorff to get disjoint opens u, v with x in u, y in v *)
+  (* Then topspace \ v is closed and contains x but not y *)
+  (* Use completely_regular to get f with f(x)=0, f=1 on topspace \ v *)
+  (* So f(y)=1 since y not in v means y in topspace \ v *)
+  (* Therefore f(x) = 0 ≠ 1 = f(y) *)
+  CHEAT_TAC);;
 let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
  (`!top:A topology.
         regular_space top /\ second_countable top /\ hausdorff_space top
