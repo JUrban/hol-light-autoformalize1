@@ -1103,3 +1103,63 @@ let REAL_ADD_LID_SIMPLE = prove
 let REAL_ADD_RID_SIMPLE = prove
  (`!x. x + &0 = x`,
   REAL_ARITH_TAC);;
+
+(* Helper: real mul lid *)
+let REAL_MUL_LID_SIMPLE = prove
+ (`!x. &1 * x = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real mul rid *)
+let REAL_MUL_RID_SIMPLE = prove
+ (`!x. x * &1 = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real le refl *)
+let REAL_LE_REFL_SIMPLE = prove
+ (`!x. x <= x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real lt asymm *)
+let REAL_LT_ASYM = prove
+ (`!x y. x < y ==> ~(y < x)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real le total *)
+let REAL_LE_TOTAL_SIMPLE = prove
+ (`!x y. x <= y \/ y <= x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real lt total *)
+let REAL_LT_TRICHOTOMY = prove
+ (`!x y. x < y \/ x = y \/ y < x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real sub add *)
+let REAL_SUB_ADD_SIMPLE = prove
+ (`!x y. (x - y) + y = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real add sub *)
+let REAL_ADD_SUB_SIMPLE = prove
+ (`!x y. (x + y) - y = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real sub refl *)
+let REAL_SUB_REFL_SIMPLE = prove
+ (`!x. x - x = &0`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real neg neg *)
+let REAL_NEG_NEG_SIMPLE = prove
+ (`!x. --x = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real neg 0 *)
+let REAL_NEG_0_SIMPLE = prove
+ (`--(&0) = &0`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real neg add *)
+let REAL_NEG_ADD_SIMPLE = prove
+ (`!x y. --(x + y) = --x + --y`,
+  REAL_ARITH_TAC);;
