@@ -675,3 +675,14 @@ let COND_EQ_IMPLIES = prove
  (`!b x y z. (if b then x else y) = z
              ==> (b ==> x = z) /\ (~b ==> y = z)`,
   MESON_TAC[]);;
+
+(* Helper: basic topology lemma *)
+let OPEN_IN_IMP_SUBSET_TOPSPACE = prove
+ (`!top u. open_in top u ==> u SUBSET topspace top`,
+  SIMP_TAC[OPEN_IN_SUBSET]);;
+
+(* Helper: continuous map range *)
+let CONTINUOUS_MAP_RANGE_SUBSET = prove
+ (`!top top' f. continuous_map (top,top') f
+                ==> IMAGE f (topspace top) SUBSET topspace top'`,
+  SIMP_TAC[CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE]);;
