@@ -211,13 +211,12 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   (* Attempts tried:
      - SKOLEM_THM with ASSUME + REWRITE: "REWRITES_CONV" error
      - ASM_MESON_TAC: too deep (80266+ steps)
-     - SUBGOAL_THEN + MATCH_MP_TAC: wrong tactic for existence goal *)
+     - SUBGOAL_THEN + MATCH_MP_TAC: wrong tactic for existence goal
+     - SKOLEM_THM with MATCH_MP: "Not an implication" error *)
 
-  (* Required: explicit construction combining:
-     - Enumerated basis (have: e:num->A->bool)
-     - Point separation functions (have: existence for each pair)
-     - Closed set separation functions (have: existence for each pair)
-     Need: NUMPAIR (from library) to index all constraints, choice to select functions *)
+  (* Attempt: Try simpler approach - use countability of basis *)
+  (* Basis b is countable, so topspace × topspace is countable when space is second-countable *)
+  (* Can enumerate all separation constraints and pick functions for each *)
 
   CHEAT_TAC);;
 
