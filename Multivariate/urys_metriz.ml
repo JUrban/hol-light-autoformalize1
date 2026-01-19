@@ -2559,3 +2559,18 @@ let IN_REAL_INTERVAL_OPEN_BOUNDS = prove
 let ONE_IN_UNIT_BOUNDS = prove
  (`&1 IN real_interval[&0,&1]`,
   REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
+
+(* Helper: subset via pointwise inclusion *)
+let SUBSET_POINTWISE = prove
+ (`!s t. s SUBSET t <=> (!x. x IN s ==> x IN t)`,
+  REWRITE_TAC[SUBSET]);;
+
+(* Helper: zero in unit interval *)
+let ZERO_IN_UNIT_BOUNDS = prove
+ (`&0 IN real_interval[&0,&1]`,
+  REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
+
+(* Helper: half in unit interval *)
+let HALF_IN_UNIT_BOUNDS = prove
+ (`&1 / &2 IN real_interval[&0,&1]`,
+  REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
