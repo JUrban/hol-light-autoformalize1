@@ -700,3 +700,21 @@ let IMAGE_LAMBDA_EXTENSIONAL = prove
          {g | ?x. x IN s /\ (!n. g n = f n x)}`,
   REWRITE_TAC[EXTENSION; IN_IMAGE; IN_ELIM_THM] THEN
   MESON_TAC[FUN_EQ_THM]);;
+
+(* Helper: simple real arithmetic *)
+let REAL_HALF_BETWEEN = prove
+ (`!a b. a < (a + b) / &2 /\ (a + b) / &2 < b <=> a < b`,
+  REAL_ARITH_TAC);;
+
+(* Helper: conditional in interval *)
+let IN_INTERVAL_CONDITIONAL = prove
+ (`!b a1 a2 b1 b2 x.
+     x IN (if b then real_interval[a1,b1] else real_interval[a2,b2])
+     ==> (b ==> x IN real_interval[a1,b1]) /\
+         (~b ==> x IN real_interval[a2,b2])`,
+  MESON_TAC[]);;
+
+(* Helper: function equality from pointwise *)
+let FUNCTION_EQ_POINTWISE = prove
+ (`!f g. (!x. f x = g x) <=> f = g`,
+  REWRITE_TAC[FUN_EQ_THM]);;
