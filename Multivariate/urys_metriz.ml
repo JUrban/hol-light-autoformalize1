@@ -335,6 +335,27 @@ let COND_INTERVAL_NE_IMP = prove
   REPEAT GEN_TAC THEN REWRITE_TAC[COND_INTERVAL_EQ_CLOSED] THEN
   MESON_TAC[]);;
 
+(* Helper: [0,1]\{0} ≠ [0,1] *)
+let REAL_INTERVAL_DIFF_ZERO_NE_UNIT = prove
+ (`~(real_interval[&0,&1] DIFF {&0} = real_interval[&0,&1])`,
+  REWRITE_TAC[EXTENSION; IN_DIFF; IN_SING; IN_REAL_INTERVAL; NOT_FORALL_THM] THEN
+  EXISTS_TAC `&0` THEN REAL_ARITH_TAC);;
+
+(* Helper: conditional with DIFF {0} *)
+let COND_INTERVAL_DIFF_ZERO_EQ = prove
+ (`!i n. (if i = n then real_interval[&0,&1] DIFF {&0}
+          else real_interval[&0,&1]) = real_interval[&0,&1] <=> ~(i = n)`,
+  REPEAT GEN_TAC THEN COND_CASES_TAC THEN
+  ASM_REWRITE_TAC[REAL_INTERVAL_DIFF_ZERO_NE_UNIT]);;
+
+(* Helper: conditional DIFF inequality *)
+let COND_INTERVAL_DIFF_ZERO_NE_IMP = prove
+ (`!i n. ~((if i = n then real_interval[&0,&1] DIFF {&0}
+            else real_interval[&0,&1]) = real_interval[&0,&1])
+         ==> i = n`,
+  REPEAT GEN_TAC THEN REWRITE_TAC[COND_INTERVAL_DIFF_ZERO_EQ] THEN
+  MESON_TAC[]);;
+
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
  (`!top:A topology f:num->A->real.
@@ -385,8 +406,8 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         [`topspace (top:A topology) DIFF u`; `x:A`]) THEN
       ASM_REWRITE_TAC[] THEN
       DISCH_THEN(X_CHOOSE_THEN `n:num` STRIP_ASSUME_TAC) THEN
-      (* Construct basic open: (1/2,1) at n, [0,1] elsewhere *)
-      EXISTS_TAC `\i:num. if i = n then real_interval(&1 / &2, &1)
+      (* Construct basic open: [0,1]\{0} at n, [0,1] elsewhere *)
+      EXISTS_TAC `\i:num. if i = n then real_interval[&0,&1] DIFF {&0}
                           else real_interval[&0,&1]` THEN
       REPEAT CONJ_TAC THENL
        [(* Show finitely many differ from topspace - only coordinate n differs *)
@@ -394,16 +415,20 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         EXISTS_TAC `{n:num}` THEN
         REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
         X_GEN_TAC `i:num` THEN
-        REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV] THEN
-        CHEAT_TAC;
+        SIMP_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV; COND_INTERVAL_DIFF_ZERO_NE_IMP];
         (* Show each component is open *)
-        (* TODO: Use HALF_ONE_OPEN_IN_UNIT for (1/2,1) case, OPEN_IN_TOPSPACE for [0,1] case *)
-        CHEAT_TAC;
+        X_GEN_TAC `i:num` THEN COND_CASES_TAC THEN
+        ASM_REWRITE_TAC[OPEN_IN_UNIT_INTERVAL_DIFF_ZERO; OPEN_IN_TOPSPACE];
         (* Show y in cartesian product *)
-        (* This is complex: y = f applied to x, but we need y IN basic open *)
-        (* The basic open has (1/2,1) at coordinate n, but f n x = 1 *)
-        (* This requires careful handling of the neighborhood *)
-        CHEAT_TAC;
+        (* y = (\i. f i x), need to show each component in right interval *)
+        ASM_REWRITE_TAC[CARTESIAN_PRODUCT; IN_ELIM_THM] THEN
+        X_GEN_TAC `i:num` THEN COND_CASES_TAC THENL
+         [ASM_REWRITE_TAC[IN_DIFF; IN_SING; IN_REAL_INTERVAL] THEN
+          STRIP_TAC THEN CONJ_TAC THEN CONJ_TAC THENL
+           [REAL_ARITH_TAC; REAL_ARITH_TAC; REAL_ARITH_TAC];
+          REWRITE_TAC[IN_REAL_INTERVAL] THEN
+          FIRST_X_ASSUM(MP_TAC o SPECL [`i:num`; `x:A`]) THEN
+          ASM_SIMP_TAC[]];
         (* Show cartesian product subset IMAGE g u *)
         CHEAT_TAC];
       (* Prove injectivity *)
