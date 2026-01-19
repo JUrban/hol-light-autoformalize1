@@ -1151,7 +1151,7 @@ let REAL_SUB_REFL_SIMPLE = prove
 
 (* Helper: real neg neg *)
 let REAL_NEG_NEG_SIMPLE = prove
- (`!x. --x = x`,
+ (`!x. --(--x) = x`,
   REAL_ARITH_TAC);;
 
 (* Helper: real neg 0 *)
@@ -1163,3 +1163,36 @@ let REAL_NEG_0_SIMPLE = prove
 let REAL_NEG_ADD_SIMPLE = prove
  (`!x y. --(x + y) = --x + --y`,
   REAL_ARITH_TAC);;
+
+(* Helper: conditional set not equal when one choice differs *)
+let COND_SET_NE = prove
+ (`!b s t u. ~(s = u) ==> (b ==> ~((if b then s else t) = u))`,
+  MESON_TAC[]);;
+
+(* Helper: whole space is open *)
+let OPEN_IN_TOPSPACE_SUBTOPOLOGY = prove
+ (`!top:A topology s. s SUBSET topspace top ==> open_in (subtopology top s) s`,
+  REPEAT STRIP_TAC THEN
+  REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
+  EXISTS_TAC `topspace (top:A topology)` THEN
+  ASM_REWRITE_TAC[OPEN_IN_TOPSPACE] THEN
+  ASM SET_TAC[]);;
+
+(* Helper: real number in open interval *)
+let IN_REAL_INTERVAL_OPEN_1 = prove
+ (`&1 IN real_interval(&1 / &2, &1 + &1)`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: membership in conditional interval *)
+let IN_COND_INTERVAL = prove
+ (`!b a1 b1 a2 b2 x.
+     x IN (if b then real_interval[a1,b1] else real_interval[a2,b2])
+     <=> (b ==> x IN real_interval[a1,b1]) /\
+         (~b ==> x IN real_interval[a2,b2])`,
+  MESON_TAC[]);;
+
+(* Helper: open intervals *)
+let REAL_INTERVAL_OPEN_NONEMPTY = prove
+ (`!a b. a < b ==> ?x. x IN real_interval(a,b)`,
+  REPEAT STRIP_TAC THEN EXISTS_TAC `(a + b) / &2` THEN
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN ASM_REAL_ARITH_TAC);;
