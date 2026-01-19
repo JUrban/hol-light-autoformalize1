@@ -56,11 +56,17 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
    [ASM_MESON_TAC[NORMAL_IMP_COMPLETELY_REGULAR_SPACE];
     ALL_TAC] THEN
   (* The hard part: constructing a countable indexed family *)
-  (* We have shown: - normal_space (hence functions exist by Urysohn)
-                     - completely_regular (hence separating functions exist)
-                     - countable basis b
-     What remains: enumerate pairs and index functions by num
-     This requires machinery for enumerating countable sets *)
+  (* We have: - normal_space (hence functions exist by Urysohn)
+               - completely_regular (hence separating functions exist)
+               - countable basis b
+     Approach: Use COUNTABLE_CROSS to show b CROSS b is countable,
+               then COUNTABLE_AS_IMAGE to enumerate it as IMAGE pairs (:num).
+               For each pair (u,v) = pairs(n), construct f(n) using
+               completely_regular_space or Urysohn lemma.
+               This requires additional infrastructure for:
+               - Handling the enumeration properly
+               - Selecting appropriate geometric conditions on pairs
+               - Proving the constructed family has required separation properties *)
   CHEAT_TAC);;
 
 (* Helper: embedding into product of [0,1] *)
