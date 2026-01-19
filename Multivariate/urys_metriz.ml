@@ -1728,3 +1728,169 @@ let PAIR_SURJECTIVE = prove
 let EXISTS_PAIR = prove
  (`!P. (?p. P p) <=> (?x y. P (x,y))`,
   MESON_TAC[PAIR_SURJECTIVE]);;
+
+(* Helper: forall pair *)
+let FORALL_PAIR = prove
+ (`!P. (!p. P p) <=> (!x y. P (x,y))`,
+  MESON_TAC[PAIR_SURJECTIVE]);;
+
+(* Helper: lambda pair *)
+let LAMBDA_PAIR = prove
+ (`!f. (\(x,y). f x y) = (\p. f (FST p) (SND p))`,
+  REWRITE_TAC[FUN_EQ_THM; FORALL_PAIR; FST; SND]);;
+
+(* Helper: injection preserves distinctness *)
+let INJECTION_IMP_DISTINCT = prove
+ (`!f x y. (!a b. f a = f b ==> a = b) /\ ~(x = y) ==> ~(f x = f y)`,
+  MESON_TAC[]);;
+
+(* Helper: surjection *)
+let SURJECTION_EXISTS = prove
+ (`!f:A->B. (!y. ?x. f x = y) <=> !y. y IN IMAGE f (:A)`,
+  REWRITE_TAC[IN_IMAGE; IN_UNIV] THEN MESON_TAC[]);;
+
+(* Helper: bijection characterization *)
+let BIJECTION_CHAR = prove
+ (`!f:A->B. (!x y. f x = f y ==> x = y) /\ (!y. ?x. f x = y)
+            ==> (!y. ?!x. f x = y)`,
+  REPEAT STRIP_TAC THEN REWRITE_TAC[EXISTS_UNIQUE_THM] THEN
+  ASM_MESON_TAC[]);;
+
+(* Helper: function equality pointwise *)
+let FUN_EQ_POINTWISE = prove
+ (`!f g:A->B. f = g <=> (!x. f x = g x)`,
+  REWRITE_TAC[FUN_EQ_THM]);;
+
+(* Helper: composition application *)
+let o_APP = prove
+ (`!f:B->C g:A->B x. (f o g) x = f (g x)`,
+  REWRITE_TAC[o_THM]);;
+
+(* Helper: eta conversion *)
+let ETA_CONV = prove
+ (`!f:A->B. (\x. f x) = f`,
+  REWRITE_TAC[ETA_AX]);;
+
+(* Helper: lambda application *)
+let LAMBDA_APP = prove
+ (`!f:A->B x. (\y. f y) x = f x`,
+  REWRITE_TAC[]);;
+
+(* Helper: constant function *)
+let CONST_FUN = prove
+ (`!c:B x:A y:A. (\z. c) x = (\z. c) y`,
+  REWRITE_TAC[]);;
+
+(* Helper: image of constant *)
+let IMAGE_CONST = prove
+ (`!c s. ~(s = {}) ==> IMAGE (\x. c) s = {c}`,
+  REWRITE_TAC[EXTENSION; IN_IMAGE; IN_SING] THEN SET_TAC[]);;
+
+(* Helper: preimage of singleton *)
+let PREIMAGE_SING = prove
+ (`!f:A->B y. {x | f x = y} = {x | f x IN {y}}`,
+  SET_TAC[IN_SING]);;
+
+(* Helper: preimage empty *)
+let PREIMAGE_EMPTY = prove
+ (`!f:A->B. {x | f x IN {}} = {}`,
+  SET_TAC[NOT_IN_EMPTY]);;
+
+(* Helper: preimage union *)
+let PREIMAGE_UNION = prove
+ (`!f:A->B s t. {x | f x IN (s UNION t)} =
+                {x | f x IN s} UNION {x | f x IN t}`,
+  SET_TAC[IN_UNION]);;
+
+(* Helper: preimage inter *)
+let PREIMAGE_INTER = prove
+ (`!f:A->B s t. {x | f x IN (s INTER t)} =
+                {x | f x IN s} INTER {x | f x IN t}`,
+  SET_TAC[IN_INTER]);;
+
+(* Helper: preimage diff *)
+let PREIMAGE_DIFF = prove
+ (`!f:A->B s t. {x | f x IN (s DIFF t)} =
+                {x | f x IN s} DIFF {x | f x IN t}`,
+  SET_TAC[IN_DIFF]);;
+
+(* Helper: preimage subset *)
+let PREIMAGE_SUBSET = prove
+ (`!f:A->B s t. s SUBSET t ==> {x | f x IN s} SUBSET {x | f x IN t}`,
+  SET_TAC[SUBSET]);;
+
+(* Helper: preimage univ *)
+let PREIMAGE_UNIV = prove
+ (`!f:A->B. {x | f x IN (:B)} = (:A)`,
+  SET_TAC[IN_UNIV]);;
+
+(* Helper: image of preimage *)
+let IMAGE_PREIMAGE_SUBSET = prove
+ (`!f:A->B s. IMAGE f {x | f x IN s} SUBSET s`,
+  SET_TAC[IN_IMAGE]);;
+
+(* Helper: continuous map basics *)
+let CONTINUOUS_MAP_ID_ALT = prove
+ (`!top. continuous_map (top,top) (\x. x)`,
+  REWRITE_TAC[CONTINUOUS_MAP_ID]);;
+
+(* Helper: continuous map const *)
+let CONTINUOUS_MAP_CONST_ALT = prove
+ (`!top top' c. c IN topspace top'
+                ==> continuous_map (top,top') (\x. c)`,
+  SIMP_TAC[CONTINUOUS_MAP_CONST]);;
+
+(* Helper: continuous map compose *)
+let CONTINUOUS_MAP_COMPOSE_ALT = prove
+ (`!top top' top'' f g.
+     continuous_map (top,top') f /\ continuous_map (top',top'') g
+     ==> continuous_map (top,top'') (g o f)`,
+  REWRITE_TAC[CONTINUOUS_MAP_COMPOSE]);;
+
+(* Helper: open in empty *)
+let OPEN_IN_EMPTY_ALT = prove
+ (`!top. open_in top {}`,
+  REWRITE_TAC[OPEN_IN_EMPTY]);;
+
+(* Helper: open in topspace *)
+let OPEN_IN_TOPSPACE_ALT = prove
+ (`!top. open_in top (topspace top)`,
+  REWRITE_TAC[OPEN_IN_TOPSPACE]);;
+
+(* Helper: open in union *)
+let OPEN_IN_UNION_ALT = prove
+ (`!top s t. open_in top s /\ open_in top t ==> open_in top (s UNION t)`,
+  SIMP_TAC[OPEN_IN_UNION]);;
+
+(* Helper: open in inter *)
+let OPEN_IN_INTER_ALT = prove
+ (`!top s t. open_in top s /\ open_in top t ==> open_in top (s INTER t)`,
+  SIMP_TAC[OPEN_IN_INTER]);;
+
+(* Helper: closed in empty *)
+let CLOSED_IN_EMPTY_ALT = prove
+ (`!top. closed_in top {}`,
+  REWRITE_TAC[CLOSED_IN_EMPTY]);;
+
+(* Helper: closed in topspace *)
+let CLOSED_IN_TOPSPACE_ALT = prove
+ (`!top. closed_in top (topspace top)`,
+  REWRITE_TAC[CLOSED_IN_TOPSPACE]);;
+
+(* Helper: closed in union *)
+let CLOSED_IN_UNION_ALT = prove
+ (`!top s t. closed_in top s /\ closed_in top t ==> closed_in top (s UNION t)`,
+  SIMP_TAC[CLOSED_IN_UNION]);;
+
+(* Helper: closed in inter *)
+let CLOSED_IN_INTER_ALT = prove
+ (`!top s t. closed_in top s /\ closed_in top t ==> closed_in top (s INTER t)`,
+  SIMP_TAC[CLOSED_IN_INTER]);;
+
+(* Helper: open closed complement *)
+let OPEN_IN_CLOSED_IN_EQ = prove
+ (`!top s. s SUBSET topspace top
+           ==> (open_in top s <=> closed_in top (topspace top DIFF s))`,
+  SIMP_TAC[OPEN_IN_CLOSED_IN_EQ]);;
+
+
