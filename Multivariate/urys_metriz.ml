@@ -217,57 +217,14 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      - Enumerated basis (have: e:num->A->bool)
      - Point separation functions (have: existence for each pair)
      - Closed set separation functions (have: existence for each pair)
-     Need: CANTOR_PAIRING to index all constraints, choice to select functions *)
+     Need: NUMPAIR (from library) to index all constraints, choice to select functions *)
 
   CHEAT_TAC);;
 
-(* Helper: explicit pairing function for enumeration *)
-let CANTOR_PAIRING = new_definition
- `CANTOR_PAIRING (n:num,m:num) = (n + m) * (n + m + 1) DIV 2 + m`;;
-
-(* Helper: inverse of Cantor pairing *)
-(* For a given k, find the unique (n,m) such that CANTOR_PAIRING(n,m) = k *)
-(* We can compute this by finding the "diagonal" s = n+m, then extracting m *)
-let CANTOR_UNPAIR = new_definition
- `CANTOR_UNPAIR k =
-    let s = @s. s * (s + 1) DIV 2 <= k /\ k < (s + 1) * (s + 2) DIV 2 in
-    let m = k - s * (s + 1) DIV 2 in
-    let n = s - m in
-    (n,m)`;;
-
-(* Note: Full bijectivity proofs would require ~30-40 lines *)
-(* These are standard results about Cantor pairing *)
-(* Gradual approach: prove basic properties step by step *)
-
-(* Property: CANTOR_PAIRING produces distinct values for distinct pairs *)
-let CANTOR_PAIRING_INJECTIVE = prove
- (`!n1 m1 n2 m2. CANTOR_PAIRING(n1,m1) = CANTOR_PAIRING(n2,m2)
-                 ==> n1 = n2 /\ m1 = m2`,
-  REWRITE_TAC[CANTOR_PAIRING] THEN
-  REPEAT GEN_TAC THEN
-  DISCH_TAC THEN
-  (* Try ARITH_TAC for arithmetic reasoning *)
-  TRY ARITH_TAC THEN
-  (* If fails, this requires detailed arithmetic proof *)
-  CHEAT_TAC);;
-
-(* Property: CANTOR_UNPAIR is left inverse of CANTOR_PAIRING *)
-let CANTOR_UNPAIR_PAIRING = prove
- (`!n m. CANTOR_UNPAIR(CANTOR_PAIRING(n,m)) = (n,m)`,
-  REPEAT GEN_TAC THEN
-  REWRITE_TAC[CANTOR_PAIRING; CANTOR_UNPAIR] THEN
-  (* This requires proving the epsilon choice computes correctly *)
-  CHEAT_TAC);;
-
-(* Property: CANTOR_PAIRING is surjective *)
-let CANTOR_PAIRING_SURJECTIVE = prove
- (`!k. ?n m. CANTOR_PAIRING(n,m) = k`,
-  GEN_TAC THEN
-  (* Witness: use CANTOR_UNPAIR to construct the pair *)
-  EXISTS_TAC `FST(CANTOR_UNPAIR k)` THEN
-  EXISTS_TAC `SND(CANTOR_UNPAIR k)` THEN
-  (* Should follow from CANTOR_UNPAIR_PAIRING *)
-  CHEAT_TAC);;
+(* Note: Pairing function NUMPAIR and properties NUMPAIR_INJ, NUMPAIR_DEST
+   are available from the library (ind_types.ml). Use those instead of
+   defining custom pairing functions, per CLAUDE.md guidance to avoid
+   duplicating library infrastructure. *)
 
 (* Helper: implication from conditional inequality *)
 let COND_NE_IMP = prove
