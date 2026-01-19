@@ -312,9 +312,7 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
         X_GEN_TAC `i:num` THEN
         REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV] THEN
-        (* TODO: Prove ~((if i=n then interval(1/2,1) else interval[0,1]) = interval[0,1]) ==> i=n *)
-        (*       Added REAL_INTERVAL_OPEN_NE_CLOSED_UNIT helper but still need right tactics *)
-        (*       Goal structure after STRIP_TAC doesn't match expected pattern *)
+        (* TODO: Still needs right tactics combination *)
         CHEAT_TAC;
         (* Show each component is open *)
         CHEAT_TAC;
@@ -797,4 +795,26 @@ let IN_SING_IFF = prove
 (* Helper: implication transitivity *)
 let IMP_TRANS_ALT = prove
  (`!p q r. (p ==> q) /\ (q ==> r) ==> (p ==> r)`,
+  MESON_TAC[]);;
+
+(* Helper: forall with conditional *)
+let FORALL_COND = prove
+ (`!P b x y. (!z. (if b then z = x else z = y) ==> P z) <=>
+             (b ==> P x) /\ (~b ==> P y)`,
+  MESON_TAC[]);;
+
+(* Helper: exists with conditional *)
+let EXISTS_COND = prove
+ (`!P b x y. (?z. (if b then z = x else z = y) /\ P z) <=>
+             (b /\ P x) \/ (~b /\ P y)`,
+  MESON_TAC[]);;
+
+(* Helper: conjunction with implication *)
+let CONJ_IMP_ALT = prove
+ (`!p q r. (p /\ q ==> r) <=> (p ==> q ==> r)`,
+  MESON_TAC[]);;
+
+(* Helper: disjunction elimination *)
+let DISJ_IMP_IMP = prove
+ (`!p q r. (p \/ q ==> r) <=> (p ==> r) /\ (q ==> r)`,
   MESON_TAC[]);;
