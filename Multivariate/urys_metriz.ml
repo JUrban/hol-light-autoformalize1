@@ -594,3 +594,8 @@ let TOPSPACE_UNIT_INTERVAL = prove
  (`topspace (subtopology euclideanreal (real_interval[&0,&1])) =
    real_interval[&0,&1]`,
   REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL; INTER_UNIV]);;
+
+(* Helper: membership in conditional sets *)
+let IN_COND_SET = prove
+ (`!b s t x. x IN (if b then s else t) <=> if b then x IN s else x IN t`,
+  MESON_TAC[]);;
