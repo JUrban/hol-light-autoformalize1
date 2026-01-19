@@ -424,7 +424,11 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* 17+ tactical approaches tried including latest SPEC_TAC attempt *)
         (* All blocked by lambda/beta reduction mismatch issues *)
         (* Helper lemma exists and proves correctness mathematically *)
-        CHEAT_TAC;
+        (* Attempt: Same strategy as goal 2 - use BETA_TAC then helper lemma *)
+        (* Also need to simplify "i IN (:num)" and topspace *)
+        BETA_TAC THEN
+        SIMP_TAC[IN_UNIV; TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL;
+                 INTER_UNIV; FINITE_COND_INTERVAL_DIFF_ZERO];
         (* Show each component is open *)
         (* Latest attempt: ASM_CASES_TAC + ASM_SIMP_TAC + ASM_MESON_TAC *)
         (* Result: ASM_MESON_TAC too deep (109572+ steps) *)
