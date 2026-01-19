@@ -918,3 +918,8 @@ let FINITE_UNION_SIMPLE = prove
 let FINITE_INSERT_SIMPLE = prove
  (`!x s. FINITE s ==> FINITE (x INSERT s)`,
   REWRITE_TAC[FINITE_INSERT]);;
+
+(* Helper: subset antisymmetric *)
+let SUBSET_ANTISYM = prove
+ (`!s t. s SUBSET t /\ t SUBSET s <=> s = t`,
+  REWRITE_TAC[SUBSET_ANTISYM_EQ]);;
