@@ -423,11 +423,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* Tactical barrier: goal has lambda \i., helper has direct i *)
         CHEAT_TAC;
         (* Show each component is open *)
-        (* Mathematically: COND_CASES_TAC splits into two cases:
-           - i = n: use OPEN_IN_UNIT_INTERVAL_DIFF_ZERO
-           - ~(i = n): use OPEN_IN_SUBTOPOLOGY_REFL with SUBSET_UNIV *)
-        (* Tactical issue: "find_term" error in REWRITE_TAC *)
-        (* TODO: Debug find_term error or try alternative tactics *)
+        (* Latest attempt: ASM_CASES_TAC + ASM_SIMP_TAC + ASM_MESON_TAC *)
+        (* Result: ASM_MESON_TAC too deep (109572+ steps) *)
+        (* Previous attempts documented in CHANGES files all failed *)
         CHEAT_TAC;
         (* Show y in cartesian product *)
         (* Mathematically: y = \n. f n x, need y i IN u i for all i *)
