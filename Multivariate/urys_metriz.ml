@@ -249,6 +249,11 @@ let UNIT_INTERVAL_SUBSET_REAL = prove
  (`real_interval[&0,&1] SUBSET (:real)`,
   REWRITE_TAC[SUBSET; IN_UNIV; IN_REAL_INTERVAL]);;
 
+(* Helper: topspace of subtopology *)
+let TOPSPACE_SUBTOPOLOGY_SUBSET = prove
+ (`!top s. topspace(subtopology top s) SUBSET s`,
+  REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_SUBSET]);;
+
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
