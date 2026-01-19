@@ -230,6 +230,14 @@ let IN_UNIT_INTERVAL_BOUNDS = prove
  (`!x. x IN real_interval[&0,&1] <=> &0 <= x /\ x <= &1`,
   REWRITE_TAC[IN_REAL_INTERVAL]);;
 
+(* Helper: continuous map into subtopology *)
+let CONTINUOUS_MAP_INTO_SUBTOPOLOGY_EQ = prove
+ (`!top top' s f:A->B.
+        IMAGE f (topspace top) SUBSET s
+        ==> (continuous_map (top,subtopology top' s) f <=>
+             continuous_map (top,top') f /\ IMAGE f (topspace top) SUBSET s)`,
+  SIMP_TAC[CONTINUOUS_MAP_IN_SUBTOPOLOGY]);;
+
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
