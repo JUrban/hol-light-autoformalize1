@@ -427,6 +427,21 @@ let PREIMAGE_IN_IMAGE = prove
  (`!f:A->B s x. x IN s ==> f x IN IMAGE f s`,
   REWRITE_TAC[IN_IMAGE] THEN MESON_TAC[]);;
 
+(* Helper: singleton is finite *)
+let FINITE_SING_ALT = prove
+ (`!x:A. FINITE {x}`,
+  REWRITE_TAC[FINITE_SING]);;
+
+(* Helper: subset of finite set *)
+let SUBSET_FINITE_I = prove
+ (`!s:A->bool t. FINITE t /\ s SUBSET t ==> FINITE s`,
+  MESON_TAC[FINITE_SUBSET]);;
+
+(* Helper: membership in singleton set *)
+let IN_SING_EQ = prove
+ (`!x:A y. x IN {y} <=> x = y`,
+  REWRITE_TAC[IN_SING]);;
+
 (* Helper: open intervals in unit interval are open *)
 let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
  (`!a b. &0 <= a /\ a < b /\ b <= &1
