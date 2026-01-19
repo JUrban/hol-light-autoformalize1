@@ -238,6 +238,12 @@ let CONTINUOUS_MAP_INTO_SUBTOPOLOGY_EQ = prove
              continuous_map (top,top') f /\ IMAGE f (topspace top) SUBSET s)`,
   SIMP_TAC[CONTINUOUS_MAP_IN_SUBTOPOLOGY]);;
 
+(* Helper: image under function applied to product *)
+let IMAGE_LAMBDA_PRODUCT = prove
+ (`!f:num->A->real x.
+        ((\y:A. \n:num. f n y) x) = (\n. f n x)`,
+  REWRITE_TAC[FUN_EQ_THM; ETA_AX]);;
+
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
