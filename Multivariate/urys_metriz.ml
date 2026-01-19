@@ -275,6 +275,11 @@ let CLOSED_IN_TOPSPACE_DIFF_OPEN = prove
         open_in top u ==> closed_in top (topspace top DIFF u)`,
   SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE]);;
 
+(* Helper: membership in diff *)
+let IN_DIFF_CONTRAPOS = prove
+ (`!s t x:A. x IN s /\ ~(x IN t) ==> x IN s DIFF t`,
+  REWRITE_TAC[IN_DIFF]);;
+
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
