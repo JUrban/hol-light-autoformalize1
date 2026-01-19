@@ -252,10 +252,22 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                           else real_interval[&0,&1]` THEN
       REPEAT CONJ_TAC THENL
        [(* Show finitely many differ from topspace - only coordinate n differs *)
+        MATCH_MP_TAC FINITE_SUBSET THEN
+        EXISTS_TAC `{n:num}` THEN
+        REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
+        X_GEN_TAC `i:num` THEN DISCH_TAC THEN
+        ASM_REWRITE_TAC[] THEN
+        REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN
+        (* real_interval(1/2,1) ≠ real_interval[0,1] but real_interval[0,1] = topspace *)
         CHEAT_TAC;
         (* Show each component is open *)
+        (* (1/2,1) is open by OPEN_IN_UNIT_INTERVAL_SUBINTERVAL *)
+        (* [0,1] is open as the topspace *)
         CHEAT_TAC;
         (* Show y in cartesian product *)
+        (* Need: y i in (if i=n then (1/2,1) else [0,1]) *)
+        (* For i=n: f n x = 1 is in (1/2,1) *)
+        (* For i≠n: f i x is in [0,1] by assumption *)
         CHEAT_TAC;
         (* Show cartesian product subset IMAGE g u *)
         CHEAT_TAC];
