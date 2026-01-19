@@ -476,6 +476,24 @@ let SUBSET_TRANS_ALT = prove
  (`!s:A->bool t u. s SUBSET t /\ t SUBSET u ==> s SUBSET u`,
   REWRITE_TAC[SUBSET] THEN MESON_TAC[]);;
 
+(* Helper: real interval monotonicity *)
+let REAL_INTERVAL_MONO = prove
+ (`!a b c d. a <= c /\ d <= b
+             ==> real_interval[c,d] SUBSET real_interval[a,b]`,
+  REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: open interval in closed interval *)
+let REAL_INTERVAL_OPEN_IN_CLOSED = prove
+ (`!a b. a < b ==> real_interval(a,b) SUBSET real_interval[a,b]`,
+  REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: values in range imply function in product *)
+let POINTWISE_IN_PRODUCT = prove
+ (`!f:num->real a b n.
+        (!i. a <= f i /\ f i <= b)
+        ==> f n IN real_interval[a,b]`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN MESON_TAC[]);;
+
 (* Helper: open intervals in unit interval are open *)
 let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
  (`!a b. &0 <= a /\ a < b /\ b <= &1
