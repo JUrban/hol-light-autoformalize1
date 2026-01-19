@@ -420,8 +420,27 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
         GEN_TAC THEN REWRITE_TAC[ETA_AX] THEN ASM_REWRITE_TAC[];
         (* Prove open set characterization for quotient_map *)
-        (* Key textbook property: need to use separation of closed sets *)
-        CHEAT_TAC];
+        (* Goal: !u. u SUBSET topspace product ==> *)
+        (*       (open_in top {x | x IN topspace /\ g x IN u} <=> open_in product u) *)
+        (* We know g is continuous, which gives (<=) direction *)
+        (* The (=>) direction needs the separation property from textbook *)
+        REPEAT STRIP_TAC THEN EQ_TAC THENL
+         [(*=> direction: preimage open ==> u open (hard - needs separation)  *)
+          CHEAT_TAC;
+          (* <= direction: u open ==> preimage open (follows from continuity) *)
+          DISCH_TAC THEN
+          SUBGOAL_THEN
+            `continuous_map (top, product_topology (:num)
+                                    (\n. subtopology euclideanreal
+                                           (real_interval[&0,&1])))
+                           (\x:A. \n:num. f n x)`
+            MP_TAC THENL
+           [REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
+            GEN_TAC THEN REWRITE_TAC[ETA_AX] THEN ASM_REWRITE_TAC[];
+            REWRITE_TAC[continuous_map] THEN
+            DISCH_THEN(MP_TAC o CONJUNCT2) THEN
+            DISCH_THEN(MP_TAC o SPEC `u:(num->real)->bool`) THEN
+            ASM_REWRITE_TAC[]]]];
       (* Prove injectivity: g injective since functions separate points *)
       (* If g x = g y then !n. f n x = f n y, contradicting assumption 3 unless x=y *)
       ASM_MESON_TAC[FUN_EQ_THM]];
