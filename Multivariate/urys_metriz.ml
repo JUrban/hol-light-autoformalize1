@@ -51,8 +51,16 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     EXISTS_TAC `b:(A->bool)->bool` THEN
     ASM_REWRITE_TAC[];
     ALL_TAC] THEN
-  (* Now construct the required family of functions
-     This is a simplified approach - we'll just use CHEAT_TAC for the detailed construction *)
+  (* Get completely_regular from normal + Hausdorff *)
+  SUBGOAL_THEN `completely_regular_space (top:A topology)` ASSUME_TAC THENL
+   [ASM_MESON_TAC[NORMAL_IMP_COMPLETELY_REGULAR_SPACE];
+    ALL_TAC] THEN
+  (* The hard part: constructing a countable indexed family *)
+  (* We have shown: - normal_space (hence functions exist by Urysohn)
+                     - completely_regular (hence separating functions exist)
+                     - countable basis b
+     What remains: enumerate pairs and index functions by num
+     This requires machinery for enumerating countable sets *)
   CHEAT_TAC);;
 
 (* Helper: embedding into product of [0,1] *)
