@@ -102,6 +102,11 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       (* For open u and x in u, topspace top \ u is closed *)
       (* Fourth property gives function that is 1 at x and 0 outside u *)
       (* This can be used to construct open neighborhoods in product *)
+      REWRITE_TAC[open_map] THEN
+      (* Need to show: for any open u, IMAGE g u is open in product *)
+      (* The image is in the product topology *)
+      (* This requires characterizing opens in product_topology *)
+      (* And showing IMAGE (\x. \n. f n x) u is one such open *)
       CHEAT_TAC;
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
