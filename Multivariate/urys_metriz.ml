@@ -411,6 +411,22 @@ let FUNCTION_NEQ_EXISTS_COMPONENT = prove
  (`!f:num->A g. ~(f = g) <=> (?n. ~(f n = g n))`,
   REWRITE_TAC[FUN_EQ_THM] THEN MESON_TAC[]);;
 
+(* Helper: open set properties *)
+let OPEN_IN_SUBSET_TOPSPACE = prove
+ (`!top:A topology u. open_in top u ==> u SUBSET topspace top`,
+  MESON_TAC[OPEN_IN_SUBSET]);;
+
+(* Helper: point in open set is in topspace *)
+let IN_OPEN_IN_IMP_IN_TOPSPACE = prove
+ (`!top:A topology u x.
+        open_in top u /\ x IN u ==> x IN topspace top`,
+  MESON_TAC[OPEN_IN_SUBSET; SUBSET]);;
+
+(* Helper: image contains preimage elements *)
+let PREIMAGE_IN_IMAGE = prove
+ (`!f:A->B s x. x IN s ==> f x IN IMAGE f s`,
+  REWRITE_TAC[IN_IMAGE] THEN MESON_TAC[]);;
+
 (* Helper: open intervals in unit interval are open *)
 let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
  (`!a b. &0 <= a /\ a < b /\ b <= &1
