@@ -244,6 +244,11 @@ let IMAGE_LAMBDA_PRODUCT = prove
         ((\y:A. \n:num. f n y) x) = (\n. f n x)`,
   REWRITE_TAC[FUN_EQ_THM; ETA_AX]);;
 
+(* Helper: subset relationship for unit interval *)
+let UNIT_INTERVAL_SUBSET_REAL = prove
+ (`real_interval[&0,&1] SUBSET (:real)`,
+  REWRITE_TAC[SUBSET; IN_UNIV; IN_REAL_INTERVAL]);;
+
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
