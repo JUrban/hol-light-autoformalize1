@@ -206,14 +206,18 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (*
-     The assumptions give us separating functions for any pair of points
-     and any closed set with external point. We need to enumerate these
-     into a single countable family.
+  (* Strategy: Enumerate basis elements and construct functions based on them.
+     For complex choice + enumeration, use gradual approach per CLAUDE.md *)
 
-     Current approach: Use admits for now, document the construction strategy.
-     This follows CLAUDE.md's gradual/partial approach.
-  *)
+  (* TODO: Use CANTOR_PAIRING to enumerate:
+     - Pairs (m,n) for point separation using basis elements e m, e n
+     - Pairs (closed set index, basis element) for closed set separation
+     This requires:
+     1. Enumerating topspace (if possible) or working with basis
+     2. Using CHOICE to extract functions (SKOLEM_THM approach failed)
+     3. Combining with CANTOR_PAIRING for bijection ℕ ↔ ℕ×ℕ *)
+
+  (* Placeholder construction - admits the existence *)
   CHEAT_TAC);;
 
 (* Helper: explicit pairing function for enumeration *)
