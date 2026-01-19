@@ -77,7 +77,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                (top,subtopology euclideanreal (real_interval[&0,&1]))
                (f n)) /\
         (!x y. x IN topspace top /\ y IN topspace top /\ ~(x = y)
-               ==> ?n. ~(f n x = f n y))
+               ==> ?n. ~(f n x = f n y)) /\
+        (!c x. closed_in top c /\ x IN topspace top /\ ~(x IN c)
+               ==> ?n. f n x = &1 /\ (!z. z IN c ==> f n z = &0))
         ==> ?g. embedding_map(top,
                               product_topology (:num)
                                 (\n. subtopology euclideanreal
