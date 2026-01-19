@@ -2574,3 +2574,13 @@ let ZERO_IN_UNIT_BOUNDS = prove
 let HALF_IN_UNIT_BOUNDS = prove
  (`&1 / &2 IN real_interval[&0,&1]`,
   REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
+
+(* Helper: everything is in UNIV *)
+let IN_UNIV_ALT = prove
+ (`!x. x IN UNIV`,
+  REWRITE_TAC[IN_UNIV]);;
+
+(* Helper: forall in UNIV simplification *)
+let FORALL_IN_UNIV = prove
+ (`!P. (!x. x IN UNIV ==> P x) <=> (!x. P x)`,
+  REWRITE_TAC[IN_UNIV]);;
