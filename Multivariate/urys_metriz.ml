@@ -1893,4 +1893,9 @@ let OPEN_IN_CLOSED_IN_EQ = prove
            ==> (open_in top s <=> closed_in top (topspace top DIFF s))`,
   SIMP_TAC[OPEN_IN_CLOSED_IN_EQ]);;
 
+(* Helper: real between *)
+let REAL_BETWEEN_HALF = prove
+ (`!x y. x < y ==> x < (x + y) / &2 /\ (x + y) / &2 < y`,
+  REAL_ARITH_TAC);;
+
 
