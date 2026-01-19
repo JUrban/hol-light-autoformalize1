@@ -437,6 +437,12 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* TODO: Expand cartesian_product and prove by cases *)
         CHEAT_TAC;
         (* Show cartesian product subset IMAGE g u *)
+        (* Mathematically: need to show cartesian_product k u ⊆ IMAGE g u *)
+        (* where u i = if i=n then [&0,&1]\{&0} else [&0,&1] *)
+        (* and g = \x. \n. f n x *)
+        (* Approach: for z in cartesian_product, need to find w in u with g w = z *)
+        (* This requires inverting the embedding, which needs the separating property *)
+        (* TODO: Try SUBSET_IMAGE or direct construction *)
         CHEAT_TAC];
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
