@@ -287,6 +287,16 @@ let HALF_ONE_OPEN_IN_UNIT = prove
   MATCH_MP_TAC OPEN_IN_UNIT_INTERVAL_SUBINTERVAL THEN
   REAL_ARITH_TAC);;
 
+(* Helper: [0,1]\{0} is open in unit interval *)
+let OPEN_IN_UNIT_INTERVAL_DIFF_ZERO = prove
+ (`open_in (subtopology euclideanreal (real_interval[&0,&1]))
+           (real_interval[&0,&1] DIFF {&0})`,
+  REWRITE_TAC[OPEN_IN_SUBTOPOLOGY; GSYM REAL_OPEN_IN] THEN
+  EXISTS_TAC `real_interval(&0,&2)` THEN
+  REWRITE_TAC[REAL_OPEN_REAL_INTERVAL] THEN
+  REWRITE_TAC[EXTENSION; IN_INTER; IN_DIFF; IN_SING; IN_REAL_INTERVAL] THEN
+  REAL_ARITH_TAC);;
+
 (* Helper: simple set lemma *)
 let SUBSET_UNION_LEFT = prove
  (`!s t. s SUBSET s UNION t`,
