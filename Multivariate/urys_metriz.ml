@@ -599,3 +599,13 @@ let TOPSPACE_UNIT_INTERVAL = prove
 let IN_COND_SET = prove
  (`!b s t x. x IN (if b then s else t) <=> if b then x IN s else x IN t`,
   MESON_TAC[]);;
+
+(* Helper: function value in range *)
+let FUNCTION_IN_RANGE = prove
+ (`!f s x. x IN s /\ (!y. y IN s ==> f y IN t) ==> f x IN t`,
+  SIMP_TAC[]);;
+
+(* Helper: pointwise comparison of functions *)
+let FUNCTION_POINTWISE_EQ = prove
+ (`!f g s. (!x. x IN s ==> f x = g x) /\ x IN s ==> f x = g x`,
+  SIMP_TAC[]);;
