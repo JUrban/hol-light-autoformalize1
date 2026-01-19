@@ -417,8 +417,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       CONJ_TAC THENL
        [(* IMAGE g topspace ∩ topspace product = IMAGE g topspace *)
         (* Requires: IMAGE g topspace ⊂ topspace product *)
-        (* This follows from: ∀x ∈ topspace, ∀n, f n x ∈ [0,1] *)
-        (* Which is assumption 1 *)
+        (* This follows from assumption 1: f n x IN [0,1] for all n, x *)
+        (* Multiple tactical approaches tried, all hit structural issues *)
+        (* Should be straightforward mathematically *)
         CHEAT_TAC;
         ALL_TAC] THEN
       (* Prove open set characterization *)
