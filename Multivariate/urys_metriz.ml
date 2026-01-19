@@ -2545,3 +2545,17 @@ let COND_DIFF_IMP = prove
 let COND_ELIM_THM = prove
  (`!b x y. (if b then x else y) = (if b then x else y)`,
   REWRITE_TAC[]);;
+
+(* Helper: 1 is in the half-open interval (&1/&2, &1) - wait, that's wrong! *)
+(* &1 is NOT in the open interval (&1/&2, &1) which is OPEN on both ends *)
+(* Let me check what the actual interval should be *)
+
+(* Helper: bounds for values  in open interval *)
+let IN_REAL_INTERVAL_OPEN_BOUNDS = prove
+ (`!x a b. x IN real_interval(a,b) <=> a < x /\ x < b`,
+  REWRITE_TAC[IN_REAL_INTERVAL]);;
+
+(* Helper: if value equals 1 and is in [0,1], express this *)
+let ONE_IN_UNIT_BOUNDS = prove
+ (`&1 IN real_interval[&0,&1]`,
+  REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
