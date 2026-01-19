@@ -1341,3 +1341,103 @@ let REAL_DIV_1 = prove
 let REAL_1_NE_0 = prove
  (`~(&1 = &0)`,
   REAL_ARITH_TAC);;
+
+(* Helper: comparison with zero *)
+let REAL_LT_LE = prove
+ (`!x y. x < y <=> x <= y /\ ~(x = y)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: transitivity *)
+let REAL_LTE_TRANS = prove
+ (`!x y z. x <= y /\ y < z ==> x < z`,
+  REAL_ARITH_TAC);;
+
+(* Helper: another transitivity *)
+let REAL_LET_TRANS = prove
+ (`!x y z. x < y /\ y <= z ==> x < z`,
+  REAL_ARITH_TAC);;
+
+(* Helper: addition preserves inequality *)
+let REAL_LT_ADD2 = prove
+ (`!x1 x2 y1 y2. x1 < y1 /\ x2 < y2 ==> x1 + x2 < y1 + y2`,
+  REAL_ARITH_TAC);;
+
+(* Helper: addition preserves order *)
+let REAL_LE_ADD2 = prove
+ (`!x1 x2 y1 y2. x1 <= y1 /\ x2 <= y2 ==> x1 + x2 <= y1 + y2`,
+  REAL_ARITH_TAC);;
+
+(* Helper: left addition *)
+let REAL_LE_LADD = prove
+ (`!x y z. x <= y <=> z + x <= z + y`,
+  REAL_ARITH_TAC);;
+
+(* Helper: right addition *)
+let REAL_LE_RADD = prove
+ (`!x y z. x <= y <=> x + z <= y + z`,
+  REAL_ARITH_TAC);;
+
+(* Helper: left subtraction *)
+let REAL_LE_LSUB = prove
+ (`!x y z. x - y <= z <=> x <= z + y`,
+  REAL_ARITH_TAC);;
+
+(* Helper: right subtraction *)
+let REAL_LE_RSUB = prove
+ (`!x y z. x <= y - z <=> x + z <= y`,
+  REAL_ARITH_TAC);;
+
+(* Helper: division basics *)
+let REAL_DIV_REFL = prove
+ (`!x. ~(x = &0) ==> x / x = &1`,
+  SIMP_TAC[REAL_DIV_REFL]);;
+
+(* Helper: inverse basics *)
+let REAL_MUL_LINV = prove
+ (`!x. ~(x = &0) ==> inv x * x = &1`,
+  SIMP_TAC[REAL_MUL_LINV]);;
+
+(* Helper: inverse basics right *)
+let REAL_MUL_RINV = prove
+ (`!x. ~(x = &0) ==> x * inv x = &1`,
+  SIMP_TAC[REAL_MUL_RINV]);;
+
+(* Helper: set membership extensionality *)
+let SET_EQ_LEMMA = prove
+ (`!s t. (!x. x IN s <=> x IN t) <=> s = t`,
+  REWRITE_TAC[EXTENSION]);;
+
+(* Helper: empty set characterization *)
+let EMPTY_EXISTS = prove
+ (`!s. s = {} <=> !x. ~(x IN s)`,
+  SET_TAC[]);;
+
+(* Helper: non-empty set *)
+let NONEMPTY_EXISTS = prove
+ (`!s. ~(s = {}) <=> ?x. x IN s`,
+  SET_TAC[]);;
+
+(* Helper: singleton characterization *)
+let SING_EXISTS = prove
+ (`!s x. s = {x} <=> !y. y IN s <=> y = x`,
+  SET_TAC[IN_SING]);;
+
+(* Helper: image of singleton *)
+let IMAGE_SING = prove
+ (`!f x. IMAGE f {x} = {f x}`,
+  SET_TAC[]);;
+
+(* Helper: image of empty *)
+let IMAGE_EMPTY_ALT = prove
+ (`!f. IMAGE f {} = {}`,
+  REWRITE_TAC[IMAGE_CLAUSES]);;
+
+(* Helper: union of singletons *)
+let UNION_SING_LEFT = prove
+ (`!x s. {x} UNION s = x INSERT s`,
+  SET_TAC[]);;
+
+(* Helper: union of singletons right *)
+let UNION_SING_RIGHT = prove
+ (`!s x. s UNION {x} = x INSERT s`,
+  SET_TAC[]);;
