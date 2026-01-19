@@ -401,7 +401,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                           else real_interval[&0,&1]` THEN
       REPEAT CONJ_TAC THENL
        [(* Show finitely many differ from topspace - only coordinate n differs *)
-        (* Library: OPEN_IN_CARTESIAN_PRODUCT_GEN characterizes this *)
+        (* Library pattern identified: Multivariate/metric.ml:4844-4846 *)
+        (* MATCH_MP_TAC FINITE_SUBSET works, but MESON_TAC goes too deep *)
+        (* Need alternative to MESON_TAC for final step *)
         CHEAT_TAC;
         (* Show each component is open *)
         CHEAT_TAC;
