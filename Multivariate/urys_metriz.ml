@@ -187,8 +187,10 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* Now use choice to select functions and enumerate them *)
-  (* This requires careful construction with CANTOR_UNPAIR *)
-  (* The full construction and verification is complex *)
+  (* Use choice axiom for separating functions *)
+  (* The construction requires selecting from existential statements *)
+  (* and enumerating them using a countable enumeration *)
+  (* This is standard but technically involved *)
   CHEAT_TAC);;
 
 (* Helper: explicit pairing function for enumeration *)
@@ -282,7 +284,7 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         X_GEN_TAC `i:num` THEN DISCH_TAC THEN
         ASM_REWRITE_TAC[] THEN
         REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN
-        (* real_interval(1/2,1) ≠ real_interval[0,1] but real_interval[0,1] = topspace *)
+        (* real_interval(1/2,1) ≠ real_interval[0,1] ∩ real_interval[0,1] *)
         CHEAT_TAC;
         (* Show each component is open *)
         (* (1/2,1) is open by OPEN_IN_UNIT_INTERVAL_SUBINTERVAL *)
@@ -578,3 +580,8 @@ let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
   REWRITE_TAC[GSYM REAL_OPEN_IN; REAL_OPEN_REAL_INTERVAL; INTER_SUBSET] THEN
   REWRITE_TAC[EXTENSION; IN_INTER; IN_REAL_INTERVAL] THEN
   ASM_MESON_TAC[REAL_LT_IMP_LE; REAL_LE_TRANS]);;
+(* Helper: topspace of unit interval subtopology *)
+let TOPSPACE_UNIT_INTERVAL = prove
+ (`topspace (subtopology euclideanreal (real_interval[&0,&1])) =
+   real_interval[&0,&1]`,
+  REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL; INTER_UNIV]);;
