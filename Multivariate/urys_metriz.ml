@@ -2620,3 +2620,18 @@ let THREE_QUARTERS_IN_UNIT = prove
 let IMP_REFL = prove
  (`!p. p ==> p`,
   MESON_TAC[]);;
+
+(* Helper: disjunction elimination *)
+let DISJ_CASES_SIMPLE = prove
+ (`!p q r. (p \/ q) /\ (p ==> r) /\ (q ==> r) ==> r`,
+  MESON_TAC[]);;
+
+(* Helper: equality symmetry *)
+let EQ_SYM_SIMPLE = prove
+ (`!x y. x = y ==> y = x`,
+  MESON_TAC[]);;
+
+(* Helper: transitivity of equality *)
+let EQ_TRANS_SIMPLE = prove
+ (`!x y z. x = y /\ y = z ==> x = z`,
+  MESON_TAC[]);;
