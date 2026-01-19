@@ -140,11 +140,10 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   (* Enumerate the countable basis b as a sequence *)
   SUBGOAL_THEN `?e:num->A->bool. !u. u IN b ==> ?n. e n = u`
                STRIP_ASSUME_TAC THENL
-   [(* From COUNTABLE b, we know b is countable *)
-    (* For each u in b, use @ to select some n with e n = u *)
-    (* This is a standard application of countability *)
-    (* The full proof requires showing b can be enumerated as IMAGE of some function *)
-    (* For now, we admit this standard result *)
+   [(* TODO: Prove using COUNTABLE_AS_IMAGE - b is countable from second_countable *)
+    (*  Standard result: countable set can be enumerated *)
+    (*  Requires extracting COUNTABLE b from the topology_base assumptions *)
+    (*  and applying COUNTABLE_AS_IMAGE theorem *)
     CHEAT_TAC;
     ALL_TAC] THEN
 
