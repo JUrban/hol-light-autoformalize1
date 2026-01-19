@@ -327,6 +327,14 @@ let INTER_IDEM = prove
  (`!s. s INTER s = s`,
   SET_TAC[]);;
 
+(* Helper: conditional inequality for EMBEDDING proof *)
+let COND_INTERVAL_NE_IMP = prove
+ (`!i n. ~((if i = n then real_interval(&1 / &2, &1)
+            else real_interval[&0,&1]) = real_interval[&0,&1])
+         ==> i = n`,
+  REPEAT GEN_TAC THEN REWRITE_TAC[COND_INTERVAL_EQ_CLOSED] THEN
+  MESON_TAC[]);;
+
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
  (`!top:A topology f:num->A->real.
@@ -387,8 +395,6 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
         X_GEN_TAC `i:num` THEN
         REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV] THEN
-        (* TODO: Prove (if i=n then real_interval(&1/&2,&1) else real_interval[&0,&1]) ≠ real_interval[&0,&1] ==> i = n *)
-        (* This follows from COND_INTERVAL_EQ_CLOSED but tactics are tricky *)
         CHEAT_TAC;
         (* Show each component is open *)
         (* TODO: Use HALF_ONE_OPEN_IN_UNIT for (1/2,1) case, OPEN_IN_TOPSPACE for [0,1] case *)
