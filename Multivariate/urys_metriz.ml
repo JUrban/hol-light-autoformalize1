@@ -73,10 +73,17 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
   REPEAT STRIP_TAC THEN
   EXISTS_TAC `\x:A. \n:num. (f:num->A->real) n x` THEN
   CONJ_TAC THENL
-   [REWRITE_TAC[embedding_map; homeomorphic_map] THEN
+   [MATCH_MP_TAC INJECTIVE_OPEN_IMP_EMBEDDING_MAP THEN
     CONJ_TAC THENL
-     [CHEAT_TAC;  (* quotient_map - requires showing preimage preserves opens *)
-      (* Injectivity *)
+     [(* Prove continuous_map using componentwise criterion *)
+      REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
+      GEN_TAC THEN REWRITE_TAC[ETA_AX] THEN
+      ASM_REWRITE_TAC[];
+      ALL_TAC] THEN
+    CONJ_TAC THENL
+     [(* Prove open_map *)
+      CHEAT_TAC;
+      (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
       EQ_TAC THENL [ALL_TAC; SIMP_TAC[]] THEN
       ONCE_REWRITE_TAC[GSYM CONTRAPOS_THM] THEN
