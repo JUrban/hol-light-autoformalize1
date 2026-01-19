@@ -346,6 +346,17 @@ let COND_INTERVAL_DIFF_ZERO_NE_IMP = prove
   REPEAT GEN_TAC THEN REWRITE_TAC[COND_INTERVAL_DIFF_ZERO_EQ] THEN
   MESON_TAC[]);;
 
+(* Helper: finite set for conditional interval construction *)
+let FINITE_COND_INTERVAL_DIFF_ZERO = prove
+ (`!n:num. FINITE {i:num | ~((if i = n then real_interval[&0,&1] DIFF {&0}
+                              else real_interval[&0,&1]) =
+                             real_interval[&0,&1])}`,
+  GEN_TAC THEN
+  MATCH_MP_TAC FINITE_SUBSET THEN
+  EXISTS_TAC `{n:num}` THEN
+  REWRITE_TAC[FINITE_SING; SUBSET; IN_SING; IN_ELIM_THM] THEN
+  REWRITE_TAC[COND_INTERVAL_DIFF_ZERO_NE_IMP]);;
+
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
  (`!top:A topology f:num->A->real.
@@ -401,11 +412,23 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                           else real_interval[&0,&1]` THEN
       REPEAT CONJ_TAC THENL
        [(* Show finitely many differ from topspace - only coordinate n differs *)
-        (* Library pattern identified: Multivariate/metric.ml:4844-4846 *)
-        (* MATCH_MP_TAC FINITE_SUBSET works, but MESON_TAC goes too deep *)
-        (* Need alternative to MESON_TAC for final step *)
+        (* Mathematically: only coordinate n differs (uses [&0,&1]\{&0} vs [&0,&1]) *)
+        (* Helper lemma FINITE_COND_INTERVAL_DIFF_ZERO proves this *)
+        (* Tactical issue: All approaches hit problems: *)
+        (* - MESON_TAC[COND_INTERVAL_DIFF_ZERO_NE_IMP]: Too deep (85962+ steps) *)
+        (* - ASM_MESON_TAC: Even deeper (475691+ steps) *)
+        (* - SIMP_TAC: Hangs (timeout) *)
+        (* - Manual MATCH_MP_TAC: "No match" after beta reduction *)
+        (* - REWRITE_TAC approach: "Unsolved goals" *)
+        (* Root cause: MESON struggles with conditional expressions in set comprehensions *)
+        (* TODO: Try manual COND_CASES_TAC proof or different helper lemma formulation *)
         CHEAT_TAC;
         (* Show each component is open *)
+        (* Mathematically: COND_CASES_TAC splits into two cases:
+           - i = n: use OPEN_IN_UNIT_INTERVAL_DIFF_ZERO
+           - ~(i = n): use OPEN_IN_SUBTOPOLOGY_REFL with SUBSET_UNIV *)
+        (* Tactical issue: "find_term" error in REWRITE_TAC *)
+        (* TODO: Debug find_term error or try alternative tactics *)
         CHEAT_TAC;
         (* Show y in cartesian product *)
         CHEAT_TAC;
