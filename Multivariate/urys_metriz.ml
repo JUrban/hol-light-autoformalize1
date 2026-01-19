@@ -2605,3 +2605,18 @@ let IMP_CHAIN = prove
 let CONJ_INTRO = prove
  (`!p q. p ==> q ==> p /\ q`,
   MESON_TAC[]);;
+
+(* Helper: value between 1/2 and 1 *)
+let THREE_QUARTERS_BOUNDS = prove
+ (`&1 / &2 < &3 / &4 /\ &3 / &4 < &1`,
+  REAL_ARITH_TAC);;
+
+(* Helper: three quarters in unit interval *)
+let THREE_QUARTERS_IN_UNIT = prove
+ (`&3 / &4 IN real_interval[&0,&1]`,
+  REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
+
+(* Helper: basic implication *)
+let IMP_REFL = prove
+ (`!p. p ==> p`,
+  MESON_TAC[]);;
