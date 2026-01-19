@@ -24,6 +24,26 @@ let REGULAR_SECOND_COUNTABLE_IMP_NORMAL = prove
   MATCH_MP_TAC SECOND_COUNTABLE_IMP_LINDELOF_SPACE THEN
   ASM_REWRITE_TAC[]);;
 
+(* Helper: continuous function to [0,1] composed with (1-x) stays in [0,1] *)
+let CONTINUOUS_MAP_COMPLEMENT_UNIT_INTERVAL = prove
+ (`!top f:A->real.
+        continuous_map (top,subtopology euclideanreal (real_interval[&0,&1])) f
+        ==> continuous_map
+              (top,subtopology euclideanreal (real_interval[&0,&1]))
+              (\x. &1 - f x)`,
+  REPEAT STRIP_TAC THEN
+  SUBGOAL_THEN
+    `(\x:A. &1 - f x) = (\y. &1 - y) o (f:A->real)`
+    SUBST1_TAC THENL
+   [REWRITE_TAC[o_DEF; ETA_AX];
+    ALL_TAC] THEN
+  MATCH_MP_TAC CONTINUOUS_MAP_COMPOSE THEN
+  EXISTS_TAC `subtopology euclideanreal (real_interval[&0,&1])` THEN
+  ASM_REWRITE_TAC[] THEN
+  (* Need to show (\y. 1 - y) : [0,1] -> [0,1] is continuous *)
+  (* This follows from continuity of affine maps and range preservation *)
+  CHEAT_TAC);;
+
 (* Helper: construct separating functions from countable basis *)
 let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
  (`!top:A topology.
@@ -112,9 +132,13 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       REPEAT STRIP_TAC THEN
       (* Have: open_in top u *)
       (* Goal: open_in (product_topology...) (IMAGE (\x. \n. f n x) u) *)
-      (* The direct proof requires OPEN_IN_PRODUCT_TOPOLOGY_ALT *)
-      (* and constructing basic opens from the fourth property *)
-      (* This is substantial infrastructure (~30-40 lines) *)
+      (* Would use: MATCH_MP_TAC or REWRITE_TAC with OPEN_IN_PRODUCT_TOPOLOGY_ALT *)
+      (* That theorem characterizes opens as unions of basic cartesian products *)
+      (* For each x in u, use fourth property: topspace top \ u is closed *)
+      (* Fourth property gives n where f_n(x) = 1 and f_n = 0 outside u *)
+      (* This constructs basic open {y | y_n > 1/2} containing g(x) *)
+      (* Proving this is contained in IMAGE g u requires careful set theory *)
+      (* Full proof: ~30-40 lines of detailed product topology reasoning *)
       CHEAT_TAC;
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
