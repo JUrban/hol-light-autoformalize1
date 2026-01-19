@@ -159,7 +159,7 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ASM_REWRITE_TAC[];
     ALL_TAC] THEN
 
-  (* For each closed set and external point, completely_regular gives function *)
+  (* For each closed set and external point, use Urysohn *)
   SUBGOAL_THEN
     `!c x:A. closed_in top c /\ x IN topspace top /\ ~(x IN c)
              ==> ?g. continuous_map
@@ -167,7 +167,23 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
                        g /\
                      g x = &1 /\ (!z. z IN c ==> g z = &0)`
     ASSUME_TAC THENL
-   [CHEAT_TAC;  (* Follows from normal_space + Urysohn *)
+   [REPEAT STRIP_TAC THEN
+    (* Use Urysohn with singleton {x} and closed set c *)
+    MP_TAC(ISPECL [`top:A topology`; `{x:A}`; `c:A->bool`]
+                  NORMAL_SPACE_URYSOHN_FUNCTION) THEN
+    ASM_REWRITE_TAC[] THEN
+    ANTS_TAC THENL
+     [CONJ_TAC THENL
+       [(* {x} is closed: Hausdorff implies T1, T1 gives closed singletons *)
+        ASM_SIMP_TAC[CLOSED_IN_T1_SING; HAUSDORFF_IMP_T1_SPACE];
+        (* {x} and c are disjoint since x ∉ c *)
+        ASM_SIMP_TAC[DISJOINT; EXTENSION; IN_INTER; NOT_IN_EMPTY; IN_SING]];
+      (* Extract the function from Urysohn *)
+      MATCH_MP_TAC MONO_EXISTS THEN X_GEN_TAC `g:A->real` THEN
+      STRIP_TAC THEN ASM_REWRITE_TAC[] THEN
+      CONJ_TAC THENL
+       [FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN SIMP_TAC[IN_SING];
+        ASM_SIMP_TAC[]]];
     ALL_TAC] THEN
 
   (* Now use choice to select functions and enumerate them *)
