@@ -2306,3 +2306,93 @@ let IN_DIFF_SIMPLE = prove
 let COMPLEMENT_SIMPLE = prove
  (`!s t u. s = u DIFF t <=> !x. x IN s <=> x IN u /\ ~(x IN t)`,
   REWRITE_TAC[EXTENSION; IN_DIFF]);;
+
+(* Helper: De Morgan's laws *)
+let COMPL_UNION = prove
+ (`!s t u. u DIFF (s UNION t) = (u DIFF s) INTER (u DIFF t)`,
+  SET_TAC[]);;
+
+(* Helper: De Morgan's laws *)
+let COMPL_INTER = prove
+ (`!s t u. u DIFF (s INTER t) = (u DIFF s) UNION (u DIFF t)`,
+  SET_TAC[]);;
+
+(* Helper: double complement *)
+let DIFF_DIFF_SUBSET = prove
+ (`!s t u. s SUBSET u ==> u DIFF (u DIFF s) = s`,
+  SET_TAC[]);;
+
+(* Helper: distributivity *)
+let INTER_UNION_DISTRIB_LEFT = prove
+ (`!s t u. s INTER (t UNION u) = (s INTER t) UNION (s INTER u)`,
+  SET_TAC[]);;
+
+(* Helper: distributivity *)
+let INTER_UNION_DISTRIB_RIGHT = prove
+ (`!s t u. (s UNION t) INTER u = (s INTER u) UNION (t INTER u)`,
+  SET_TAC[]);;
+
+(* Helper: distributivity *)
+let UNION_INTER_DISTRIB_LEFT = prove
+ (`!s t u. s UNION (t INTER u) = (s UNION t) INTER (s UNION u)`,
+  SET_TAC[]);;
+
+(* Helper: distributivity *)
+let UNION_INTER_DISTRIB_RIGHT = prove
+ (`!s t u. (s INTER t) UNION u = (s UNION u) INTER (t UNION u)`,
+  SET_TAC[]);;
+
+(* Helper: subset and diff *)
+let SUBSET_DIFF_EQ = prove
+ (`!s t u. s SUBSET t ==> (t DIFF u) SUBSET (s UNION (t DIFF u))`,
+  SET_TAC[]);;
+
+(* Helper: diff and inter *)
+let DIFF_INTER = prove
+ (`!s t u. (s DIFF t) INTER u = s INTER u DIFF t`,
+  SET_TAC[]);;
+
+(* Helper: diff distributivity *)
+let DIFF_UNION_DISTRIB = prove
+ (`!s t u. s DIFF (t UNION u) = (s DIFF t) INTER (s DIFF u)`,
+  SET_TAC[]);;
+
+(* Helper: real abs properties *)
+let REAL_ABS_0 = prove
+ (`abs(&0) = &0`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real abs properties *)
+let REAL_ABS_NEG = prove
+ (`!x. abs(--x) = abs(x)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real abs properties *)
+let REAL_ABS_POS = prove
+ (`!x. &0 <= abs(x)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real abs properties *)
+let REAL_ABS_REFL = prove
+ (`!x. abs(abs(x)) = abs(x)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real abs triangle *)
+let REAL_ABS_TRIANGLE_SIMPLE = prove
+ (`!x y. abs(x + y) <= abs(x) + abs(y)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: finite operations *)
+let FINITE_INSERT_SIMPLE = prove
+ (`!x s. FINITE s ==> FINITE (x INSERT s)`,
+  REWRITE_TAC[FINITE_INSERT]);;
+
+(* Helper: finite operations *)
+let FINITE_UNION_SIMPLE = prove
+ (`!s t. FINITE s /\ FINITE t ==> FINITE (s UNION t)`,
+  REWRITE_TAC[FINITE_UNION]);;
+
+(* Helper: finite operations *)
+let FINITE_INTER_SIMPLE = prove
+ (`!s t. FINITE s \/ FINITE t ==> FINITE (s INTER t)`,
+  MESON_TAC[FINITE_INTER; INTER_COMM]);;
