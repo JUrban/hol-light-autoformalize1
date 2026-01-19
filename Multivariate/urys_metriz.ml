@@ -2396,3 +2396,93 @@ let FINITE_UNION_SIMPLE = prove
 let FINITE_INTER_SIMPLE = prove
  (`!s t. FINITE s \/ FINITE t ==> FINITE (s INTER t)`,
   MESON_TAC[FINITE_INTER; INTER_COMM]);;
+
+(* Helper: finite diff *)
+let FINITE_DIFF_SIMPLE = prove
+ (`!s t. FINITE s ==> FINITE (s DIFF t)`,
+  SIMP_TAC[FINITE_DIFF]);;
+
+(* Helper: forall in insert *)
+let FORALL_IN_INSERT_SIMPLE = prove
+ (`!P x s. (!y. y IN x INSERT s ==> P y) <=> P x /\ (!y. y IN s ==> P y)`,
+  REWRITE_TAC[IN_INSERT] THEN MESON_TAC[]);;
+
+(* Helper: exists in insert *)
+let EXISTS_IN_INSERT_SIMPLE = prove
+ (`!P x s. (?y. y IN x INSERT s /\ P y) <=> P x \/ (?y. y IN s /\ P y)`,
+  REWRITE_TAC[IN_INSERT] THEN MESON_TAC[]);;
+
+(* Helper: element of union *)
+let IN_UNION_SIMPLE = prove
+ (`!x s t. x IN s UNION t <=> x IN s \/ x IN t`,
+  REWRITE_TAC[IN_UNION]);;
+
+(* Helper: element of inter *)
+let IN_INTER_SIMPLE = prove
+ (`!x s t. x IN s INTER t <=> x IN s /\ x IN t`,
+  REWRITE_TAC[IN_INTER]);;
+
+(* Helper: subset and union *)
+let SUBSET_UNION_EQ = prove
+ (`!s t. s SUBSET t <=> s UNION t = t`,
+  SET_TAC[]);;
+
+(* Helper: subset and inter *)
+let SUBSET_INTER_EQ = prove
+ (`!s t. s SUBSET t <=> s INTER t = s`,
+  SET_TAC[]);;
+
+(* Helper: disjoint characterization *)
+let DISJOINT_EMPTY_INTER = prove
+ (`!s t. DISJOINT s t <=> s INTER t = {}`,
+  REWRITE_TAC[DISJOINT]);;
+
+(* Helper: disjoint symmetry *)
+let DISJOINT_SYM = prove
+ (`!s t. DISJOINT s t <=> DISJOINT t s`,
+  REWRITE_TAC[DISJOINT] THEN SET_TAC[]);;
+
+(* Helper: pairwise disjoint *)
+let PAIRWISE_DISJOINT_SIMPLE = prove
+ (`!s t u. DISJOINT s t /\ DISJOINT s u /\ DISJOINT t u
+           ==> s INTER t = {} /\ s INTER u = {} /\ t INTER u = {}`,
+  REWRITE_TAC[DISJOINT] THEN SET_TAC[]);;
+
+(* Helper: in elim *)
+let IN_ELIM_SIMPLE = prove
+ (`!P x. x IN {y | P y} <=> P x`,
+  REWRITE_TAC[IN_ELIM_THM]);;
+
+(* Helper: gspec *)
+let IN_GSPEC_SIMPLE = prove
+ (`!P x. x IN {f y | P y} <=> ?y. P y /\ x = f y`,
+  REWRITE_TAC[IN_ELIM_THM] THEN MESON_TAC[]);;
+
+(* Helper: image monotone *)
+let IMAGE_MONO = prove
+ (`!f s t. s SUBSET t ==> IMAGE f s SUBSET IMAGE f t`,
+  REWRITE_TAC[IMAGE_SUBSET]);;
+
+(* Helper: continuous map in subtopology *)
+let CONTINUOUS_MAP_FROM_SUBTOPOLOGY_SIMPLE = prove
+ (`!top top' s f. continuous_map (subtopology top s, top') f
+                  ==> !x. x IN s INTER topspace top ==> f x IN topspace top'`,
+  REWRITE_TAC[continuous_map; TOPSPACE_SUBTOPOLOGY; IN_INTER] THEN
+  SET_TAC[IN_IMAGE]);;
+
+(* Helper: open_in subtopology characterization *)
+let OPEN_IN_SUBTOPOLOGY_SIMPLE = prove
+ (`!top s u. open_in (subtopology top s) u <=>
+             ?v. open_in top v /\ u = v INTER s`,
+  REWRITE_TAC[OPEN_IN_SUBTOPOLOGY]);;
+
+(* Helper: closed_in subtopology characterization *)
+let CLOSED_IN_SUBTOPOLOGY_SIMPLE = prove
+ (`!top s u. closed_in (subtopology top s) u <=>
+             ?v. closed_in top v /\ u = v INTER s`,
+  REWRITE_TAC[CLOSED_IN_SUBTOPOLOGY]);;
+
+(* Helper: subtopology of subtopology *)
+let SUBTOPOLOGY_SUBTOPOLOGY = prove
+ (`!top s t. subtopology (subtopology top s) t = subtopology top (s INTER t)`,
+  REWRITE_TAC[SUBTOPOLOGY_SUBTOPOLOGY]);;
