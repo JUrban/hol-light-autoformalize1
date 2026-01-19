@@ -366,6 +366,15 @@ let FINITE_COND_INTERVAL_DIFF_ZERO = prove
   REWRITE_TAC[FINITE_SING; SUBSET; IN_SING; IN_ELIM_THM] THEN
   REWRITE_TAC[COND_INTERVAL_DIFF_ZERO_NE_IMP]);;
 
+(* Helper: membership in conditional interval *)
+let IN_COND_INTERVAL_DIFF_ZERO = prove
+ (`!x n i. x IN real_interval[&0,&1] /\ (i = n ==> ~(x = &0))
+           ==> x IN (if i = n then real_interval[&0,&1] DIFF {&0}
+                     else real_interval[&0,&1])`,
+  REPEAT STRIP_TAC THEN COND_CASES_TAC THEN
+  ASM_REWRITE_TAC[IN_DIFF; IN_SING] THEN
+  ASM_MESON_TAC[]);;
+
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
  (`!top:A topology f:num->A->real.
