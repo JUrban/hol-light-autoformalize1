@@ -843,3 +843,48 @@ let EMPTY_SUBSET_SIMPLE = prove
 let SUBSET_UNION_LEFT = prove
  (`!s t. s SUBSET (s UNION t)`,
   SET_TAC[]);;
+
+(* Helper: subset union right *)
+let SUBSET_UNION_RIGHT = prove
+ (`!s t. t SUBSET (s UNION t)`,
+  SET_TAC[]);;
+
+(* Helper: subset inter *)
+let SUBSET_INTER_BOTH = prove
+ (`!s t u. s SUBSET t /\ s SUBSET u ==> s SUBSET (t INTER u)`,
+  SET_TAC[]);;
+
+(* Helper: union comm *)
+let UNION_COMM_SIMPLE = prove
+ (`!s t. s UNION t = t UNION s`,
+  REWRITE_TAC[UNION_COMM]);;
+
+(* Helper: inter comm *)
+let INTER_COMM_SIMPLE = prove
+ (`!s t. s INTER t = t INTER s`,
+  REWRITE_TAC[INTER_COMM]);;
+
+(* Helper: subset antisym *)
+let SUBSET_ANTISYM_SIMPLE = prove
+ (`!s t. s SUBSET t /\ t SUBSET s ==> s = t`,
+  REWRITE_TAC[GSYM SUBSET_ANTISYM_EQ] THEN MESON_TAC[]);;
+
+(* Helper: in union *)
+let IN_UNION_SIMPLE = prove
+ (`!x s t. x IN (s UNION t) <=> x IN s \/ x IN t`,
+  REWRITE_TAC[IN_UNION]);;
+
+(* Helper: in inter *)
+let IN_INTER_SIMPLE = prove
+ (`!x s t. x IN (s INTER t) <=> x IN s /\ x IN t`,
+  REWRITE_TAC[IN_INTER]);;
+
+(* Helper: in diff *)
+let IN_DIFF_SIMPLE = prove
+ (`!x s t. x IN (s DIFF t) <=> x IN s /\ ~(x IN t)`,
+  REWRITE_TAC[IN_DIFF]);;
+
+(* Helper: subset refl *)
+let SUBSET_REFL_SIMPLE = prove
+ (`!s. s SUBSET s`,
+  REWRITE_TAC[SUBSET_REFL]);;
