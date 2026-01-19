@@ -366,6 +366,16 @@ let URYSOHN_METRIZATION = prove
              metrizable_space top)`,
   MESON_TAC[URYSOHN_METRIZATION_FWD; URYSOHN_METRIZATION_BWD]);;
 
+(* Helper: 1/2 in unit interval *)
+let HALF_IN_UNIT_INTERVAL = prove
+ (`&1 / &2 IN real_interval[&0,&1]`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: 0 and 1 in unit interval *)
+let ZERO_ONE_IN_UNIT_INTERVAL = prove
+ (`&0 IN real_interval[&0,&1] /\ &1 IN real_interval[&0,&1]`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
 (* Helper: open intervals in unit interval are open *)
 let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
  (`!a b. &0 <= a /\ a < b /\ b <= &1
