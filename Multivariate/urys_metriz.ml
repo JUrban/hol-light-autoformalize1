@@ -494,6 +494,23 @@ let POINTWISE_IN_PRODUCT = prove
         ==> f n IN real_interval[a,b]`,
   REWRITE_TAC[IN_REAL_INTERVAL] THEN MESON_TAC[]);;
 
+(* Helper: image subset from pointwise *)
+let IMAGE_SUBSET_FROM_POINTWISE = prove
+ (`!f:A->B s t.
+        (!x. x IN s ==> f x IN t)
+        ==> IMAGE f s SUBSET t`,
+  REWRITE_TAC[SUBSET; IN_IMAGE] THEN MESON_TAC[]);;
+
+(* Helper: set inequality *)
+let SET_NEQ_EXISTS_ELEMENT = prove
+ (`!s:A->bool t. ~(s = t) <=> (?x. x IN s /\ ~(x IN t) \/ ~(x IN s) /\ x IN t)`,
+  REWRITE_TAC[EXTENSION] THEN MESON_TAC[]);;
+
+(* Helper: nonempty set has element *)
+let NONEMPTY_HAS_ELEMENT = prove
+ (`!s:A->bool. ~(s = {}) <=> (?x. x IN s)`,
+  REWRITE_TAC[EXTENSION; NOT_IN_EMPTY] THEN MESON_TAC[]);;
+
 (* Helper: open intervals in unit interval are open *)
 let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
  (`!a b. &0 <= a /\ a < b /\ b <= &1
