@@ -634,3 +634,9 @@ let SUBSET_UNION = prove
 let IN_UNION_ALT = prove
  (`!x s t. x IN (s UNION t) <=> x IN s \/ x IN t`,
   SET_TAC[]);;
+
+(* Helper: continuity composition *)
+let CONTINUOUS_MAP_CONST = prove
+ (`!top top' c. c IN topspace top' 
+                ==> continuous_map (top,top') (\x. c)`,
+  SIMP_TAC[CONTINUOUS_MAP_CONST]);;
