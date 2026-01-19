@@ -128,7 +128,12 @@ let URYSOHN_METRIZATION_BWD = prove
   ASM_REWRITE_TAC[] THEN
   DISCH_THEN(X_CHOOSE_THEN `g:A->num->real` STRIP_ASSUME_TAC) THEN
   (* Show top is homeomorphic to a subspace of the product, hence metrizable *)
-  CHEAT_TAC);;
+  ABBREV_TAC `prod = product_topology (:num)
+                       (\n. subtopology euclideanreal (real_interval[&0,&1]))` THEN
+  ASM_MESON_TAC[EMBEDDING_MAP_IMP_HOMEOMORPHIC_SPACE;
+                HOMEOMORPHIC_METRIZABLE_SPACE;
+                METRIZABLE_SPACE_SUBTOPOLOGY;
+                METRIZABLE_PRODUCT_UNIT_INTERVAL]);;
 
 (* Combined form *)
 let URYSOHN_METRIZATION = prove
