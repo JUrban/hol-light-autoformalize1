@@ -145,13 +145,15 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   SUBGOAL_THEN `COUNTABLE (b CROSS b:(A->bool#A->bool)->bool)` ASSUME_TAC THENL
    [MATCH_MP_TAC COUNTABLE_CROSS THEN ASM_REWRITE_TAC[];
     ALL_TAC] THEN
-  (* Can use completely_regular + CONTINUOUS_MAP_COMPLEMENT_UNIT_INTERVAL *)
-  (* to get functions g where g(x)=1, g=0 on closed c *)
-  (* Strategy: for each closed c and x not in c, *)
-  (*   get h from completely_regular with h(x)=0, h=1 on c *)
-  (*   then g = 1-h gives g(x)=1, g=0 on c *)
-  (*   and g is continuous by CONTINUOUS_MAP_COMPLEMENT_UNIT_INTERVAL *)
-  (* Main remaining work: enumerate and index these using the basis *)
+  (* Key facts available from helper lemmas:
+     - COMPLETELY_REGULAR_HAUSDORFF_POINT_FUNCTIONS gives property 3
+     - completely_regular + CONTINUOUS_MAP_COMPLEMENT_UNIT_INTERVAL gives property 4
+     - Both functions have range [0,1] and are continuous
+     Main remaining challenge: enumerate and index by num *)
+  (* Strategy: Could enumerate pairs (x,y) and pairs (c,x) separately,
+     then combine using countable union. Or could use COUNTABLE_AS_IMAGE
+     on appropriate sets. Both approaches require substantial enumeration
+     infrastructure (~50-70 lines). *)
   CHEAT_TAC);;
 
 (* Helper: embedding into product of [0,1] *)
