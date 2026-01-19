@@ -686,3 +686,17 @@ let CONTINUOUS_MAP_RANGE_SUBSET = prove
  (`!top top' f. continuous_map (top,top') f
                 ==> IMAGE f (topspace top) SUBSET topspace top'`,
   SIMP_TAC[CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE]);;
+
+(* Helper: product topology basics *)
+let CARTESIAN_PRODUCT_SUBSET = prove
+ (`!k u v. (!i. u i SUBSET v i)
+           ==> cartesian_product k u SUBSET cartesian_product k v`,
+  REWRITE_TAC[SUBSET; cartesian_product; IN_ELIM_THM] THEN
+  SIMP_TAC[]);;
+
+(* Helper: image under lambda *)
+let IMAGE_LAMBDA_EXTENSIONAL = prove
+ (`!f s. IMAGE (\x. \n. f n x) s =
+         {g | ?x. x IN s /\ (!n. g n = f n x)}`,
+  REWRITE_TAC[EXTENSION; IN_IMAGE; IN_ELIM_THM] THEN
+  MESON_TAC[FUN_EQ_THM]);;
