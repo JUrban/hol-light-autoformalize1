@@ -218,7 +218,10 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   (* Second-countable spaces have countable dense subset when Hausdorff + regular *)
   (* Use enumeration of points + pairing to index all separation requirements *)
 
-  (* First get choice functions using @-operator *)
+  (* Attempt 8: Try different approach - revert to choice functions *)
+  (* This is a difficult construction - needs more thought *)
+
+  (* Get choice functions using @-operator *)
   ABBREV_TAC
     `(fp:A->A->A->real) =
        \x y. @g. if x IN topspace top /\ y IN topspace top /\ ~(x = y)
