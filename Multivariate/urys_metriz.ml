@@ -416,16 +416,11 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                           else real_interval[&0,&1]` THEN
       REPEAT CONJ_TAC THENL
        [(* Show finitely many differ from topspace - only coordinate n differs *)
-        (* Mathematically: only coordinate n differs (uses [&0,&1]\{&0} vs [&0,&1]) *)
-        (* Helper lemma FINITE_COND_INTERVAL_DIFF_ZERO proves this *)
-        (* Tactical issue: All approaches hit problems: *)
-        (* - MESON_TAC[COND_INTERVAL_DIFF_ZERO_NE_IMP]: Too deep (85962+ steps) *)
-        (* - ASM_MESON_TAC: Even deeper (475691+ steps) *)
-        (* - SIMP_TAC: Hangs (timeout) *)
-        (* - Manual MATCH_MP_TAC: "No match" after beta reduction *)
-        (* - REWRITE_TAC approach: "Unsolved goals" *)
-        (* Root cause: MESON struggles with conditional expressions in set comprehensions *)
-        (* TODO: Try manual COND_CASES_TAC proof or different helper lemma formulation *)
+        (* Helper lemma FINITE_COND_INTERVAL_DIFF_ZERO exists and compiles *)
+        (* Latest attempt: MP_TAC helper + MATCH_MP_TAC FINITE_SUBSET - unsolved goals *)
+        (* Previous 10+ attempts all failed with various tactical errors *)
+        (* Mathematical approach confirmed correct by helper lemma *)
+        (* Tactical barrier: goal has lambda \i., helper has direct i *)
         CHEAT_TAC;
         (* Show each component is open *)
         (* Mathematically: COND_CASES_TAC splits into two cases:
