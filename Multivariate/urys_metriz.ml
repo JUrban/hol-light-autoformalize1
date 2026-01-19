@@ -2535,3 +2535,12 @@ let CLOSED_IN_SUBTOPOLOGY_SIMPLE = prove
 let SUBTOPOLOGY_SUBTOPOLOGY = prove
  (`!top s t. subtopology (subtopology top s) t = subtopology top (s INTER t)`,
   REWRITE_TAC[SUBTOPOLOGY_SUBTOPOLOGY]);;
+
+(* Helper: set comprehension for conditional interval *)
+let COND_INTERVAL_NE_SET = prove
+ (`!n. {i | i IN UNIV /\ ~((if i = n then real_interval(&1 / &2, &1)
+                                     else real_interval[&0,&1]) =
+                            real_interval[&0,&1])} = {n}`,
+  GEN_TAC THEN REWRITE_TAC[EXTENSION; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
+  X_GEN_TAC `i:num` THEN REWRITE_TAC[COND_INTERVAL_EQ_CLOSED] THEN
+  MESON_TAC[]);;
