@@ -281,6 +281,26 @@ let SUBSET_UNION_RIGHT = prove
  (`!s t. t SUBSET s UNION t`,
   SET_TAC[]);;
 
+(* Helper: inter subset left *)
+let INTER_SUBSET_LEFT = prove
+ (`!s t. s INTER t SUBSET s`,
+  SET_TAC[]);;
+
+(* Helper: inter subset right *)
+let INTER_SUBSET_RIGHT = prove
+ (`!s t. s INTER t SUBSET t`,
+  SET_TAC[]);;
+
+(* Helper: union idempotent *)
+let UNION_IDEM = prove
+ (`!s. s UNION s = s`,
+  SET_TAC[]);;
+
+(* Helper: inter idempotent *)
+let INTER_IDEM = prove
+ (`!s. s INTER s = s`,
+  SET_TAC[]);;
+
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
  (`!top:A topology f:num->A->real.
