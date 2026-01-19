@@ -2417,11 +2417,6 @@ let REAL_INTERVAL_UBOUND = prove
  (`!a b x. x IN real_interval[a,b] ==> x <= b`,
   REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
-(* Helper: membership in diff *)
-let IN_DIFF_SIMPLE = prove
- (`!x s t. x IN s DIFF t <=> x IN s /\ ~(x IN t)`,
-  REWRITE_TAC[IN_DIFF]);;
-
 (* Helper: complement characterization *)
 let COMPLEMENT_SIMPLE = prove
  (`!s t u. s = u DIFF t <=> !x. x IN s <=> x IN u /\ ~(x IN t)`,
@@ -2531,16 +2526,6 @@ let FORALL_IN_INSERT_SIMPLE = prove
 let EXISTS_IN_INSERT_SIMPLE = prove
  (`!P x s. (?y. y IN x INSERT s /\ P y) <=> P x \/ (?y. y IN s /\ P y)`,
   REWRITE_TAC[IN_INSERT] THEN MESON_TAC[]);;
-
-(* Helper: element of union *)
-let IN_UNION_SIMPLE = prove
- (`!x s t. x IN s UNION t <=> x IN s \/ x IN t`,
-  REWRITE_TAC[IN_UNION]);;
-
-(* Helper: element of inter *)
-let IN_INTER_SIMPLE = prove
- (`!x s t. x IN s INTER t <=> x IN s /\ x IN t`,
-  REWRITE_TAC[IN_INTER]);;
 
 (* Helper: subset and union *)
 let SUBSET_UNION_EQ = prove
@@ -2695,36 +2680,6 @@ let EQ_SYM_SIMPLE = prove
 let EQ_TRANS_SIMPLE = prove
  (`!x y z. x = y /\ y = z ==> x = z`,
   MESON_TAC[]);;
-
-(* Helper: empty set has no elements *)
-let NOT_IN_EMPTY_SIMPLE = prove
- (`!x. ~(x IN {})`,
-  REWRITE_TAC[NOT_IN_EMPTY]);;
-
-(* Helper: singleton characterization *)
-let IN_SING_SIMPLE = prove
- (`!x y. x IN {y} <=> x = y`,
-  REWRITE_TAC[IN_SING]);;
-
-(* Helper: union membership *)
-let IN_UNION_SIMPLE = prove
- (`!x s t. x IN (s UNION t) <=> x IN s \/ x IN t`,
-  REWRITE_TAC[IN_UNION]);;
-
-(* Helper: intersection membership *)
-let IN_INTER_SIMPLE = prove
- (`!x s t. x IN (s INTER t) <=> x IN s /\ x IN t`,
-  REWRITE_TAC[IN_INTER]);;
-
-(* Helper: difference membership *)
-let IN_DIFF_SIMPLE = prove
- (`!x s t. x IN (s DIFF t) <=> x IN s /\ ~(x IN t)`,
-  REWRITE_TAC[IN_DIFF]);;
-
-(* Helper: universal set membership *)
-let IN_UNIV_SIMPLE = prove
- (`!x. x IN UNIV`,
-  REWRITE_TAC[IN_UNIV]);;
 
 (* Helper: conjunction and implication *)
 let CONJ_IMP = prove
