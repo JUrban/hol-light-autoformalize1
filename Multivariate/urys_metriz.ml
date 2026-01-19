@@ -2126,3 +2126,78 @@ let CARTESIAN_PRODUCT_SUBSET_SIMPLE = prove
 let TOPSPACE_SUBTOPOLOGY_SUBSET = prove
  (`!top s. topspace (subtopology top s) SUBSET s`,
   REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN SET_TAC[]);;
+
+(* Helper: element not in empty set *)
+let NOT_IN_EMPTY_SIMPLE = prove
+ (`!x. ~(x IN {})`,
+  REWRITE_TAC[NOT_IN_EMPTY]);;
+
+(* Helper: singleton nonempty *)
+let SING_NONEMPTY = prove
+ (`!x. ~({x} = {})`,
+  SET_TAC[]);;
+
+(* Helper: insert nonempty *)
+let INSERT_NONEMPTY = prove
+ (`!x s. ~(x INSERT s = {})`,
+  SET_TAC[]);;
+
+(* Helper: union with universe *)
+let UNION_UNIV_RIGHT = prove
+ (`!s. s UNION (:A) = (:A)`,
+  SET_TAC[]);;
+
+(* Helper: union with universe *)
+let UNION_UNIV_LEFT = prove
+ (`!s. (:A) UNION s = (:A)`,
+  SET_TAC[]);;
+
+(* Helper: intersection with universe *)
+let INTER_UNIV_RIGHT = prove
+ (`!s. s INTER (:A) = s`,
+  SET_TAC[]);;
+
+(* Helper: intersection with universe *)
+let INTER_UNIV_LEFT = prove
+ (`!s. (:A) INTER s = s`,
+  SET_TAC[]);;
+
+(* Helper: diff with empty *)
+let DIFF_EMPTY_RIGHT = prove
+ (`!s. s DIFF {} = s`,
+  SET_TAC[]);;
+
+(* Helper: diff with universe *)
+let DIFF_UNIV = prove
+ (`!s. s DIFF (:A) = {}`,
+  SET_TAC[]);;
+
+(* Helper: real bounds from interval membership *)
+let IN_INTERVAL_BOUNDS = prove
+ (`!x a b. x IN real_interval[a,b] ==> a <= b`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: open interval strict bounds *)
+let IN_OPEN_INTERVAL_BOUNDS = prove
+ (`!x a b. x IN real_interval(a,b) ==> a < b`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: nonempty has element *)
+let NONEMPTY_EXISTS = prove
+ (`!s. ~(s = {}) <=> (?x. x IN s)`,
+  SET_TAC[]);;
+
+(* Helper: subset antisymmetry *)
+let SUBSET_ANTISYM_SIMPLE = prove
+ (`!s t. s SUBSET t /\ t SUBSET s ==> s = t`,
+  SET_TAC[]);;
+
+(* Helper: element in universal set *)
+let IN_UNIV_SIMPLE = prove
+ (`!x:A. x IN (:A)`,
+  REWRITE_TAC[IN_UNIV]);;
+
+(* Helper: universal set nonempty *)
+let UNIV_NONEMPTY = prove
+ (`~((:A) = {})`,
+  SET_TAC[IN_UNIV]);;
