@@ -226,19 +226,39 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       ALL_TAC] THEN
     CONJ_TAC THENL
      [(* Prove open_map *)
-      (* Strategy: use fourth property to show images of open sets are open *)
-      (* For open u and x in u, topspace top \ u is closed *)
-      (* Fourth property gives function that is 1 at x and 0 outside u *)
-      (* This can be used to construct open neighborhoods in product *)
       REWRITE_TAC[open_map] THEN
       X_GEN_TAC `u:A->bool` THEN STRIP_TAC THEN
-      (* Need to show: IMAGE g u is open in product topology *)
-      (* Strategy: For each x in u, use fourth property with closed topspace \ u *)
-      (* This gives index n where f_n(x) = 1, f_n = 0 outside u *)
-      (* Then {w | w_n > 1/2} is a basic open containing g(x) *)
-      (* Must show this is contained in IMAGE g u - uses that f_n = 0 outside u *)
-      (* Requires detailed product topology and set theory reasoning *)
-      CHEAT_TAC;
+      (* Show IMAGE (\x. \n. f n x) u is open using OPEN_IN_PRODUCT_TOPOLOGY_ALT *)
+      REWRITE_TAC[OPEN_IN_PRODUCT_TOPOLOGY_ALT] THEN
+      REWRITE_TAC[IN_IMAGE] THEN
+      X_GEN_TAC `y:num->real` THEN
+      DISCH_THEN(X_CHOOSE_THEN `x:A` STRIP_ASSUME_TAC) THEN
+      (* For x in u: topspace \ u is closed and doesn't contain x *)
+      SUBGOAL_THEN `closed_in (top:A topology) (topspace top DIFF u)`
+        ASSUME_TAC THENL
+       [ASM_SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE; OPEN_IN_SUBSET];
+        ALL_TAC] THEN
+      SUBGOAL_THEN `(x:A) IN topspace top /\ ~(x IN topspace top DIFF u)`
+        STRIP_ASSUME_TAC THENL
+       [ASM_MESON_TAC[OPEN_IN_SUBSET; SUBSET; IN_DIFF];
+        ALL_TAC] THEN
+      (* Use fourth property to get separating function *)
+      FIRST_X_ASSUM(MP_TAC o SPECL
+        [`topspace (top:A topology) DIFF u`; `x:A`]) THEN
+      ASM_REWRITE_TAC[] THEN
+      DISCH_THEN(X_CHOOSE_THEN `n:num` STRIP_ASSUME_TAC) THEN
+      (* Construct basic open: (1/2,1) at n, [0,1] elsewhere *)
+      EXISTS_TAC `\i:num. if i = n then real_interval(&1 / &2, &1)
+                          else real_interval[&0,&1]` THEN
+      REPEAT CONJ_TAC THENL
+       [(* Show finitely many differ from topspace - only coordinate n differs *)
+        CHEAT_TAC;
+        (* Show each component is open *)
+        CHEAT_TAC;
+        (* Show y in cartesian product *)
+        CHEAT_TAC;
+        (* Show cartesian product subset IMAGE g u *)
+        CHEAT_TAC];
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
       EQ_TAC THENL [ALL_TAC; SIMP_TAC[]] THEN
