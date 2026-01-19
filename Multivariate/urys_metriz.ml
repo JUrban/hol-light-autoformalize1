@@ -1003,3 +1003,48 @@ let INTER_UNIV_LEFT = prove
 let INTER_UNIV_RIGHT = prove
  (`!s. s INTER (:A) = s`,
   REWRITE_TAC[INTER_UNIV]);;
+
+(* Helper: diff self *)
+let DIFF_SELF = prove
+ (`!s. s DIFF s = {}`,
+  SET_TAC[]);;
+
+(* Helper: diff empty *)
+let DIFF_EMPTY_LEFT = prove
+ (`!s. {} DIFF s = {}`,
+  SET_TAC[]);;
+
+(* Helper: empty diff *)
+let DIFF_EMPTY_RIGHT = prove
+ (`!s. s DIFF {} = s`,
+  REWRITE_TAC[DIFF_EMPTY]);;
+
+(* Helper: diff univ *)
+let DIFF_UNIV = prove
+ (`!s. (:A) DIFF s = UNIV DIFF s`,
+  REWRITE_TAC[]);;
+
+(* Helper: subset diff *)
+let SUBSET_DIFF_SUBSET = prove
+ (`!s t u. s SUBSET t ==> s DIFF u SUBSET t`,
+  SET_TAC[]);;
+
+(* Helper: insert comm *)
+let INSERT_COMM = prove
+ (`!x y s. x INSERT (y INSERT s) = y INSERT (x INSERT s)`,
+  SET_TAC[]);;
+
+(* Helper: insert absorb *)
+let INSERT_ABSORB = prove
+ (`!x s. x IN s ==> x INSERT s = s`,
+  SET_TAC[]);;
+
+(* Helper: insert union *)
+let INSERT_UNION = prove
+ (`!x s t. (x INSERT s) UNION t = x INSERT (s UNION t)`,
+  SET_TAC[]);;
+
+(* Helper: in insert *)
+let IN_INSERT_SIMPLE = prove
+ (`!x y s. x IN (y INSERT s) <=> x = y \/ x IN s`,
+  REWRITE_TAC[IN_INSERT]);;
