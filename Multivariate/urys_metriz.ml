@@ -296,9 +296,10 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
         X_GEN_TAC `i:num` THEN
         REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV] THEN
-        (* TODO: Use COND_CASES_TAC to split on conditional *)
-        (*       After split: i=n gives ~(interval(1/2,1)=interval[0,1])=>n=n (trivial) *)
-        (*                   i<>n gives ~(interval[0,1]=interval[0,1])=>i=n (false antecedent) *)
+        (* TODO: Prove ~((if i=n then interval(1/2,1) else interval[0,1]) = interval[0,1]) ==> i=n *)
+        (*       Attempted: ASM_CASES_TAC + ASM_SIMP_TAC (unsolved goals) *)
+        (*                 ASM_CASES_TAC + MESON_TAC (too deep) *)
+        (*       Need: More specialized tactic or helper lemma about interval inequality *)
         CHEAT_TAC;
         (* Show each component is open *)
         CHEAT_TAC;
