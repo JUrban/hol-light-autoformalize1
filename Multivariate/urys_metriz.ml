@@ -218,26 +218,23 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   (* Second-countable spaces have countable dense subset when Hausdorff + regular *)
   (* Use enumeration of points + pairing to index all separation requirements *)
 
-  (* Attempt 8: Try different approach - revert to choice functions *)
-  (* This is a difficult construction - needs more thought *)
+  (* Attempt 9: Try using NUMPAIR to index basis-based separation *)
+  (* For each pair (i,j) of basis indices, construct separating function *)
 
-  (* Get choice functions using @-operator *)
-  ABBREV_TAC
-    `(fp:A->A->A->real) =
-       \x y. @g. if x IN topspace top /\ y IN topspace top /\ ~(x = y)
-                 then continuous_map
-                        (top,subtopology euclideanreal (real_interval[&0,&1]))
-                        g /\
-                      ~(g x = g y)
-                 else g = (\z. &1 / &2)` THEN
-  ABBREV_TAC
-    `(fc:(A->bool)->A->A->real) =
-       \c x. @g. if closed_in top c /\ x IN topspace top /\ ~(x IN c)
-                 then continuous_map
-                        (top,subtopology euclideanreal (real_interval[&0,&1]))
-                        g /\
-                      g x = &1 /\ (!z. z IN c ==> g z = &0)
-                 else g = (\z. &1 / &2)` THEN
+  (* Strategy: Use Urysohn lemma for each pair of disjoint basis elements *)
+  (* For basis elements e_i, e_j with closures disjoint, separate them *)
+
+  (* Attempt 9: Construction genuinely difficult *)
+  (* Need to carefully index separation tasks using basis *)
+  (* Use NUMPAIR to encode pairs of basis indices *)
+  (* For each pair, use Urysohn if closures are disjoint *)
+  (* Then verify the constructed family satisfies all four properties *)
+
+  (* This construction requires careful treatment of: *)
+  (* - Enumerating separation tasks *)
+  (* - Applying Urysohn/completely_regular to each task *)
+  (* - Combining into single family f : num -> A -> real *)
+  (* - Verifying bounds, continuity, point separation, closed set separation *)
 
   CHEAT_TAC);;
 
