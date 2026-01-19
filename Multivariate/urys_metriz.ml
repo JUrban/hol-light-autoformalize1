@@ -218,23 +218,25 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   (* Second-countable spaces have countable dense subset when Hausdorff + regular *)
   (* Use enumeration of points + pairing to index all separation requirements *)
 
-  (* Attempt 9: Try using NUMPAIR to index basis-based separation *)
-  (* For each pair (i,j) of basis indices, construct separating function *)
-
-  (* Strategy: Use Urysohn lemma for each pair of disjoint basis elements *)
-  (* For basis elements e_i, e_j with closures disjoint, separate them *)
-
-  (* Attempt 9: Construction genuinely difficult *)
-  (* Need to carefully index separation tasks using basis *)
-  (* Use NUMPAIR to encode pairs of basis indices *)
-  (* For each pair, use Urysohn if closures are disjoint *)
-  (* Then verify the constructed family satisfies all four properties *)
-
-  (* This construction requires careful treatment of: *)
-  (* - Enumerating separation tasks *)
-  (* - Applying Urysohn/completely_regular to each task *)
-  (* - Combining into single family f : num -> A -> real *)
-  (* - Verifying bounds, continuity, point separation, closed set separation *)
+  (* Attempt 10: Following topology textbook (Munkres) construction *)
+  (**)
+  (* FROM TOPOLOGY TEXTBOOK - Section 34, Step 1: *)
+  (* For each pair (n,m) of basis indices where closure(B_n) ⊂ B_m: *)
+  (* - Apply Urysohn lemma to get g_{n,m}: X → [0,1] *)
+  (* - Such that g_{n,m}(closure(B_n)) = {1} *)
+  (* - And g_{n,m}(X - B_m) = {0} *)
+  (* *)
+  (* Index this collection {g_{n,m}} using NUMPAIR: *)
+  (* f_k = g_{n,m} where (n,m) = NUMPAIR_DEST k *)
+  (**)
+  (* This gives countable family satisfying: *)
+  (* Given point x_0 and neighborhood U: *)
+  (* - Choose B_m containing x_0, contained in U (from basis) *)
+  (* - Choose B_n with x_0 ∈ B_n, closure(B_n) ⊂ B_m (from regularity) *)
+  (* - Then g_{n,m} is positive at x_0 and vanishes outside U *)
+  (**)
+  (* From this the four properties follow by careful verification *)
+  (**)
 
   CHEAT_TAC);;
 
