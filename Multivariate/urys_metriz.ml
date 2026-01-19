@@ -148,22 +148,23 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      countably many functions. These functions separate points and
      closed sets as required. *)
 
-  (* Step 1: b × b is countable (product of countable sets) *)
-  (* We can enumerate it as pairs:num -> (A->bool) # (A->bool) *)
+  (* Use Axiom of Choice to get functions for all needed separations *)
+  (* For point separation: use COMPLETELY_REGULAR_HAUSDORFF_POINT_FUNCTIONS *)
+  (* For closed set separation: use completely_regular directly *)
 
-  (* Step 2: For each pair (u,v) from the enumeration where u ⊆ v *)
-  (* and both are in the basis, use completely_regular to get a function *)
+  (* The collection of all such separation needs is at most countable *)
+  (* because the space is second countable *)
 
-  (* Step 3: Define the function family by cases on the enumeration *)
-  (* For each k, if the k-th pair satisfies our conditions, use *)
-  (* the corresponding separating function; otherwise use constant 0 *)
+  (* Key insight: We don't need to explicitly construct the enumeration *)
+  (* We just need to show existence of a countable family with the properties *)
 
-  (* This construction requires: *)
-  (* - Enumerating countable product (COUNTABLE_AS_IMAGE) *)
-  (* - Choice to select functions for each valid pair *)
-  (* - Verification that the four properties hold *)
+  (* For a second countable space, the collection of pairs (x,y) with x≠y *)
+  (* and the collection of pairs (closed set, point) we need to separate *)
+  (* can both be covered by countably many functions from the basis *)
 
-  (* Gradual approach: admit this technical enumeration for now *)
+  (* Full rigorous proof requires ~40-60 more lines of careful argument *)
+  (* involving enumeration, choice, and verification *)
+  (* Gradual approach: admit for now *)
   CHEAT_TAC);;
 
 (* Helper: explicit pairing function for enumeration *)
