@@ -287,6 +287,11 @@ let SUBSET_IMAGE_INJ = prove
                  ==> (IMAGE f t SUBSET IMAGE f s)`,
   REWRITE_TAC[SUBSET; IN_IMAGE] THEN MESON_TAC[]);;
 
+(* Helper: function values and intervals *)
+let IN_INTERVAL_1_2 = prove
+ (`&1 / &2 < &1`,
+  REAL_ARITH_TAC);;
+
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
