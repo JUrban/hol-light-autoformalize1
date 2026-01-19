@@ -40,9 +40,16 @@ let CONTINUOUS_MAP_COMPLEMENT_UNIT_INTERVAL = prove
   MATCH_MP_TAC CONTINUOUS_MAP_COMPOSE THEN
   EXISTS_TAC `subtopology euclideanreal (real_interval[&0,&1])` THEN
   ASM_REWRITE_TAC[] THEN
-  (* Need to show (\y. 1 - y) : [0,1] -> [0,1] is continuous *)
-  (* This follows from continuity of affine maps and range preservation *)
-  CHEAT_TAC);;
+  MATCH_MP_TAC CONTINUOUS_MAP_INTO_SUBTOPOLOGY THEN
+  CONJ_TAC THENL
+   [MATCH_MP_TAC CONTINUOUS_MAP_FROM_SUBTOPOLOGY THEN
+    MATCH_MP_TAC CONTINUOUS_MAP_REAL_SUB THEN
+    REWRITE_TAC[CONTINUOUS_MAP_REAL_CONST; CONTINUOUS_MAP_ID;
+                TOPSPACE_EUCLIDEANREAL; IN_UNIV];
+    REWRITE_TAC[SUBSET; FORALL_IN_IMAGE; TOPSPACE_SUBTOPOLOGY;
+                TOPSPACE_EUCLIDEANREAL; IN_INTER; IN_UNIV;
+                IN_REAL_INTERVAL] THEN
+    REAL_ARITH_TAC]);;
 
 (* Helper: normal space gives Urysohn functions for closed sets *)
 let NORMAL_SPACE_URYSOHN_FUNCTION = prove
