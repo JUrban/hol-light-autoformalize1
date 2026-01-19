@@ -449,9 +449,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* Attempted SET_TAC - too deep (26819+ steps) *)
         (* Attempted manual proof with GEN_TAC - "GEN_TAC" failure *)
         (* Goal structure defeats both automated and manual tactics *)
-        (* Attempt: BETA_TAC + REWRITE + GEN_TAC *)
-        (* Result: "GEN_TAC" failure - same as earlier manual attempts *)
-        (* cartesian_product goal structure blocks GEN_TAC after REWRITE *)
+        (* Attempt: Use new IN_COND_INTERVAL_DIFF_ZERO helper with ASM_SIMP_TAC *)
+        (* Result: Still "Unsolved goals" - helper not sufficient *)
+        (* Goal 3 structure more complex than simple simp can handle *)
         CHEAT_TAC;
         (* Show cartesian product subset IMAGE g u *)
         (* Mathematically: need to show cartesian_product k u ⊆ IMAGE g u *)
