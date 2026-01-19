@@ -1606,3 +1606,125 @@ let NUM_SUC_ADD = prove
 let NUM_0_LT_SUC = prove
  (`!n. 0 < SUC n`,
   ARITH_TAC);;
+
+(* Helper: half less than one *)
+let REAL_HALF_LT_1 = prove
+ (`&1 / &2 < &1`,
+  REAL_ARITH_TAC);;
+
+(* Helper: zero less than half *)
+let REAL_0_LT_HALF = prove
+ (`&0 < &1 / &2`,
+  REAL_ARITH_TAC);;
+
+(* Helper: half in bounds *)
+let REAL_HALF_BETWEEN_0_1 = prove
+ (`&0 <= &1 / &2 /\ &1 / &2 <= &1`,
+  REAL_ARITH_TAC);;
+
+(* Helper: one in open interval *)
+let REAL_1_IN_HALF_OPEN = prove
+ (`&1 / &2 < &1 /\ &1 < &1 + &1`,
+  REAL_ARITH_TAC);;
+
+(* Helper: topspace equality *)
+let TOPSPACE_EQ = prove
+ (`!top s. topspace (subtopology top s) = topspace top INTER s`,
+  REWRITE_TAC[TOPSPACE_SUBTOPOLOGY]);;
+
+(* Helper: open in subtopology whole space *)
+let OPEN_IN_SUBTOPOLOGY_REFL = prove
+ (`!top s. open_in (subtopology top s) (topspace top INTER s)`,
+  REWRITE_TAC[GSYM TOPSPACE_SUBTOPOLOGY; OPEN_IN_TOPSPACE]);;
+
+(* Helper: closed interval subset *)
+let REAL_CLOSED_INTERVAL_SUBSET = prove
+ (`!a b c d. a <= c /\ d <= b
+             ==> real_interval[c,d] SUBSET real_interval[a,b]`,
+  REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: open subset closed interval *)
+let REAL_OPEN_SUBSET_CLOSED_INTERVAL = prove
+ (`!a b. a < b ==> real_interval(a,b) SUBSET real_interval[a,b]`,
+  REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: 1 in half-open interval *)
+let REAL_1_IN_INTERVAL = prove
+ (`&1 IN real_interval(&1 / &2, &1 + &1)`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: image subset image *)
+let IMAGE_SUBSET_IMAGE = prove
+ (`!f s t. s SUBSET t ==> IMAGE f s SUBSET IMAGE f t`,
+  REWRITE_TAC[SUBSET; IN_IMAGE] THEN MESON_TAC[]);;
+
+(* Helper: subset reflexive *)
+let SUBSET_REFL_SIMPLE2 = prove
+ (`!s. s SUBSET s`,
+  REWRITE_TAC[SUBSET]);;
+
+(* Helper: conditional not equal *)
+let COND_NOT_EQ = prove
+ (`!b x y z. b /\ ~(x = z) ==> ~((if b then x else y) = z)`,
+  MESON_TAC[]);;
+
+(* Helper: conditional equal case *)
+let COND_EQ_CASE_T = prove
+ (`!x y z. (if T then x else y) = z <=> x = z`,
+  REWRITE_TAC[]);;
+
+(* Helper: conditional equal case *)
+let COND_EQ_CASE_F = prove
+ (`!x y z. (if F then x else y) = z <=> y = z`,
+  REWRITE_TAC[]);;
+
+(* Helper: inequality strict *)
+let REAL_LT_NE = prove
+ (`!x y. x < y ==> ~(x = y)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: between bounds *)
+let REAL_BETWEEN_BOUNDS_LT = prove
+ (`!a b x. a < x /\ x < b ==> a < b`,
+  REAL_ARITH_TAC);;
+
+(* Helper: interval containment *)
+let REAL_IN_INTERVAL_IMP_LE = prove
+ (`!a b x. x IN real_interval[a,b] ==> a <= x /\ x <= b`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: open interval containment *)
+let REAL_IN_OPEN_INTERVAL_IMP_LT = prove
+ (`!a b x. x IN real_interval(a,b) ==> a < x /\ x < b`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: image of function *)
+let IN_IMAGE_F = prove
+ (`!f x s. x IN s ==> f x IN IMAGE f s`,
+  REWRITE_TAC[IN_IMAGE] THEN MESON_TAC[]);;
+
+(* Helper: subset from member *)
+let SUBSET_FROM_MEMBER = prove
+ (`!s t. (!x. x IN s ==> x IN t) <=> s SUBSET t`,
+  REWRITE_TAC[SUBSET]);;
+
+
+(* Helper: pair equality *)
+let PAIR_EQ = prove
+ (`!(x1:A) (y1:B) x2 y2. (x1,y1) = (x2,y2) <=> x1 = x2 /\ y1 = y2`,
+  REWRITE_TAC[PAIR_EQ]);;
+
+(* Helper: fst and snd *)
+let FST_SND = prove
+ (`!x y. FST (x,y) = x /\ SND (x,y) = y`,
+  REWRITE_TAC[FST; SND]);;
+
+(* Helper: pair surjective *)
+let PAIR_SURJECTIVE = prove
+ (`!p. p = (FST p, SND p)`,
+  REWRITE_TAC[PAIR]);;
+
+(* Helper: exists pair *)
+let EXISTS_PAIR = prove
+ (`!P. (?p. P p) <=> (?x y. P (x,y))`,
+  MESON_TAC[PAIR_SURJECTIVE]);;
