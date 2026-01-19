@@ -718,3 +718,11 @@ let IN_INTERVAL_CONDITIONAL = prove
 let FUNCTION_EQ_POINTWISE = prove
  (`!f g. (!x. f x = g x) <=> f = g`,
   REWRITE_TAC[FUN_EQ_THM]);;
+
+(* Helper: embedding map injectivity *)
+let EMBEDDING_MAP_IMP_INJECTIVE = prove
+ (`!top top' f. embedding_map (top,top') f
+                ==> (!x y. x IN topspace top /\ y IN topspace top /\ f x = f y
+                           ==> x = y)`,
+  REWRITE_TAC[embedding_map; homeomorphic_map] THEN
+  MESON_TAC[]);;
