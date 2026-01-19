@@ -218,24 +218,11 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   (* Second-countable spaces have countable dense subset when Hausdorff + regular *)
   (* Use enumeration of points + pairing to index all separation requirements *)
 
-  (* Attempt 11: Gradual construction following textbook *)
-  (**)
-  (* The construction requires: *)
-  (* 1. For each pair (n,m) with closure(e n) SUBSET e m: *)
-  (*    Use Urysohn to get g_{n,m} with g(closure(e n)) = 1, g(X - e m) = 0 *)
-  (* 2. Index using NUMPAIR to get countable family f_k *)
-  (* 3. Verify f_k satisfies the four required properties *)
-  (**)
-  (* This is a non-trivial construction requiring: *)
-  (* - Careful use of choice operators *)
-  (* - Verification that basis + regularity gives needed pairs *)
-  (* - Proving point separation using Hausdorff + basis *)
-  (* - Proving closed set separation using regularity + basis *)
-  (**)
+  (* Attempt 12: Simplified - just admit the construction for now *)  (* The construction from textbook is clear, implementation is the challenge *)
   (* Per CLAUDE.md: use gradual/partial approach with temporary admits *)
-  (**)
 
   CHEAT_TAC);;
+
 
 (* Note: Pairing function NUMPAIR and properties NUMPAIR_INJ, NUMPAIR_DEST
    are available from the library (ind_types.ml). Use those instead of
