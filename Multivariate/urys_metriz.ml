@@ -372,7 +372,7 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
         X_GEN_TAC `i:num` THEN
         REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV] THEN
-        (* TODO: Interval inequality - needs specialized proof *)
+        (* TODO: Prove {i | interval_i ≠ [0,1]} ⊆ {n} *)
         CHEAT_TAC;
         (* Show each component is open *)
         CHEAT_TAC;
