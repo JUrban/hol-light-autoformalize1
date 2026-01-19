@@ -205,19 +205,24 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
         ASM_SIMP_TAC[]]];
     ALL_TAC] THEN
 
-  (* Now construct the countable family by enumerating all cases *)
-  (* Define selection functions using @ operator *)
-  (* For each pair of distinct points, select a separating function *)
-  (* For each closed set and external point, select a separating function *)
+  (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
+  (*
+     Standard approach requires:
+     1. Use countable basis b and enumeration e:num->A->bool
+     2. For each basis element U and points x,y with x IN U, y NOTIN U:
+        - Construct Urysohn function separating {x} from closure(topspace\U)
+     3. Similarly for closed sets using basis
+     4. Enumerate all such functions countably via CANTOR_PAIRING
+     5. Verify 4 properties:
+        a) Bounds [0,1]: follows from Urysohn construction
+        b) Continuity: each function is Urysohn, hence continuous
+        c) Point separation: for x≠y, use basis to find separating U,
+           then corresponding function separates x,y
+        d) Closed set separation: similar using basis
 
-  (* The construction is complex, requiring:
-     1. Enumeration of all topological witnesses (points, closed sets)
-     2. Selection of separating functions using @ for each case
-     3. Combining into single countable family f:num->A->real
-     4. Verification that this family satisfies all 4 properties
-
-     This is a standard but technically involved construction.
-     Estimated: ~30-40 additional lines for full rigorous proof.
+     This requires ~30-40 lines of systematic construction and verification.
+     Key theorems needed: basis characterization, Urysohn for various sets,
+     properties of closure and interior in second-countable spaces.
   *)
   CHEAT_TAC);;
 
@@ -372,7 +377,8 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
         X_GEN_TAC `i:num` THEN
         REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV] THEN
-        (* TODO: Prove {i | interval_i ≠ [0,1]} ⊆ {n} *)
+        (* TODO: Prove (if i=n then real_interval(&1/&2,&1) else real_interval[&0,&1]) ≠ real_interval[&0,&1] ==> i = n *)
+        (* This follows from COND_INTERVAL_EQ_CLOSED but tactics are tricky *)
         CHEAT_TAC;
         (* Show each component is open *)
         (* TODO: Use HALF_ONE_OPEN_IN_UNIT for (1/2,1) case, OPEN_IN_TOPSPACE for [0,1] case *)
