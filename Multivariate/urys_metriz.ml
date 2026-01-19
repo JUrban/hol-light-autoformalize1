@@ -476,10 +476,19 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* Result: Too deep (1327648+ steps) *)
         (* Attempt 14: ASM_REWRITE_TAC to use f n x = &1 explicitly *)
         (* Result: REAL_ARITH still can't prove ~(f n x = &0) from assumptions *)
-        (* Goal 3 extremely resistant - 14+ tactical approaches exhausted *)
-        (* May need explicit helper lemma or different proof architecture *)
-        (* Moving on per CLAUDE.md "don't get endlessly stuck" *)
-        CHEAT_TAC;
+        (* Attempt 15: Use COND_CASES_TAC early to split conditional before membership *)
+        (* Result: Still REAL_ARITH failure on ~(f n x = &0) *)
+        (* Attempt 16: Use CONV_TAC REAL_RAT_REDUCE_CONV to directly prove ~(&1 = &0) *)
+        (* Result: Unsolved goals *)
+        (* Attempt 17: Use ASM_CASES_TAC on i=n before substitution, simplify each case *)
+        ASM_REWRITE_TAC[IN_CARTESIAN_PRODUCT; EXTENSIONAL_UNIV] THEN
+        REWRITE_TAC[IN_UNIV] THEN
+        X_GEN_TAC `i:num` THEN
+        FIRST_X_ASSUM SUBST_ALL_TAC THEN BETA_TAC THEN
+        ASM_CASES_TAC `i:num = n` THENL
+         [ASM_REWRITE_TAC[IN_DIFF; IN_SING; IN_REAL_INTERVAL] THEN
+          ASM_SIMP_TAC[];
+          ASM_REWRITE_TAC[IN_REAL_INTERVAL] THEN ASM_SIMP_TAC[]];
         (* Show cartesian product subset IMAGE g u *)
         (* Mathematically: need to show cartesian_product k u ⊆ IMAGE g u *)
         (* where u i = if i=n then [&0,&1]\{&0} else [&0,&1] *)
