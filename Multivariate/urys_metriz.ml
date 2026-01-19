@@ -431,6 +431,10 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* TODO: Debug find_term error or try alternative tactics *)
         CHEAT_TAC;
         (* Show y in cartesian product *)
+        (* Mathematically: y = \n. f n x, need y i IN u i for all i *)
+        (* Case i = n: f n x = &1 ∈ [&0,&1]\{&0} *)
+        (* Case i ≠ n: f i x ∈ [&0,&1] by first property *)
+        (* TODO: Expand cartesian_product and prove by cases *)
         CHEAT_TAC;
         (* Show cartesian product subset IMAGE g u *)
         CHEAT_TAC];
