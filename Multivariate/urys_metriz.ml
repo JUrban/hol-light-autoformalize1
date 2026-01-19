@@ -104,14 +104,13 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   SUBGOAL_THEN `COUNTABLE (b CROSS b:(A->bool#A->bool)->bool)` ASSUME_TAC THENL
    [MATCH_MP_TAC COUNTABLE_CROSS THEN ASM_REWRITE_TAC[];
     ALL_TAC] THEN
-  (* Now would enumerate the pairs with COUNTABLE_AS_IMAGE *)
-  (* and construct functions from them *)
-  (* The complete construction requires:
-     - Case analysis on whether b CROSS b is empty
-     - If non-empty, use COUNTABLE_AS_IMAGE to enumerate pairs
-     - For each pair, apply Urysohn or completely_regular
-     - Prove all four required properties
-     This is substantial infrastructure (~50-70 lines) *)
+  (* Can use completely_regular + CONTINUOUS_MAP_COMPLEMENT_UNIT_INTERVAL *)
+  (* to get functions g where g(x)=1, g=0 on closed c *)
+  (* Strategy: for each closed c and x not in c, *)
+  (*   get h from completely_regular with h(x)=0, h=1 on c *)
+  (*   then g = 1-h gives g(x)=1, g=0 on c *)
+  (*   and g is continuous by CONTINUOUS_MAP_COMPLEMENT_UNIT_INTERVAL *)
+  (* Main remaining work: enumerate and index these using the basis *)
   CHEAT_TAC);;
 
 (* Helper: embedding into product of [0,1] *)
