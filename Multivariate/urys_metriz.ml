@@ -89,12 +89,23 @@ let COMPLETELY_REGULAR_HAUSDORFF_POINT_FUNCTIONS = prove
                   (top,subtopology euclideanreal (real_interval[&0,&1])) f /\
                 ~(f x = f y)`,
   REPEAT STRIP_TAC THEN
-  (* Use Hausdorff to get disjoint opens u, v with x in u, y in v *)
-  (* Then topspace \ v is closed and contains x but not y *)
-  (* Use completely_regular to get f with f(x)=0, f=1 on topspace \ v *)
-  (* So f(y)=1 since y not in v means y in topspace \ v *)
-  (* Therefore f(x) = 0 ≠ 1 = f(y) *)
-  CHEAT_TAC);;
+  FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [hausdorff_space]) THEN
+  DISCH_THEN(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_THEN `u:A->bool` (X_CHOOSE_THEN `v:A->bool`
+    STRIP_ASSUME_TAC)) THEN
+  (* Use completely_regular with closed set (topspace \ u) and point x *)
+  (* Note: y in v, v disjoint from u, so y in topspace \ u *)
+  FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [completely_regular_space]) THEN
+  DISCH_THEN(MP_TAC o SPECL [`topspace top DIFF u:A->bool`; `x:A`]) THEN
+  ANTS_TAC THENL
+   [ASM_SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE; IN_DIFF];
+    DISCH_THEN(X_CHOOSE_THEN `f:A->real` STRIP_ASSUME_TAC) THEN
+    EXISTS_TAC `f:A->real` THEN
+    ASM_REWRITE_TAC[] THEN
+    FIRST_X_ASSUM(MP_TAC o SPEC `y:A`) THEN
+    ASM_SIMP_TAC[IN_DIFF] THEN
+    ANTS_TAC THENL [ASM SET_TAC[]; REAL_ARITH_TAC]]);;
 let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
  (`!top:A topology.
         regular_space top /\ second_countable top /\ hausdorff_space top
