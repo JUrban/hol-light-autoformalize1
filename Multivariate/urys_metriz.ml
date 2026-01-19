@@ -208,13 +208,10 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       (* This can be used to construct open neighborhoods in product *)
       REWRITE_TAC[open_map] THEN
       REPEAT STRIP_TAC THEN
-      (* Strategy documented:
-         1. Use OPEN_IN_PRODUCT_TOPOLOGY_ALT
-         2. For each x in u, fourth property gives n where f_n(x)=1, f_n=0 outside u
-         3. Construct basic open {y | y_n > 1/2} containing g(x)
-         4. Prove this is contained in IMAGE g u
-         5. This establishes openness in product topology
-         Estimated: ~25-35 lines of product topology reasoning *)
+      (* Need to show: IMAGE g u is open in product topology *)
+      (* Strategy: Show for each point in IMAGE, there's a basic open containing it *)
+      (* We'll use the fourth property with the closed set topspace \ u *)
+      (* This approach works but requires careful product topology reasoning *)
       CHEAT_TAC;
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
