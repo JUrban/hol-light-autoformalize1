@@ -818,3 +818,28 @@ let CONJ_IMP_ALT = prove
 let DISJ_IMP_IMP = prove
  (`!p q r. (p \/ q ==> r) <=> (p ==> r) /\ (q ==> r)`,
   MESON_TAC[]);;
+
+(* Helper: union singleton *)
+let UNION_SING = prove
+ (`!s x. s UNION {x} = x INSERT s`,
+  REWRITE_TAC[EXTENSION; IN_UNION; IN_INSERT; IN_SING] THEN MESON_TAC[]);;
+
+(* Helper: intersection with universe *)
+let INTER_UNIV_SIMPLE = prove
+ (`!s. s INTER (:A) = s`,
+  REWRITE_TAC[INTER_UNIV]);;
+
+(* Helper: diff empty *)
+let DIFF_EMPTY_SIMPLE = prove
+ (`!s. s DIFF {} = s`,
+  REWRITE_TAC[DIFF_EMPTY]);;
+
+(* Helper: empty subset *)
+let EMPTY_SUBSET_SIMPLE = prove
+ (`!s. {} SUBSET s`,
+  REWRITE_TAC[EMPTY_SUBSET]);;
+
+(* Helper: subset union left *)
+let SUBSET_UNION_LEFT = prove
+ (`!s t. s SUBSET (s UNION t)`,
+  SET_TAC[]);;
