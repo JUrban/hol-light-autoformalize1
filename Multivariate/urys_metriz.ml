@@ -1196,3 +1196,78 @@ let REAL_INTERVAL_OPEN_NONEMPTY = prove
  (`!a b. a < b ==> ?x. x IN real_interval(a,b)`,
   REPEAT STRIP_TAC THEN EXISTS_TAC `(a + b) / &2` THEN
   REWRITE_TAC[IN_REAL_INTERVAL] THEN ASM_REAL_ARITH_TAC);;
+
+(* Helper: multiplication associativity *)
+let REAL_MUL_ASSOC_SIMPLE = prove
+ (`!x y z. (x * y) * z = x * (y * z)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: addition of zero *)
+let REAL_ADD_LZERO = prove
+ (`!x. &0 + x = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: multiplication by zero *)
+let REAL_MUL_LZERO = prove
+ (`!x. &0 * x = &0`,
+  REAL_ARITH_TAC);;
+
+(* Helper: multiplication by zero right *)
+let REAL_MUL_RZERO = prove
+ (`!x. x * &0 = &0`,
+  REAL_ARITH_TAC);;
+
+(* Helper: distributivity *)
+let REAL_ADD_LDISTRIB_SIMPLE = prove
+ (`!x y z. x * (y + z) = x * y + x * z`,
+  REAL_ARITH_TAC);;
+
+(* Helper: distributivity right *)
+let REAL_ADD_RDISTRIB_SIMPLE = prove
+ (`!x y z. (x + y) * z = x * z + y * z`,
+  REAL_ARITH_TAC);;
+
+(* Helper: negation and subtraction *)
+let REAL_NEG_SUB = prove
+ (`!x y. --(x - y) = y - x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: subtraction and negation *)
+let REAL_SUB_NEG = prove
+ (`!x y. x - (--y) = x + y`,
+  REAL_ARITH_TAC);;
+
+(* Helper: double *)
+let REAL_DOUBLE = prove
+ (`!x. x + x = &2 * x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: half *)
+let REAL_HALF_DOUBLE = prove
+ (`!x. x / &2 + x / &2 = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: conditional with false *)
+let COND_FALSE = prove
+ (`!x y. (if F then x else y) = y`,
+  REWRITE_TAC[]);;
+
+(* Helper: conditional with true *)
+let COND_TRUE = prove
+ (`!x y. (if T then x else y) = x`,
+  REWRITE_TAC[]);;
+
+(* Helper: negation of equality *)
+let NEQ_SYM = prove
+ (`!x y. ~(x = y) <=> ~(y = x)`,
+  MESON_TAC[]);;
+
+(* Helper: inequality and bounds *)
+let REAL_LT_IMP_NE = prove
+ (`!x y. x < y ==> ~(x = y)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: inequality from bounds *)
+let REAL_LE_LT = prove
+ (`!x y. x <= y <=> x < y \/ x = y`,
+  REAL_ARITH_TAC);;
