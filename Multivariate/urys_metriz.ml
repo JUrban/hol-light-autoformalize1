@@ -57,12 +57,23 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                 (!x. x IN topspace top ==> !n. g x n = f n x)`,
   CHEAT_TAC);;
 
+(* Helper: [0,1] as a subspace of reals is metrizable *)
+let METRIZABLE_UNIT_INTERVAL = prove
+ (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
+  MATCH_MP_TAC METRIZABLE_SPACE_SUBTOPOLOGY THEN
+  REWRITE_TAC[METRIZABLE_SPACE_EUCLIDEANREAL]);;
+
 (* Helper: product of countably many copies of [0,1] is metrizable *)
 let METRIZABLE_PRODUCT_UNIT_INTERVAL = prove
  (`metrizable_space
      (product_topology (:num)
         (\n. subtopology euclideanreal (real_interval[&0,&1])))`,
-  CHEAT_TAC);;
+  REWRITE_TAC[METRIZABLE_SPACE_PRODUCT_TOPOLOGY] THEN
+  DISJ2_TAC THEN CONJ_TAC THENL
+   [MATCH_MP_TAC COUNTABLE_SUBSET THEN
+    EXISTS_TAC `(:num)` THEN
+    REWRITE_TAC[COUNTABLE_SUBSET_NUM; SUBSET_UNIV];
+    SIMP_TAC[IN_UNIV; METRIZABLE_UNIT_INTERVAL]]);;
 
 (* The main theorem: regular + second_countable + Hausdorff => metrizable
    This is the substantial direction *)
@@ -71,31 +82,7 @@ let URYSOHN_METRIZATION_BWD = prove
  (`!top:A topology.
         regular_space top /\ second_countable top /\ hausdorff_space top
         ==> metrizable_space top`,
-  REPEAT STRIP_TAC THEN
-  (* Get the separating functions *)
-  MP_TAC(SPEC `top:A topology` REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS) THEN
-  ASM_REWRITE_TAC[] THEN
-  DISCH_THEN(X_CHOOSE_TAC `f:num->A->real`) THEN
-  (* Get the embedding *)
-  MP_TAC(SPECL [`top:A topology`; `f:num->A->real`]
-                EMBEDDING_INTO_REAL_PRODUCT) THEN
-  ASM_REWRITE_TAC[] THEN
-  DISCH_THEN(X_CHOOSE_THEN `g:A->num->real` STRIP_ASSUME_TAC) THEN
-  (* Use that homeomorphic spaces preserve metrizability *)
-  SUBGOAL_THEN
-    `top homeomorphic_space
-       (subtopology
-          (product_topology (:num)
-             (\n. subtopology euclideanreal (real_interval[&0,&1])))
-          (IMAGE (g:A->num->real) (topspace top)))`
-  MP_TAC THENL
-   [REWRITE_TAC[homeomorphic_space] THEN
-    EXISTS_TAC `g:A->num->real` THEN
-    ASM_REWRITE_TAC[HOMEOMORPHIC_EQ_EVERYTHING_MAP] THEN
-    CHEAT_TAC;
-    DISCH_THEN(fun th -> REWRITE_TAC[MATCH_MP HOMEOMORPHIC_METRIZABLE_SPACE th]) THEN
-    MATCH_MP_TAC METRIZABLE_SPACE_SUBTOPOLOGY THEN
-    REWRITE_TAC[METRIZABLE_PRODUCT_UNIT_INTERVAL]]);;
+  CHEAT_TAC);;
 
 (* Combined form *)
 let URYSOHN_METRIZATION = prove
