@@ -488,14 +488,16 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* Attempt 16: Use CONV_TAC REAL_RAT_REDUCE_CONV to directly prove ~(&1 = &0) *)
         (* Result: Unsolved goals *)
         (* Attempt 17: Use ASM_CASES_TAC on i=n before substitution, simplify each case *)
-        ASM_REWRITE_TAC[IN_CARTESIAN_PRODUCT; EXTENSIONAL_UNIV] THEN
-        REWRITE_TAC[IN_UNIV] THEN
-        X_GEN_TAC `i:num` THEN
-        FIRST_X_ASSUM SUBST_ALL_TAC THEN BETA_TAC THEN
+        (* Result: Unsolved goals *)
+        (* Attempt 18: Use bounds + f n x = &1 assumption directly *)
+        FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
+        REWRITE_TAC[IN_CARTESIAN_PRODUCT; EXTENSIONAL_UNIV; IN_UNIV] THEN
+        X_GEN_TAC `i:num` THEN BETA_TAC THEN
         ASM_CASES_TAC `i:num = n` THENL
-         [ASM_REWRITE_TAC[IN_DIFF; IN_SING; IN_REAL_INTERVAL] THEN
-          ASM_SIMP_TAC[];
-          ASM_REWRITE_TAC[IN_REAL_INTERVAL] THEN ASM_SIMP_TAC[]];
+         [ASM_REWRITE_TAC[IN_DIFF; IN_SING] THEN CONJ_TAC THENL
+           [ASM_MESON_TAC[IN_REAL_INTERVAL];
+            ASM_MESON_TAC[REAL_ARITH `&1 = &0 <=> F`]];
+          ASM_MESON_TAC[IN_REAL_INTERVAL]];
         (* Show cartesian product subset IMAGE g u *)
         (* Mathematically: need to show cartesian_product k u ⊆ IMAGE g u *)
         (* where u i = if i=n then [&0,&1]\{&0} else [&0,&1] *)
