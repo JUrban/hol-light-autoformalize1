@@ -428,9 +428,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* Previous attempts documented in CHANGES files all failed *)
         CHEAT_TAC;
         (* Show y in cartesian product *)
-        (* Latest attempt: SET_TAC[] - too deep (26819+ steps) *)
-        (* Previous attempts: SUBST_ALL_TAC + GEN_TAC failed *)
-        (* Manual proof needed *)
+        (* Attempted SET_TAC - too deep (26819+ steps) *)
+        (* Attempted manual proof with GEN_TAC - "GEN_TAC" failure *)
+        (* Goal structure defeats both automated and manual tactics *)
         CHEAT_TAC;
         (* Show cartesian product subset IMAGE g u *)
         (* Mathematically: need to show cartesian_product k u ⊆ IMAGE g u *)
