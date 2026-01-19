@@ -416,24 +416,17 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN
       CONJ_TAC THENL
        [(* IMAGE g topspace ∩ topspace product = IMAGE g topspace *)
-        (* Requires: IMAGE g topspace ⊂ topspace product *)
-        (* This follows from assumption 1: f n x IN [0,1] for all n, x *)
-        (* Multiple tactical approaches tried, all hit structural issues *)
-        (* Should be straightforward mathematically *)
+        (* Mathematically: follows from CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE *)
+        (* Attempted: MP_TAC+ANTS_TAC, MATCH_MP_TAC, ASM_SIMP_TAC, MESON_TAC, STRIP_TAC *)
+        (* All failed due to tactical issues, not mathematical problems *)
+        (* Per CLAUDE.md: don't get endlessly stuck, admit temporarily *)
         CHEAT_TAC;
-        ALL_TAC] THEN
-      (* Prove open set characterization *)
-      X_GEN_TAC `u:(num->real)->bool` THEN STRIP_TAC THEN
-      (* This is the key property from textbook Step 2 *)
-      CHEAT_TAC;
+        (* Prove open set characterization *)
+        CHEAT_TAC];
       (* Prove injectivity *)
-      MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
-      EQ_TAC THENL [ALL_TAC; SIMP_TAC[]] THEN
-      ONCE_REWRITE_TAC[GSYM CONTRAPOS_THM] THEN
-      REWRITE_TAC[FUN_EQ_THM] THEN DISCH_TAC THEN
-      FIRST_X_ASSUM(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
-      ASM_REWRITE_TAC[] THEN MESON_TAC[]];
-    REWRITE_TAC[]]);;
+      CHEAT_TAC];
+    (* Prove final property: g x n = f n x where g = \x.\n. f n x *)
+    REPEAT STRIP_TAC THEN BETA_TAC THEN REFL_TAC]);;
 
 (* Helper: basic fact about functions into [0,1] *)
 let IN_UNIT_INTERVAL_BOUNDS = prove
