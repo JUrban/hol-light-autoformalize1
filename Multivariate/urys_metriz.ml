@@ -246,7 +246,9 @@ let CANTOR_PAIRING_INJECTIVE = prove
   REWRITE_TAC[CANTOR_PAIRING] THEN
   REPEAT GEN_TAC THEN
   DISCH_TAC THEN
-  (* Prove this using arithmetic properties *)
+  (* Try ARITH_TAC for arithmetic reasoning *)
+  TRY ARITH_TAC THEN
+  (* If fails, this requires detailed arithmetic proof *)
   CHEAT_TAC);;
 
 (* Helper: implication from conditional inequality *)
