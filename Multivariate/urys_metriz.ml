@@ -155,6 +155,15 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      Estimated: ~50-70 lines of enumeration and merging *)
   CHEAT_TAC);;
 
+(* Helper: explicit pairing function for enumeration *)
+let CANTOR_PAIRING = new_definition
+ `CANTOR_PAIRING (n:num,m:num) = (n + m) * (n + m + 1) DIV 2 + m`;;
+
+(* Note: CANTOR_PAIRING provides explicit bijection num#num -> num *)
+(* This can be used to enumerate countable products *)
+(* Full development of unpair and bijectivity properties: TODO *)
+(* For now, the definition is available for future use *)
+
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
  (`!top:A topology f:num->A->real.
