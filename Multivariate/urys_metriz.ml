@@ -1271,3 +1271,73 @@ let REAL_LT_IMP_NE = prove
 let REAL_LE_LT = prove
  (`!x y. x <= y <=> x < y \/ x = y`,
   REAL_ARITH_TAC);;
+
+(* Helper: subtraction equals zero *)
+let REAL_SUB_EQ_0 = prove
+ (`!x y. x - y = &0 <=> x = y`,
+  REAL_ARITH_TAC);;
+
+(* Helper: zero less than one *)
+let REAL_LT_01 = prove
+ (`&0 < &1`,
+  REAL_ARITH_TAC);;
+
+(* Helper: one positive *)
+let REAL_LE_01 = prove
+ (`&0 <= &1`,
+  REAL_ARITH_TAC);;
+
+(* Helper: negation of one *)
+let REAL_NEG_1 = prove
+ (`--(&1) = --(&1)`,
+  REWRITE_TAC[]);;
+
+(* Helper: absolute value basic *)
+let REAL_ABS_0 = prove
+ (`abs(&0) = &0`,
+  REAL_ARITH_TAC);;
+
+(* Helper: absolute value of one *)
+let REAL_ABS_1 = prove
+ (`abs(&1) = &1`,
+  REAL_ARITH_TAC);;
+
+(* Helper: abs neg *)
+let REAL_ABS_NEG = prove
+ (`!x. abs(--x) = abs x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: abs nonneg *)
+let REAL_ABS_POS = prove
+ (`!x. &0 <= abs x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: max basic *)
+let REAL_MAX_REFL = prove
+ (`!x. max x x = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: min basic *)
+let REAL_MIN_REFL = prove
+ (`!x. min x x = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: max comm *)
+let REAL_MAX_SYM = prove
+ (`!x y. max x y = max y x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: min comm *)
+let REAL_MIN_SYM = prove
+ (`!x y. min x y = min y x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: division by one *)
+let REAL_DIV_1 = prove
+ (`!x. x / &1 = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: one not zero *)
+let REAL_1_NE_0 = prove
+ (`~(&1 = &0)`,
+  REAL_ARITH_TAC);;
