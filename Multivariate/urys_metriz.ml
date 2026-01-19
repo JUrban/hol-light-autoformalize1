@@ -2092,25 +2092,6 @@ let IN_SING_SIMPLE = prove
   REWRITE_TAC[IN_SING]);;
 
 (* Helper: union with empty *)
-let UNION_EMPTY_LEFT = prove
- (`!s. {} UNION s = s`,
-  SET_TAC[]);;
-
-(* Helper: union with empty *)
-let UNION_EMPTY_RIGHT = prove
- (`!s. s UNION {} = s`,
-  SET_TAC[]);;
-
-(* Helper: intersection with empty *)
-let INTER_EMPTY_LEFT = prove
- (`!s. {} INTER s = {}`,
-  SET_TAC[]);;
-
-(* Helper: intersection with empty *)
-let INTER_EMPTY_RIGHT = prove
- (`!s. s INTER {} = {}`,
-  SET_TAC[]);;
-
 (* Helper: real arithmetic *)
 let REAL_ADD_AC_SIMPLE = prove
  (`!x y z. x + (y + z) = y + (x + z)`,
