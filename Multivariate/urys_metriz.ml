@@ -646,3 +646,15 @@ let CONTINUOUS_MAP_CONST = prove
  (`!top top' c. c IN topspace top' 
                 ==> continuous_map (top,top') (\x. c)`,
   SIMP_TAC[CONTINUOUS_MAP_CONST]);;
+
+(* Helper: intervals and open sets *)
+
+(* Helper: simple set inclusions *)
+let DIFF_SUBSET_COMPLEMENT = prove
+ (`!s t u. s SUBSET u /\ t SUBSET u ==> u DIFF s SUBSET u`,
+  SET_TAC[]);;
+
+(* Helper: basic interval property *)
+let IN_INTERVAL_IMP_BOUNDS = prove
+ (`!x a b. x IN real_interval[a,b] ==> a <= x /\ x <= b`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
