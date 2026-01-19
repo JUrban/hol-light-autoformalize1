@@ -423,7 +423,8 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
   REPEAT STRIP_TAC THEN
   EXISTS_TAC `\x:A. \n:num. (f:num->A->real) n x` THEN
   CONJ_TAC THENL
-   [MATCH_MP_TAC INJECTIVE_OPEN_IMP_EMBEDDING_MAP THEN
+   [(* Attempt 9: Use INJECTIVE_CLOSED_IMP_EMBEDDING_MAP instead of open map *)
+    MATCH_MP_TAC INJECTIVE_CLOSED_IMP_EMBEDDING_MAP THEN
     CONJ_TAC THENL
      [(* Prove continuous_map using componentwise criterion *)
       REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
@@ -431,91 +432,14 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       ASM_REWRITE_TAC[];
       ALL_TAC] THEN
     CONJ_TAC THENL
-     [(* Prove open_map *)
-      REWRITE_TAC[open_map] THEN
-      X_GEN_TAC `u:A->bool` THEN STRIP_TAC THEN
-      (* Show IMAGE (\x. \n. f n x) u is open using OPEN_IN_PRODUCT_TOPOLOGY_ALT *)
-      REWRITE_TAC[OPEN_IN_PRODUCT_TOPOLOGY_ALT] THEN
-      REWRITE_TAC[IN_IMAGE] THEN
-      X_GEN_TAC `y:num->real` THEN
-      DISCH_THEN(X_CHOOSE_THEN `x:A` STRIP_ASSUME_TAC) THEN
-      (* For x in u: topspace \ u is closed and doesn't contain x *)
-      SUBGOAL_THEN `closed_in (top:A topology) (topspace top DIFF u)`
-        ASSUME_TAC THENL
-       [ASM_SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE; OPEN_IN_SUBSET];
-        ALL_TAC] THEN
-      SUBGOAL_THEN `(x:A) IN topspace top /\ ~(x IN topspace top DIFF u)`
-        STRIP_ASSUME_TAC THENL
-       [ASM_MESON_TAC[OPEN_IN_SUBSET; SUBSET; IN_DIFF];
-        ALL_TAC] THEN
-      (* Use fourth property to get separating function *)
-      FIRST_X_ASSUM(MP_TAC o SPECL
-        [`topspace (top:A topology) DIFF u`; `x:A`]) THEN
-      ASM_REWRITE_TAC[] THEN
-      DISCH_THEN(X_CHOOSE_THEN `n:num` STRIP_ASSUME_TAC) THEN
-      (* Construct basic open: [0,1]\{0} at n, [0,1] elsewhere *)
-      EXISTS_TAC `\i:num. if i = n then real_interval[&0,&1] DIFF {&0}
-                          else real_interval[&0,&1]` THEN
-      REPEAT CONJ_TAC THENL
-       [(* Show finitely many differ from topspace - only coordinate n differs *)
-        (* 17+ tactical approaches tried including latest SPEC_TAC attempt *)
-        (* All blocked by lambda/beta reduction mismatch issues *)
-        (* Helper lemma exists and proves correctness mathematically *)
-        (* Attempt: Same strategy as goal 2 - use BETA_TAC then helper lemma *)
-        (* Also need to simplify "i IN (:num)" and topspace *)
-        BETA_TAC THEN
-        SIMP_TAC[IN_UNIV; TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL;
-                 INTER_UNIV; FINITE_COND_INTERVAL_DIFF_ZERO];
-        (* Show each component is open *)
-        (* Latest attempt: ASM_CASES_TAC + ASM_SIMP_TAC + ASM_MESON_TAC *)
-        (* Result: ASM_MESON_TAC too deep (109572+ steps) *)
-        (* Previous attempts documented in CHANGES files all failed *)
-        (* Attempt: Use new OPEN_IN_COND_INTERVAL_DIFF_ZERO lemma with BETA_TAC *)
-        GEN_TAC THEN BETA_TAC THEN
-        REWRITE_TAC[OPEN_IN_COND_INTERVAL_DIFF_ZERO];
-        (* Show y in cartesian product *)
-        (* Attempted SET_TAC - too deep (26819+ steps) *)
-        (* Attempted manual proof with GEN_TAC - "GEN_TAC" failure *)
-        (* Goal structure defeats both automated and manual tactics *)
-        (* Attempt: ASM_SIMP_TAC + STRIP_TAC approach *)
-        (* Result: "find_term" error - STRIP_TAC incompatible with goal structure *)
-        (* Goal 3 very resistant - 11+ approaches tried, all failed *)
-        (* Attempt 12: Use IN_CARTESIAN_PRODUCT + EXTENSIONAL_UNIV + IN_COND_INTERVAL_DIFF_ZERO *)
-        (* Result: Unsolved goals - REAL_ARITH can't find f n x = &1 assumption *)
-        (* Attempt 13: ASM_MESON_TAC with REAL_ARITH lemma *)
-        (* Result: Too deep (1327648+ steps) *)
-        (* Attempt 14: ASM_REWRITE_TAC to use f n x = &1 explicitly *)
-        (* Result: REAL_ARITH still can't prove ~(f n x = &0) from assumptions *)
-        (* Attempt 15: Use COND_CASES_TAC early to split conditional before membership *)
-        (* Result: Still REAL_ARITH failure on ~(f n x = &0) *)
-        (* Attempt 16: Use CONV_TAC REAL_RAT_REDUCE_CONV to directly prove ~(&1 = &0) *)
-        (* Result: Unsolved goals *)
-        (* Attempt 17: Use ASM_CASES_TAC on i=n before substitution, simplify each case *)
-        (* Result: Unsolved goals *)
-        (* Attempt 18: Use bounds + f n x = &1 assumption directly *)
-        FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
-        REWRITE_TAC[IN_CARTESIAN_PRODUCT; EXTENSIONAL_UNIV; IN_UNIV] THEN
-        X_GEN_TAC `i:num` THEN BETA_TAC THEN
-        ASM_CASES_TAC `i:num = n` THENL
-         [ASM_REWRITE_TAC[IN_DIFF; IN_SING] THEN CONJ_TAC THENL
-           [ASM_MESON_TAC[IN_REAL_INTERVAL];
-            ASM_MESON_TAC[REAL_ARITH `&1 = &0 <=> F`]];
-          ASM_MESON_TAC[IN_REAL_INTERVAL]];
-        (* Show cartesian product subset IMAGE g u *)
-        (* Key: if w in basic open, w n ≠ 0, but f n z = 0 for z ∉ u, so w from u *)
-        (* But need to assume w is in IMAGE g topspace, not just any w *)
-        (* Actually, the basic open might not be fully in IMAGE *)
-        (* Use contrapositive: if z ∉ u then g z ∉ basic open *)
-        REWRITE_TAC[SUBSET] THEN X_GEN_TAC `w:num->real` THEN
-        REWRITE_TAC[IN_CARTESIAN_PRODUCT; EXTENSIONAL_UNIV; IN_UNIV] THEN
-        REWRITE_TAC[IN_IMAGE] THEN STRIP_TAC THEN
-        (* We have w n ≠ 0 (from w in cartesian product with v n = [0,1]\{0}) *)
-        (* Need to show ∃z ∈ u. g z = w *)
-        (* Since w = g z' for some z' ∈ topspace, and f n z' = w n ≠ 0 *)
-        (* But f n z = 0 for z ∈ topspace\u, so z' ∉ topspace\u, hence z' ∈ u *)
-        (* But we don't have w = g z' as an assumption! *)
-        (* The cartesian product isn't necessarily in IMAGE g *)
-        CHEAT_TAC];
+     [(* Prove closed_map instead of open_map *)
+      (* Try: show IMAGE g c is closed for any closed c *)
+      REWRITE_TAC[closed_map] THEN
+      X_GEN_TAC `c:A->bool` THEN STRIP_TAC THEN
+      (* Show IMAGE (\x. \n. f n x) c is closed in product topology *)
+      (* Closedness in product topology is tricky - may need different approach *)
+      (* This might also be difficult without surjectivity *)
+      CHEAT_TAC;
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
       EQ_TAC THENL [ALL_TAC; SIMP_TAC[]] THEN
