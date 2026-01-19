@@ -2234,15 +2234,7 @@ let INSERT_NONEMPTY = prove
 (* Helper: union with universe *)
 (* Helper: intersection with universe *)
 (* Helper: diff with empty *)
-let DIFF_EMPTY_RIGHT = prove
- (`!s. s DIFF {} = s`,
-  SET_TAC[]);;
-
 (* Helper: diff with universe *)
-let DIFF_UNIV = prove
- (`!s. s DIFF (:A) = {}`,
-  SET_TAC[]);;
-
 (* Helper: real bounds from interval membership *)
 let IN_INTERVAL_BOUNDS = prove
  (`!x a b. x IN real_interval[a,b] ==> a <= b`,
@@ -2254,10 +2246,6 @@ let IN_OPEN_INTERVAL_BOUNDS = prove
   REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
 (* Helper: nonempty has element *)
-let NONEMPTY_EXISTS = prove
- (`!s. ~(s = {}) <=> (?x. x IN s)`,
-  SET_TAC[]);;
-
 (* Helper: subset antisymmetry *)
 let SUBSET_ANTISYM_SIMPLE = prove
  (`!s t. s SUBSET t /\ t SUBSET s ==> s = t`,
@@ -2339,20 +2327,6 @@ let IMAGE_INTER_SUBSET = prove
   SET_TAC[IN_IMAGE]);;
 
 (* Helper: preimage and union *)
-let PREIMAGE_UNION = prove
- (`!f s t. {x | f x IN s UNION t} = {x | f x IN s} UNION {x | f x IN t}`,
-  REWRITE_TAC[EXTENSION; IN_ELIM_THM; IN_UNION]);;
-
-(* Helper: preimage and intersection *)
-let PREIMAGE_INTER = prove
- (`!f s t. {x | f x IN s INTER t} = {x | f x IN s} INTER {x | f x IN t}`,
-  REWRITE_TAC[EXTENSION; IN_ELIM_THM; IN_INTER]);;
-
-(* Helper: preimage of empty *)
-let PREIMAGE_EMPTY = prove
- (`!f. {x | f x IN {}} = {}`,
-  REWRITE_TAC[EXTENSION; IN_ELIM_THM; NOT_IN_EMPTY]);;
-
 (* Helper: topspace of euclideanreal *)
 let TOPSPACE_EUCLIDEANREAL_UNIV = prove
  (`topspace euclideanreal = (:real)`,
@@ -2583,10 +2557,6 @@ let HALF_IN_UNIT_BOUNDS = prove
   REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
 
 (* Helper: everything is in UNIV *)
-let IN_UNIV_ALT = prove
- (`!x. x IN UNIV`,
-  REWRITE_TAC[IN_UNIV]);;
-
 (* Helper: forall in UNIV simplification *)
 let FORALL_IN_UNIV = prove
  (`!P. (!x. x IN UNIV ==> P x) <=> (!x. P x)`,
