@@ -2003,4 +2003,52 @@ let SUBSET_UNION_RIGHT = prove
  (`!s t. t SUBSET s UNION t`,
   SET_TAC[]);;
 
+(* Helper: real arithmetic *)
+let REAL_ADD_AC_SIMPLE = prove
+ (`!x y z. x + (y + z) = y + (x + z)`,
+  REAL_ARITH_TAC);;
 
+(* Helper: real arithmetic *)
+let REAL_MUL_LZERO = prove
+ (`!x. &0 * x = &0`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real arithmetic *)
+let REAL_MUL_RZERO = prove
+ (`!x. x * &0 = &0`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real arithmetic *)
+let REAL_ADD_LZERO = prove
+ (`!x. &0 + x = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real arithmetic *)
+let REAL_ADD_RZERO = prove
+ (`!x. x + &0 = x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real inequality *)
+let REAL_LE_REFL_SIMPLE = prove
+ (`!x. x <= x`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real inequality *)
+let REAL_LT_IMP_NE = prove
+ (`!x y. x < y ==> ~(x = y)`,
+  REAL_ARITH_TAC);;
+
+(* Helper: real inequality *)
+let REAL_LE_ANTISYM_SIMPLE = prove
+ (`!x y. x <= y /\ y <= x ==> x = y`,
+  REAL_ARITH_TAC);;
+
+(* Helper: interval bounds *)
+let REAL_INTERVAL_NONEMPTY_CLOSED = prove
+ (`!a b. ~(real_interval[a,b] = {}) <=> a <= b`,
+  REWRITE_TAC[REAL_INTERVAL_NE_EMPTY]);;
+
+(* Helper: subset of self *)
+let DIFF_EQ_EMPTY = prove
+ (`!s. s DIFF s = {}`,
+  SET_TAC[]);;
