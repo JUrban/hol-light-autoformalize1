@@ -417,7 +417,8 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
       CONJ_TAC THENL
        [(* IMAGE g topspace ∩ topspace product = IMAGE g topspace *)
         (* Mathematically: follows from CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE *)
-        (* Attempted: MP_TAC+ANTS_TAC, MATCH_MP_TAC, ASM_SIMP_TAC, MESON_TAC, STRIP_TAC *)
+        (* Attempted 7 approaches: MP_TAC+ANTS_TAC, MATCH_MP_TAC, ASM_SIMP_TAC, *)
+        (* MESON_TAC, STRIP_TAC, SUBGOAL_THEN+MESON, SUBGOAL_THEN+ACCEPT_TAC *)
         (* All failed due to tactical issues, not mathematical problems *)
         (* Per CLAUDE.md: don't get endlessly stuck, admit temporarily *)
         CHEAT_TAC;
