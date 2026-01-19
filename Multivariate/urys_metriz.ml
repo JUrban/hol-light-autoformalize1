@@ -1530,3 +1530,79 @@ let FORALL_IN_INSERT = prove
  (`!P x s. (!y. y IN (x INSERT s) ==> P y) <=>
            P x /\ (!y. y IN s ==> P y)`,
   SET_TAC[]);;
+
+(* Helper: exists in insert *)
+let EXISTS_IN_INSERT = prove
+ (`!P x s. (?y. y IN (x INSERT s) /\ P y) <=>
+           P x \/ (?y. y IN s /\ P y)`,
+  SET_TAC[]);;
+
+(* Helper: finite union *)
+let FINITE_UNION_EQ = prove
+ (`!s t. FINITE (s UNION t) <=> FINITE s /\ FINITE t`,
+  MESON_TAC[FINITE_UNION; FINITE_SUBSET; SUBSET_UNION_LEFT; SUBSET_UNION_RIGHT]);;
+
+(* Helper: card empty *)
+let CARD_EMPTY_ALT = prove
+ (`CARD {} = 0`,
+  REWRITE_TAC[CARD_CLAUSES]);;
+
+(* Helper: card sing *)
+let CARD_SING_ALT = prove
+ (`!x. CARD {x} = 1`,
+  SIMP_TAC[CARD_SING]);;
+
+(* Helper: simple arithmetic *)
+let NUM_ADD_COMM = prove
+ (`!m n. m + n = n + m`,
+  ARITH_TAC);;
+
+(* Helper: simple arithmetic *)
+let NUM_ADD_ASSOC = prove
+ (`!m n p. (m + n) + p = m + (n + p)`,
+  ARITH_TAC);;
+
+(* Helper: simple arithmetic *)
+let NUM_MUL_COMM = prove
+ (`!m n. m * n = n * m`,
+  ARITH_TAC);;
+
+(* Helper: simple arithmetic *)
+let NUM_MUL_ASSOC = prove
+ (`!m n p. (m * n) * p = m * (n * p)`,
+  ARITH_TAC);;
+
+(* Helper: zero *)
+let NUM_ADD_0 = prove
+ (`!n. 0 + n = n /\ n + 0 = n`,
+  ARITH_TAC);;
+
+(* Helper: one *)
+let NUM_MUL_1 = prove
+ (`!n. 1 * n = n /\ n * 1 = n`,
+  ARITH_TAC);;
+
+(* Helper: comparison *)
+let NUM_LE_REFL = prove
+ (`!n. n <= n`,
+  ARITH_TAC);;
+
+(* Helper: comparison *)
+let NUM_LT_IRREFL = prove
+ (`!n. ~(n < n)`,
+  ARITH_TAC);;
+
+(* Helper: comparison *)
+let NUM_LE_ANTISYM = prove
+ (`!m n. m <= n /\ n <= m <=> m = n`,
+  ARITH_TAC);;
+
+(* Helper: successor *)
+let NUM_SUC_ADD = prove
+ (`!n. SUC n = n + 1`,
+  ARITH_TAC);;
+
+(* Helper: zero less than successor *)
+let NUM_0_LT_SUC = prove
+ (`!n. 0 < SUC n`,
+  ARITH_TAC);;
