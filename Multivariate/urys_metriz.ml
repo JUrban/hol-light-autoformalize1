@@ -2650,3 +2650,18 @@ let IN_SING_SIMPLE = prove
 let IN_UNION_SIMPLE = prove
  (`!x s t. x IN (s UNION t) <=> x IN s \/ x IN t`,
   REWRITE_TAC[IN_UNION]);;
+
+(* Helper: intersection membership *)
+let IN_INTER_SIMPLE = prove
+ (`!x s t. x IN (s INTER t) <=> x IN s /\ x IN t`,
+  REWRITE_TAC[IN_INTER]);;
+
+(* Helper: difference membership *)
+let IN_DIFF_SIMPLE = prove
+ (`!x s t. x IN (s DIFF t) <=> x IN s /\ ~(x IN t)`,
+  REWRITE_TAC[IN_DIFF]);;
+
+(* Helper: universal set membership *)
+let IN_UNIV_SIMPLE = prove
+ (`!x. x IN UNIV`,
+  REWRITE_TAC[IN_UNIV]);;
