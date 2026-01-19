@@ -664,3 +664,14 @@ let CONTINUOUS_MAP_ID_SUBT = prove
  (`!top s. s SUBSET topspace top
            ==> continuous_map (subtopology top s, top) (\x. x)`,
   SIMP_TAC[CONTINUOUS_MAP_FROM_SUBTOPOLOGY; CONTINUOUS_MAP_ID]);;
+
+(* Helper: finite intersection of subsets *)
+let FINITE_INTER_SUBSET = prove
+ (`!s t u. s SUBSET u /\ t SUBSET u ==> (s INTER t) SUBSET u`,
+  SET_TAC[]);;
+
+(* Helper: conditional equality *)
+let COND_EQ_IMPLIES = prove
+ (`!b x y z. (if b then x else y) = z
+             ==> (b ==> x = z) /\ (~b ==> y = z)`,
+  MESON_TAC[]);;
