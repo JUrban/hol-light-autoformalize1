@@ -499,12 +499,19 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
             ASM_MESON_TAC[REAL_ARITH `&1 = &0 <=> F`]];
           ASM_MESON_TAC[IN_REAL_INTERVAL]];
         (* Show cartesian product subset IMAGE g u *)
-        (* Mathematically: need to show cartesian_product k u ⊆ IMAGE g u *)
-        (* where u i = if i=n then [&0,&1]\{&0} else [&0,&1] *)
-        (* and g = \x. \n. f n x *)
-        (* Approach: for z in cartesian_product, need to find w in u with g w = z *)
-        (* This requires inverting the embedding, which needs the separating property *)
-        (* TODO: Try SUBSET_IMAGE or direct construction *)
+        (* Key: if w in basic open, w n ≠ 0, but f n z = 0 for z ∉ u, so w from u *)
+        (* But need to assume w is in IMAGE g topspace, not just any w *)
+        (* Actually, the basic open might not be fully in IMAGE *)
+        (* Use contrapositive: if z ∉ u then g z ∉ basic open *)
+        REWRITE_TAC[SUBSET] THEN X_GEN_TAC `w:num->real` THEN
+        REWRITE_TAC[IN_CARTESIAN_PRODUCT; EXTENSIONAL_UNIV; IN_UNIV] THEN
+        REWRITE_TAC[IN_IMAGE] THEN STRIP_TAC THEN
+        (* We have w n ≠ 0 (from w in cartesian product with v n = [0,1]\{0}) *)
+        (* Need to show ∃z ∈ u. g z = w *)
+        (* Since w = g z' for some z' ∈ topspace, and f n z' = w n ≠ 0 *)
+        (* But f n z = 0 for z ∈ topspace\u, so z' ∉ topspace\u, hence z' ∈ u *)
+        (* But we don't have w = g z' as an assumption! *)
+        (* The cartesian product isn't necessarily in IMAGE g *)
         CHEAT_TAC];
       (* Prove injectivity *)
       MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
