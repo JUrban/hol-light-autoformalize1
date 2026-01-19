@@ -278,6 +278,24 @@ let OPEN_IN_UNIT_INTERVAL_DIFF_ZERO = prove
   REWRITE_TAC[EXTENSION; IN_INTER; IN_DIFF; IN_SING; IN_REAL_INTERVAL] THEN
   REAL_ARITH_TAC);;
 
+(* Helper: [0,1] is open in itself *)
+let OPEN_IN_UNIT_INTERVAL_SELF = prove
+ (`open_in (subtopology euclideanreal (real_interval[&0,&1]))
+           (real_interval[&0,&1])`,
+  REWRITE_TAC[OPEN_IN_SUBTOPOLOGY; GSYM REAL_OPEN_IN; INTER_IDEMPOT] THEN
+  EXISTS_TAC `real_interval(&0 - &1, &1 + &1)` THEN
+  REWRITE_TAC[REAL_OPEN_REAL_INTERVAL] THEN
+  REWRITE_TAC[EXTENSION; IN_INTER; IN_REAL_INTERVAL] THEN
+  REAL_ARITH_TAC);;
+
+(* Helper: conditional interval is always open *)
+let OPEN_IN_COND_INTERVAL_DIFF_ZERO = prove
+ (`!i n. open_in (subtopology euclideanreal (real_interval[&0,&1]))
+                 (if i = n then real_interval[&0,&1] DIFF {&0}
+                  else real_interval[&0,&1])`,
+  REPEAT GEN_TAC THEN COND_CASES_TAC THEN
+  ASM_REWRITE_TAC[OPEN_IN_UNIT_INTERVAL_DIFF_ZERO; OPEN_IN_UNIT_INTERVAL_SELF]);;
+
 (* Helper: simple set lemma *)
 let SUBSET_UNION_LEFT = prove
  (`!s t. s SUBSET s UNION t`,
@@ -411,7 +429,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* Latest attempt: ASM_CASES_TAC + ASM_SIMP_TAC + ASM_MESON_TAC *)
         (* Result: ASM_MESON_TAC too deep (109572+ steps) *)
         (* Previous attempts documented in CHANGES files all failed *)
-        CHEAT_TAC;
+        (* Attempt: Use new OPEN_IN_COND_INTERVAL_DIFF_ZERO lemma with BETA_TAC *)
+        GEN_TAC THEN BETA_TAC THEN
+        REWRITE_TAC[OPEN_IN_COND_INTERVAL_DIFF_ZERO];
         (* Show y in cartesian product *)
         (* Attempted SET_TAC - too deep (26819+ steps) *)
         (* Attempted manual proof with GEN_TAC - "GEN_TAC" failure *)
