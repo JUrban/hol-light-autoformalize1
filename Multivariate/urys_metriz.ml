@@ -1898,4 +1898,74 @@ let REAL_BETWEEN_HALF = prove
  (`!x y. x < y ==> x < (x + y) / &2 /\ (x + y) / &2 < y`,
   REAL_ARITH_TAC);;
 
+(* Helper: one half less than one *)
+let REAL_HALF_LT_ONE = prove
+ (`&1 / &2 < &1`,
+  REAL_ARITH_TAC);;
+
+(* Helper: zero less than half *)
+let REAL_ZERO_LT_HALF = prove
+ (`&0 < &1 / &2`,
+  REAL_ARITH_TAC);;
+
+(* Helper: specific interval containment *)
+let REAL_ONE_IN_UNIT_INTERVAL = prove
+ (`&1 IN real_interval[&0, &1]`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: specific interval containment *)
+let REAL_ZERO_IN_UNIT_INTERVAL = prove
+ (`&0 IN real_interval[&0, &1]`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: half in unit interval *)
+let REAL_HALF_IN_UNIT_INTERVAL = prove
+ (`&1 / &2 IN real_interval[&0, &1]`,
+  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
+(* Helper: interval subset relation *)
+let REAL_INTERVAL_SUBSET_SELF = prove
+ (`!a b. real_interval[a,b] SUBSET real_interval[a,b]`,
+  REWRITE_TAC[SUBSET_REFL]);;
+
+(* Helper: intersection with subset *)
+let INTER_SUBSET_SECOND = prove
+ (`!s t. s INTER t SUBSET t`,
+  SET_TAC[]);;
+
+(* Helper: finite union with singleton *)
+let FINITE_UNION_SING = prove
+ (`!s x. FINITE s ==> FINITE (s UNION {x})`,
+  SIMP_TAC[FINITE_UNION; FINITE_SING]);;
+
+(* Helper: subset transitivity *)
+let SUBSET_TRANS_SIMPLE = prove
+ (`!s t u. s SUBSET t /\ t SUBSET u ==> s SUBSET u`,
+  SET_TAC[]);;
+
+(* Helper: image composition *)
+let IMAGE_COMPOSE_GEN = prove
+ (`!f g s. IMAGE f (IMAGE g s) = IMAGE (f o g) s`,
+  REWRITE_TAC[IMAGE_o]);;
+
+(* Helper: function application *)
+let FUN_APP_THM = prove
+ (`!f x. f x = f x`,
+  REWRITE_TAC[]);;
+
+(* Helper: conditional equality *)
+let COND_ID = prove
+ (`!b x. (if b then x else x) = x`,
+  MESON_TAC[]);;
+
+(* Helper: inequality from membership *)
+let IN_INTERVAL_IMP_LE = prove
+ (`!x a b. x IN real_interval[a,b] ==> a <= x /\ x <= b`,
+  REWRITE_TAC[IN_REAL_INTERVAL]);;
+
+(* Helper: inequality from membership in open interval *)
+let IN_OPEN_INTERVAL_IMP_LT = prove
+ (`!x a b. x IN real_interval(a,b) ==> a < x /\ x < b`,
+  REWRITE_TAC[IN_REAL_INTERVAL]);;
+
 
