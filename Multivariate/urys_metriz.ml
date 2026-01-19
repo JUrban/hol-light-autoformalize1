@@ -214,9 +214,27 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      - SUBGOAL_THEN + MATCH_MP_TAC: wrong tactic for existence goal
      - SKOLEM_THM with MATCH_MP: "Not an implication" error *)
 
-  (* Attempt: Try simpler approach - use countability of basis *)
-  (* Basis b is countable, so topspace × topspace is countable when space is second-countable *)
-  (* Can enumerate all separation constraints and pick functions for each *)
+  (* Attempt 6: Enumerate topspace using second countable property *)
+  (* Second-countable spaces have countable dense subset when Hausdorff + regular *)
+  (* Use enumeration of points + pairing to index all separation requirements *)
+
+  (* First get choice functions using @-operator *)
+  ABBREV_TAC
+    `(fp:A->A->A->real) =
+       \x y. @g. if x IN topspace top /\ y IN topspace top /\ ~(x = y)
+                 then continuous_map
+                        (top,subtopology euclideanreal (real_interval[&0,&1]))
+                        g /\
+                      ~(g x = g y)
+                 else g = (\z. &1 / &2)` THEN
+  ABBREV_TAC
+    `(fc:(A->bool)->A->A->real) =
+       \c x. @g. if closed_in top c /\ x IN topspace top /\ ~(x IN c)
+                 then continuous_map
+                        (top,subtopology euclideanreal (real_interval[&0,&1]))
+                        g /\
+                      g x = &1 /\ (!z. z IN c ==> g z = &0)
+                 else g = (\z. &1 / &2)` THEN
 
   CHEAT_TAC);;
 
@@ -452,6 +470,14 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* Attempt: ASM_SIMP_TAC + STRIP_TAC approach *)
         (* Result: "find_term" error - STRIP_TAC incompatible with goal structure *)
         (* Goal 3 very resistant - 11+ approaches tried, all failed *)
+        (* Attempt 12: Use IN_CARTESIAN_PRODUCT + EXTENSIONAL_UNIV + IN_COND_INTERVAL_DIFF_ZERO *)
+        (* Result: Unsolved goals - REAL_ARITH can't find f n x = &1 assumption *)
+        (* Attempt 13: ASM_MESON_TAC with REAL_ARITH lemma *)
+        (* Result: Too deep (1327648+ steps) *)
+        (* Attempt 14: ASM_REWRITE_TAC to use f n x = &1 explicitly *)
+        (* Result: REAL_ARITH still can't prove ~(f n x = &0) from assumptions *)
+        (* Goal 3 extremely resistant - 14+ tactical approaches exhausted *)
+        (* May need explicit helper lemma or different proof architecture *)
         (* Moving on per CLAUDE.md "don't get endlessly stuck" *)
         CHEAT_TAC;
         (* Show cartesian product subset IMAGE g u *)
