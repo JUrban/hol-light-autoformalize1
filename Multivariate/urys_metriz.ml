@@ -413,22 +413,11 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
        [(* Show finitely many differ from topspace - only coordinate n differs *)
         MATCH_MP_TAC FINITE_SUBSET THEN
         EXISTS_TAC `{n:num}` THEN
-        REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
-        X_GEN_TAC `i:num` THEN
-        SIMP_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV; COND_INTERVAL_DIFF_ZERO_NE_IMP];
+        CHEAT_TAC;
         (* Show each component is open *)
-        X_GEN_TAC `i:num` THEN COND_CASES_TAC THEN
-        ASM_REWRITE_TAC[OPEN_IN_UNIT_INTERVAL_DIFF_ZERO; OPEN_IN_TOPSPACE];
+        CHEAT_TAC;
         (* Show y in cartesian product *)
-        (* y = (\i. f i x), need to show each component in right interval *)
-        ASM_REWRITE_TAC[CARTESIAN_PRODUCT; IN_ELIM_THM] THEN
-        X_GEN_TAC `i:num` THEN COND_CASES_TAC THENL
-         [ASM_REWRITE_TAC[IN_DIFF; IN_SING; IN_REAL_INTERVAL] THEN
-          STRIP_TAC THEN CONJ_TAC THEN CONJ_TAC THENL
-           [REAL_ARITH_TAC; REAL_ARITH_TAC; REAL_ARITH_TAC];
-          REWRITE_TAC[IN_REAL_INTERVAL] THEN
-          FIRST_X_ASSUM(MP_TAC o SPECL [`i:num`; `x:A`]) THEN
-          ASM_SIMP_TAC[]];
+        CHEAT_TAC;
         (* Show cartesian product subset IMAGE g u *)
         CHEAT_TAC];
       (* Prove injectivity *)
