@@ -228,6 +228,11 @@ let CANTOR_UNPAIR = new_definition
 (* These are standard results about Cantor pairing *)
 (* For now, definitions are available for use *)
 
+(* Helper: implication from conditional inequality *)
+let COND_NE_IMP = prove
+ (`!b x y z. (~((if b then x else y) = z) ==> b) <=> b \/ (y = z)`,
+  MESON_TAC[]);;
+
 (* Helper: open intervals in unit interval are open *)
 let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
  (`!a b. &0 <= a /\ a < b /\ b <= &1
@@ -751,9 +756,4 @@ let COND_EXPAND_EQ = prove
 (* Helper: negation of conditional equality *)
 let COND_NE_EXPAND = prove
  (`!b x y z. ~((if b then x else y) = z) <=> (b /\ ~(x = z)) \/ (~b /\ ~(y = z))`,
-  MESON_TAC[]);;
-
-(* Helper: implication from conditional inequality *)
-let COND_NE_IMP = prove
- (`!b x y z. (~((if b then x else y) = z) ==> b) <=> b \/ (y = z)`,
   MESON_TAC[]);;
