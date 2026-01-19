@@ -294,16 +294,14 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         MATCH_MP_TAC FINITE_SUBSET THEN
         EXISTS_TAC `{n:num}` THEN
         REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING; IN_UNIV] THEN
-        X_GEN_TAC `i:num` THEN DISCH_TAC THEN
-        ASM_REWRITE_TAC[] THEN
+        X_GEN_TAC `i:num` THEN
         REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV] THEN
-        (* TODO: Show (if i=n then interval(1/2,1) else interval[0,1]) ≠ interval[0,1] implies i=n *)
-        (*       When i<>n: LHS = interval[0,1] = RHS, contradiction *)
-        (*       When i=n: LHS = interval(1/2,1) ≠ interval[0,1] *)
+        (* TODO: Prove ~((if i=n then interval(1/2,1) else interval[0,1]) = interval[0,1]) ==> i=n *)
+        (*       Strategy: ASM_CASES_TAC on i=n, then both cases are straightforward *)
+        (*       Case i=n: goal becomes ~(interval(1/2,1) = interval[0,1]) ==> T *)
+        (*       Case i<>n: goal becomes ~(interval[0,1] = interval[0,1]) ==> i=n, antecedent false *)
         CHEAT_TAC;
         (* Show each component is open *)
-        (* (1/2,1) is open by OPEN_IN_UNIT_INTERVAL_SUBINTERVAL *)
-        (* [0,1] is open as the topspace *)
         CHEAT_TAC;
         (* Show y in cartesian product *)
         (* This is complex: y = f applied to x, but we need y IN basic open *)
