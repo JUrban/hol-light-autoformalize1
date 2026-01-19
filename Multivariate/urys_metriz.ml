@@ -2665,3 +2665,18 @@ let IN_DIFF_SIMPLE = prove
 let IN_UNIV_SIMPLE = prove
  (`!x. x IN UNIV`,
   REWRITE_TAC[IN_UNIV]);;
+
+(* Helper: conjunction and implication *)
+let CONJ_IMP = prove
+ (`!p q r. (p /\ q ==> r) <=> (p ==> q ==> r)`,
+  MESON_TAC[]);;
+
+(* Helper: negation and equivalence *)
+let NOT_IFF = prove
+ (`!p q. (~p <=> ~q) <=> (p <=> q)`,
+  MESON_TAC[]);;
+
+(* Helper: contrapositive *)
+let CONTRAPOS_SIMPLE = prove
+ (`!p q. (p ==> q) ==> (~q ==> ~p)`,
+  MESON_TAC[]);;
