@@ -1968,4 +1968,39 @@ let IN_OPEN_INTERVAL_IMP_LT = prove
  (`!x a b. x IN real_interval(a,b) ==> a < x /\ x < b`,
   REWRITE_TAC[IN_REAL_INTERVAL]);;
 
+(* Helper: element in singleton *)
+let IN_SING_SIMPLE = prove
+ (`!x y. x IN {y} <=> x = y`,
+  REWRITE_TAC[IN_SING]);;
+
+(* Helper: union with empty *)
+let UNION_EMPTY_LEFT = prove
+ (`!s. {} UNION s = s`,
+  SET_TAC[]);;
+
+(* Helper: union with empty *)
+let UNION_EMPTY_RIGHT = prove
+ (`!s. s UNION {} = s`,
+  SET_TAC[]);;
+
+(* Helper: intersection with empty *)
+let INTER_EMPTY_LEFT = prove
+ (`!s. {} INTER s = {}`,
+  SET_TAC[]);;
+
+(* Helper: intersection with empty *)
+let INTER_EMPTY_RIGHT = prove
+ (`!s. s INTER {} = {}`,
+  SET_TAC[]);;
+
+(* Helper: subset of union *)
+let SUBSET_UNION_LEFT = prove
+ (`!s t. s SUBSET s UNION t`,
+  SET_TAC[]);;
+
+(* Helper: subset of union *)
+let SUBSET_UNION_RIGHT = prove
+ (`!s t. t SUBSET s UNION t`,
+  SET_TAC[]);;
+
 
