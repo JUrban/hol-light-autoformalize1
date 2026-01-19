@@ -259,6 +259,18 @@ let COND_INTERVAL_EQ_CLOSED = prove
   REPEAT GEN_TAC THEN COND_CASES_TAC THEN
   ASM_REWRITE_TAC[REAL_INTERVAL_OPEN_NE_CLOSED_UNIT]);;
 
+(* Helper: half and one bounds *)
+let HALF_ONE_BOUNDS = prove
+ (`&0 <= &1 / &2 /\ &1 / &2 < &1 /\ &1 <= &1`,
+  REAL_ARITH_TAC);;
+
+(* Helper: half open interval is open in unit interval *)
+let HALF_ONE_OPEN_IN_UNIT = prove
+ (`open_in (subtopology euclideanreal (real_interval[&0,&1]))
+           (real_interval(&1 / &2, &1))`,
+  MATCH_MP_TAC OPEN_IN_UNIT_INTERVAL_SUBINTERVAL THEN
+  REAL_ARITH_TAC);;
+
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
  (`!top:A topology f:num->A->real.
