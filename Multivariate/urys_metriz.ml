@@ -252,6 +252,13 @@ let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
   REWRITE_TAC[EXTENSION; IN_INTER; IN_REAL_INTERVAL] THEN
   ASM_MESON_TAC[REAL_LT_IMP_LE; REAL_LE_TRANS]);;
 
+(* Helper: conditional interval equality for potential use in EMBEDDING *)
+let COND_INTERVAL_EQ_CLOSED = prove
+ (`!i n. (if i = n then real_interval(&1 / &2, &1) else real_interval[&0,&1]) =
+         real_interval[&0,&1] <=> ~(i = n)`,
+  REPEAT GEN_TAC THEN COND_CASES_TAC THEN
+  ASM_REWRITE_TAC[REAL_INTERVAL_OPEN_NE_CLOSED_UNIT]);;
+
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
  (`!top:A topology f:num->A->real.
