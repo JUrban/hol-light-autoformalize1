@@ -233,6 +233,13 @@ let COND_NE_IMP = prove
  (`!b x y z. (~((if b then x else y) = z) ==> b) <=> b \/ (y = z)`,
   MESON_TAC[]);;
 
+(* Helper: open and closed unit intervals are not equal *)
+let REAL_INTERVAL_OPEN_NE_CLOSED_UNIT = prove
+ (`~(real_interval(&1 / &2, &1) = real_interval[&0,&1])`,
+  REWRITE_TAC[EXTENSION; real_interval; IN_ELIM_THM] THEN
+  DISCH_THEN(MP_TAC o SPEC `&0`) THEN
+  REAL_ARITH_TAC);;
+
 (* Helper: open intervals in unit interval are open *)
 let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
  (`!a b. &0 <= a /\ a < b /\ b <= &1
@@ -306,9 +313,8 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         X_GEN_TAC `i:num` THEN
         REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_UNIV] THEN
         (* TODO: Prove ~((if i=n then interval(1/2,1) else interval[0,1]) = interval[0,1]) ==> i=n *)
-        (*       Attempted: ASM_CASES_TAC + ASM_SIMP_TAC (unsolved goals) *)
-        (*                 ASM_CASES_TAC + MESON_TAC (too deep) *)
-        (*       Need: More specialized tactic or helper lemma about interval inequality *)
+        (*       Added REAL_INTERVAL_OPEN_NE_CLOSED_UNIT helper but still need right tactics *)
+        (*       Goal structure after STRIP_TAC doesn't match expected pattern *)
         CHEAT_TAC;
         (* Show each component is open *)
         CHEAT_TAC;
