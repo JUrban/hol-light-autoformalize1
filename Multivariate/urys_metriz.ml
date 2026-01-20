@@ -309,6 +309,17 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
              Requires: Product topology library (PRODUCT_TOPOLOGY, π_N projection),
                       open set manipulation tactics, IMAGE/preimage reasoning
           *)
+
+          (* Attempt 11: Add structure - show goal is in subtopology form *)
+          REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
+          (* Goal: ?t. open_in (product_topology...) t /\ u = t INTER IMAGE g topspace *)
+          (* Strategy: construct t as union of cylinders, one for each z ∈ u *)
+          (* This requires: for each z, finding the separating index N,
+             then defining the cylinder, then taking their union *)
+          (* Key difficulty: quantifying over u to build the union,
+             while maintaining openness in product topology *)
+          (* The cylinder for each z depends on the choice of N from separation,
+             which requires dependent choice over all elements of u *)
           CHEAT_TAC;
           (* <= direction: u open ==> preimage open (follows from continuity) *)
           DISCH_TAC THEN
