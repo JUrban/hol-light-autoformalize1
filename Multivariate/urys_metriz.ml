@@ -189,7 +189,6 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   (* Leaving as CHEAT_TAC but with clear textbook strategy documented *)
   CHEAT_TAC);;
 
-
 (* Note: Pairing function NUMPAIR and properties NUMPAIR_INJ, NUMPAIR_DEST
    are available from the library (ind_types.ml). Use those instead of
    defining custom pairing functions, per CLAUDE.md guidance to avoid
@@ -303,15 +302,7 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
 (* Helper: basic fact about functions into [0,1] *)
 (* Helper: continuous map into subtopology *)
 
-
-
-
-
-
 (* Helper: membership in diff *)
-
-
-
 
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
@@ -368,17 +359,10 @@ let URYSOHN_METRIZATION = prove
 
 (* Helper: 0 and 1 in unit interval *)
 
-
-
-
-
-
-
 (* Helper: open set properties *)
 (* Note: Several basic lemmas like OPEN_IN_SUBSET, FINITE_SING,
    FINITE_SUBSET, IN_SING are available from the library and used
    directly instead of defining wrapper versions. *)
-
 
 (* Helper: equality with lambda *)
 
@@ -410,10 +394,7 @@ let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
 
 (* Helper: open interval subset closed *)
 
-
-
 (* Note: Conditional set membership: use MESON_TAC directly *)
-
 
 (* Note: HALF_IN_UNIT_INTERVAL removed (unused, trivial REAL_ARITH_TAC) *)
 
@@ -422,10 +403,7 @@ let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
 
 (* Helper: conditional equality cases *)
 
-
-
 (* Note: CONJ_IMP is basic MESON_TAC property *)
-
 
 (* Helper: union singleton *)
 (* Note: INTER_UNIV, DIFF_EMPTY, EMPTY_SUBSET, UNION_COMM, INTER_COMM,
@@ -473,7 +451,6 @@ let IN_COND_INTERVAL = prove
 (* Note: More real arithmetic (multiplication associativity, zero identities,
    distributivity, negation/subtraction): use REAL_ARITH_TAC directly *)
 
-
 (* Helper: conditional with false *)
 (* Note: COND_FALSE and COND_TRUE are basic library properties *)
 
@@ -486,7 +463,6 @@ let IN_COND_INTERVAL = prove
 (* Note: REAL_ABS_NEG, REAL_ABS_POS - trivial REAL_ARITH_TAC, use directly *)
 (* Note: REAL_MAX_REFL, REAL_MIN_REFL - trivial REAL_ARITH_TAC, use directly *)
 
-
 (* Note: REAL_DIV_1, REAL_1_NE_0 - trivial REAL_ARITH_TAC, use directly *)
 
 (* Note: REAL_LT_LE - basic REAL_ARITH_TAC, use directly *)
@@ -495,7 +471,6 @@ let IN_COND_INTERVAL = prove
 (* Note: REAL_LT_ADD2, REAL_LE_ADD2 - basic REAL_ARITH_TAC, use directly *)
 
 (* Note: REAL_DIV_REFL, REAL_MUL_LINV, REAL_MUL_RINV - trivial library wrappers, use library directly *)
-
 
 (* Note: Basic set properties - EMPTY_EXISTS, NONEMPTY_EXISTS, SING_EXISTS,
    IMAGE_SING, IMAGE_EMPTY_ALT, UNION_SING_*, INSERT_EMPTY, INSERT_INSERT,
@@ -510,52 +485,23 @@ let IN_COND_INTERVAL = prove
 
 (* Note: FUN_EQ - unused wrapper of FUN_EQ_THM, use FUN_EQ_THM directly *)
 
-
-
-
 (* Note: Injection definition - basic MESON_TAC property *)
 
 (* Note: SURJECTIVE_DEF, BIJECTIVE_DEF - basic function definitions, use library *)
 
-
 (* Note: FORALL_IN_INSERT, EXISTS_IN_INSERT - basic SET_TAC properties *)
-
 
 (* Note: CARD_CLAUSES, CARD_SING, NUM addition - all library lemmas or ARITH_TAC *)
 
 (* Helper: simple arithmetic *)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 (* Helper: closed interval subset *)
-
-
 
 (* Note: SUBSET_REFL is available from library *)
 
-
-
-
-
 (* Helper: between bounds *)
 
-
-
-
 (* Note: PAIR_EQ - trivial library wrapper, use library PAIR_EQ directly *)
-
 
 (* Helper: image of constant *)
 
@@ -570,9 +516,7 @@ let IN_COND_INTERVAL = prove
 
 (* Note: OPEN_IN_CLOSED_IN_EQ - trivial library wrapper, use library directly *)
 
-
 (* Note: REAL_HALF_LT_ONE, REAL_ZERO_LT_HALF - basic REAL_ARITH_TAC, use directly *)
-
 
 (* Helper: half in unit interval *)
 (* Note: REAL_INTERVAL_SUBSET_SELF - just SUBSET_REFL, use directly *)
@@ -590,7 +534,6 @@ let IN_COND_INTERVAL = prove
 (* Note: Real arithmetic AC, zero identities: use REAL_ARITH_TAC directly *)
 
 (* Helper: subset of self *)
-
 
 (* Note: IMAGE_SUBSET is in library *)
 
@@ -632,9 +575,7 @@ let IN_COND_INTERVAL = prove
 
 (* Note: De Morgan's laws - basic SET_TAC *)
 
-
 (* Note: DIFF/INTER/UNION distributivity: use SET_TAC directly *)
-
 
 (* Note: Real abs triangle inequality: use REAL_ARITH_TAC directly *)
 
@@ -653,7 +594,6 @@ let IN_COND_INTERVAL = prove
    subtopology, use REWRITE_TAC[continuous_map; TOPSPACE_SUBTOPOLOGY] with SET_TAC. *)
 
 (* Helper: conditional with different branches not equal to second branch *)
-
 
 (* Helper: 1 is in the half-open interval (&1/&2, &1) - wait, that's wrong! *)
 (* &1 is NOT in the open interval (&1/&2, &1) which is OPEN on both ends *)
