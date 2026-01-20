@@ -2165,25 +2165,8 @@ let REAL_ABS_TRIANGLE_SIMPLE = prove
 
 (* Note: FINITE_INTER, FINITE_DIFF are available from library *)
 
-(* Helper: forall in insert *)
-let FORALL_IN_INSERT_SIMPLE = prove
- (`!P x s. (!y. y IN x INSERT s ==> P y) <=> P x /\ (!y. y IN s ==> P y)`,
-  REWRITE_TAC[IN_INSERT] THEN MESON_TAC[]);;
-
-(* Helper: exists in insert *)
-let EXISTS_IN_INSERT_SIMPLE = prove
- (`!P x s. (?y. y IN x INSERT s /\ P y) <=> P x \/ (?y. y IN s /\ P y)`,
-  REWRITE_TAC[IN_INSERT] THEN MESON_TAC[]);;
-
-(* Helper: subset and union *)
-let SUBSET_UNION_EQ = prove
- (`!s t. s SUBSET t <=> s UNION t = t`,
-  SET_TAC[]);;
-
-(* Helper: subset and inter *)
-let SUBSET_INTER_EQ = prove
- (`!s t. s SUBSET t <=> s INTER t = s`,
-  SET_TAC[]);;
+(* Note: For quantifiers over INSERT, use IN_INSERT with MESON_TAC or SET_TAC.
+   For subset characterizations, use SET_TAC directly. *)
 
 (* Helper: disjoint characterization *)
 let DISJOINT_EMPTY_INTER = prove
