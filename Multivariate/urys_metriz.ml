@@ -156,14 +156,19 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (* Following Munkres §34.1, Step 1: For each pair (n,m) where
-     closure(B_n) ⊆ B_m, apply Urysohn to get g_{n,m} with g_{n,m}(closure(B_n))={1}
-     and g_{n,m}(X-B_m)={0}. Reindex as {f_k} using NUMPAIR.
+  (* Munkres §34.1, Step 1, page 214-215:
+     For each pair (n,m) where closure(B_n) ⊆ B_m, use Urysohn lemma to get
+     g_{n,m}: X → [0,1] with g_{n,m}(closure(B_n)) = {1}, g_{n,m}(X-B_m) = {0}.
+     Since indexed by subset of N×N, this collection is countable.
+     Reindex as {f_k} using pairing function (NUMPAIR available in library).
 
-     Construction outline:
-     1. Use SKOLEM_THM to extract choice function g: num→num→A→real
-     2. Define f k = g n m where k = NUMPAIR n m (or &1/&2 if invalid)
-     3. Verify four properties using regularity to find suitable basis pairs *)
+     To verify the four required properties:
+     - Property 1-2: Each g_{n,m} maps to [0,1] and is continuous (from Urysohn)
+     - Property 3: Point separation follows from regularity (can find basis pair)
+     - Property 4: Closed set separation follows from regularity (can find basis pair)
+
+     Key: Given x₀ and neighborhood U, regularity gives basis elements B_n, B_m
+     with x₀ ∈ B_n, closure(B_n) ⊆ B_m ⊆ U. Then g_{n,m} works. *)
 
   CHEAT_TAC);;
 
