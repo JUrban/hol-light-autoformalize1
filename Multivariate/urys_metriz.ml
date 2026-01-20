@@ -858,55 +858,14 @@ let DIFF_EMPTY_SIMPLE = prove
  (`!s. s DIFF {} = s`,
   REWRITE_TAC[DIFF_EMPTY]);;
 
-(* Helper: empty subset *)
-let EMPTY_SUBSET_SIMPLE = prove
- (`!s. {} SUBSET s`,
-  REWRITE_TAC[EMPTY_SUBSET]);;
+(* Note: EMPTY_SUBSET, UNION_COMM, INTER_COMM, SUBSET_ANTISYM_EQ,
+   IN_UNION, IN_INTER, IN_DIFF, SUBSET_REFL, SUBSET_TRANS are all
+   available from library (sets.ml). *)
 
 (* Helper: subset inter *)
 let SUBSET_INTER_BOTH = prove
  (`!s t u. s SUBSET t /\ s SUBSET u ==> s SUBSET (t INTER u)`,
   SET_TAC[]);;
-
-(* Helper: union comm *)
-let UNION_COMM_SIMPLE = prove
- (`!s t. s UNION t = t UNION s`,
-  REWRITE_TAC[UNION_COMM]);;
-
-(* Helper: inter comm *)
-let INTER_COMM_SIMPLE = prove
- (`!s t. s INTER t = t INTER s`,
-  REWRITE_TAC[INTER_COMM]);;
-
-(* Helper: subset antisym *)
-let SUBSET_ANTISYM_SIMPLE = prove
- (`!s t. s SUBSET t /\ t SUBSET s ==> s = t`,
-  REWRITE_TAC[GSYM SUBSET_ANTISYM_EQ] THEN MESON_TAC[]);;
-
-(* Helper: in union *)
-let IN_UNION_SIMPLE = prove
- (`!x s t. x IN (s UNION t) <=> x IN s \/ x IN t`,
-  REWRITE_TAC[IN_UNION]);;
-
-(* Helper: in inter *)
-let IN_INTER_SIMPLE = prove
- (`!x s t. x IN (s INTER t) <=> x IN s /\ x IN t`,
-  REWRITE_TAC[IN_INTER]);;
-
-(* Helper: in diff *)
-let IN_DIFF_SIMPLE = prove
- (`!x s t. x IN (s DIFF t) <=> x IN s /\ ~(x IN t)`,
-  REWRITE_TAC[IN_DIFF]);;
-
-(* Helper: subset refl *)
-let SUBSET_REFL_SIMPLE = prove
- (`!s. s SUBSET s`,
-  REWRITE_TAC[SUBSET_REFL]);;
-
-(* Helper: subset trans *)
-let SUBSET_TRANS_SIMPLE = prove
- (`!s t u. s SUBSET t /\ t SUBSET u ==> s SUBSET u`,
-  REWRITE_TAC[SUBSET_TRANS]);;
 
 (* Helper: insert subset *)
 let INSERT_SUBSET_SIMPLE = prove
