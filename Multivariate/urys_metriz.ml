@@ -35,9 +35,6 @@ let REGULAR_SECOND_COUNTABLE_IMP_NORMAL = prove
   MATCH_MP_TAC SECOND_COUNTABLE_IMP_LINDELOF_SPACE THEN
   ASM_REWRITE_TAC[]);;
 
-(* Note: CONTINUOUS_MAP_COMPLEMENT_UNIT_INTERVAL - unused, can derive with
-   CONTINUOUS_MAP_COMPOSE + CONTINUOUS_MAP_REAL_SUB as needed *)
-
 (* Helper: normal space gives Urysohn functions for closed sets *)
 let NORMAL_SPACE_URYSOHN_FUNCTION = prove
  (`!top c d:A->bool.
