@@ -405,10 +405,3 @@ let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
         continuous_map (top,top') f
         ==> IMAGE f (topspace top) SUBSET topspace top'`,
   SIMP_TAC[CONTINUOUS_MAP]);;
-
-let IN_COND_INTERVAL = prove
- (`!b a1 b1 a2 b2 x.
-     x IN (if b then real_interval[a1,b1] else real_interval[a2,b2])
-     <=> (b ==> x IN real_interval[a1,b1]) /\
-         (~b ==> x IN real_interval[a2,b2])`,
-  MESON_TAC[])
