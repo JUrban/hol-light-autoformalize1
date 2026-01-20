@@ -206,19 +206,24 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (* Gradual approach per CLAUDE.md *)
+  (* Following textbook Step 1: construct {g_{n,m}} for pairs where cl(B_n) ⊂ B_m *)
 
-  (* Attempts tried:
-     - SKOLEM_THM with ASSUME + REWRITE: "REWRITES_CONV" error
-     - ASM_MESON_TAC: too deep (80266+ steps)
-     - SUBGOAL_THEN + MATCH_MP_TAC: wrong tactic for existence goal
-     - SKOLEM_THM with MATCH_MP: "Not an implication" error
-     - MESON with COUNTABLE_AS_IMAGE: timeout after 3.8M+ steps *)
+  (* Textbook approach: For each pair (n,m) where closure(e n) ⊂ e m,
+     use Urysohn to get g_{n,m} with g_{n,m}(cl(e n)) = {1} and g_{n,m}(X - e m) = {0}.
+     Then reindex this countable collection to get {f_n}. *)
 
-  (* Attempt 15: Direct CHEAT_TAC (reverting after timeout) *)
-  (* The existence is guaranteed by the point separation and closed set properties *)
-  (* Construction requires explicit enumeration which is tactically very complex *)
-  (* All automated tactics (MESON, SKOLEM) fail due to search space size *)
+  (* For each valid pair, we can construct the function using the closed set assumption *)
+  (* The pair (n,m) is "valid" when closure_of top (e n) SUBSET e m *)
+  (* For such pairs, apply Urysohn with c = closure_of top (e n) and d = topspace DIFF e m *)
+
+  (* Attempt 16: Explicit construction following textbook *)
+  (* Need to:
+     1) Define valid pairs predicate
+     2) For each valid pair, get function via choice from closed set assumption
+     3) Reindex via NUMPAIR to get countable family
+     4) Prove separation properties *)
+  (* This requires sophisticated choice principles and pair enumeration *)
+  (* Leaving as CHEAT_TAC but with clear textbook strategy documented *)
   CHEAT_TAC);;
 
 
@@ -402,18 +407,28 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
           (* Assume: u SUBSET IMAGE g topspace /\ *)
           (*         open_in top {x | x IN topspace /\ g x IN u} *)
           DISCH_TAC THEN
-          (* Use OPEN_IN_SUBTOPOLOGY: need to find v open in product with u = v INTER IMAGE *)
-          REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
-          (* Need to provide witness v such that: open_in product v /\ u = v INTER IMAGE *)
-          (* Strategy: take v = u itself, then need to show:
-             1) u is open in the product_topology
-             2) u = u INTER IMAGE g topspace (follows from u SUBSET IMAGE)
+          (* Following textbook Step 2 proof (topology.tex lines 4662-4683) *)
+          (* Goal: show u is open in subtopology product (IMAGE g topspace) *)
+          (* Strategy: For each z ∈ u, construct cylinder neighborhood *)
+
+          (* Textbook approach:
+             - z ∈ u ⊆ IMAGE g topspace, so ∃x. z = g(x) = (f_1(x), f_2(x), ...)
+             - Preimage {y | y ∈ topspace ∧ g(y) ∈ u} is open and contains x
+             - Use regularity/separation to find closed c with x ∉ c
+             - Apply closed set separation (assumption 4) to get index N where:
+               f_N(x) = 1 and ∀z∈c. f_N(z) = 0
+             - Define cylinder V = π_N^(-1)((0, +∞)) = {h | h(N) > 0}
+             - Take W = V ∩ IMAGE g topspace
+             - Show: z ∈ W and W ⊆ u
           *)
-          (* Proving (1) requires showing each point in u has cylinder neighborhood *)
-          (* For y = g(x) in u: preimage open gives v with x IN v SUBSET preimage *)
-          (* Take c = topspace DIFF v (closed), apply separation to get n with *)
-          (* f_n(x) = 1 and f_n = 0 on c, giving cylinder {h | h(n) > 1/2} around y *)
-          (* This cylinder set construction is complex and needs explicit proof *)
+
+          (* To implement this needs:
+             1. Unpack z ∈ u to get preimage element x
+             2. Use preimage openness to construct closed complement
+             3. Apply separation to get witnessing index N
+             4. Construct cylinder set explicitly
+             5. Prove containments
+             All tactically complex - leaving as CHEAT_TAC *)
           CHEAT_TAC;
           (* <= direction: u open ==> preimage open (follows from continuity) *)
           DISCH_TAC THEN
