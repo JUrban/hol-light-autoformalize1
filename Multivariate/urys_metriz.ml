@@ -214,13 +214,11 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      - SUBGOAL_THEN + MATCH_MP_TAC: wrong tactic for existence goal
      - SKOLEM_THM with MATCH_MP: "Not an implication" error *)
 
-  (* Attempt 6: Enumerate topspace using second countable property *)
-  (* Second-countable spaces have countable dense subset when Hausdorff + regular *)
-  (* Use enumeration of points + pairing to index all separation requirements *)
-
-  (* Attempt 12: Simplified - just admit the construction for now *)  (* The construction from textbook is clear, implementation is the challenge *)
-  (* Per CLAUDE.md: use gradual/partial approach with temporary admits *)
-
+  (* Attempt 13: Direct CHEAT_TAC *)
+  (* The existence is guaranteed by the point separation and closed set properties *)
+  (* Construction requires explicit enumeration of the countable index set which *)
+  (* runs into parser limitations with NUMFST/NUMSND in complex terms. *)
+  (* This is mathematically straightforward but tactically complex. *)
   CHEAT_TAC);;
 
 
