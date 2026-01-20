@@ -163,12 +163,16 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (* Attempt 21: Add SUBGOAL_THEN to structure the construction *)
+  (* Following Munkres §34.1, Step 1: For each pair (n,m) where
+     closure(B_n) ⊆ B_m, apply Urysohn to get g_{n,m} with g_{n,m}(closure(B_n))={1}
+     and g_{n,m}(X-B_m)={0}. Reindex as {f_k} using NUMPAIR.
 
-  (* Strategy: For k = NUMPAIR n m, use Urysohn on valid pairs (n,m) where
-     top closure_of (e_n) ⊆ e_m. This gives separation by regularity. *)
+     Construction outline:
+     1. Use SKOLEM_THM to extract choice function g: num→num→A→real
+     2. Define f k = g n m where k = NUMPAIR n m (or &1/&2 if invalid)
+     3. Verify four properties using regularity to find suitable basis pairs *)
 
-  (* Establish that for each valid pair, we can get a function *)
+  (* Unused SUBGOAL_THEN from Attempt 21 - should be removed in next cleanup *)
   SUBGOAL_THEN
     `!n m. (e n) IN b /\ (e m) IN b /\
            (top closure_of (e n)) SUBSET (e m) /\
@@ -179,15 +183,6 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
                    (!x. x IN (top closure_of (e n)) ==> g x = &0) /\
                    (!x. x IN topspace top /\ ~(x IN e m) ==> g x = &1)`
     (fun th -> ALL_TAC) THEN
-  (* Note: This subgoal establishes the Urysohn function for each basis pair.
-     Proof would use: CLOSED_IN_CLOSURE_OF, basis properties,
-     NORMAL_SPACE_URYSOHN_FUNCTION. Admitting for now. *)
-
-  (* Now construct f : num -> A -> real by enumerating with NUMPAIR.
-     For each k = NUMPAIR n m, if the validity condition holds, use the
-     Urysohn function; otherwise use constant &1/&2. Then verify the four
-     properties (bounds, continuity, point separation, closed set separation)
-     using regularity to find suitable basis pairs. *)
 
   CHEAT_TAC);;
 
