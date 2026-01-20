@@ -469,35 +469,18 @@ let IMAGE_LAMBDA_PRODUCT = prove
         ((\y:A. \n:num. f n y) x) = (\n. f n x)`,
   REWRITE_TAC[FUN_EQ_THM; ETA_AX]);;
 
-(* Helper: subset relationship for unit interval *)
-let UNIT_INTERVAL_SUBSET_REAL = prove
- (`real_interval[&0,&1] SUBSET (:real)`,
-  REWRITE_TAC[SUBSET; IN_UNIV; IN_REAL_INTERVAL]);;
 
-(* Helper: topspace of subtopology *)
-let TOPSPACE_SUBTOPOLOGY_SUBSET = prove
- (`!top s. topspace(subtopology top s) SUBSET s`,
-  REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; INTER_SUBSET]);;
 
 (* Helper: basic property of real intervals *)
 let REAL_INTERVAL_SUBSET_INTERVALS = prove
  (`!a b c d. a <= c /\ d <= b ==> real_interval[c,d] SUBSET real_interval[a,b]`,
   REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
-(* Helper: closure properties *)
-let CLOSED_IN_TOPSPACE_DIFF_OPEN = prove
- (`!top u:A->bool.
-        open_in top u ==> closed_in top (topspace top DIFF u)`,
-  SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE]);;
 
 (* Helper: membership in diff *)
 
 
 
-(* Helper: image under injection preserves non-emptiness *)
-let IMAGE_EQ_EMPTY_INJ = prove
- (`!f:A->B s. IMAGE f s = {} <=> s = {}`,
-  REWRITE_TAC[IMAGE_EQ_EMPTY]);;
 
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
