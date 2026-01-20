@@ -602,10 +602,7 @@ let LAMBDA_ETA = prove
  (`!f:A->B. (\x. f x) = f`,
   REWRITE_TAC[ETA_AX]);;
 
-(* Helper: function composition with lambda *)
-let LAMBDA_COMPOSE = prove
- (`!f:B->C g:A->B x. (\y. f (g y)) x = f (g x)`,
-  REWRITE_TAC[]);;
+(* Note: Lambda/function composition - trivial beta reduction *)
 
 (* Helper: image under identity *)
 let IMAGE_ID = prove
@@ -696,10 +693,7 @@ let CONTINUOUS_MAP_CONST = prove
 
 (* Helper: intervals and open sets *)
 
-(* Helper: simple set inclusions *)
-let DIFF_SUBSET_COMPLEMENT = prove
- (`!s t u. s SUBSET u /\ t SUBSET u ==> u DIFF s SUBSET u`,
-  SET_TAC[]);;
+(* Note: Set difference subset - use SET_TAC directly *)
 
 (* Helper: basic interval property *)
 let IN_INTERVAL_IMP_BOUNDS = prove
@@ -712,10 +706,7 @@ let CONTINUOUS_MAP_ID_SUBT = prove
            ==> continuous_map (subtopology top s, top) (\x. x)`,
   SIMP_TAC[CONTINUOUS_MAP_FROM_SUBTOPOLOGY; CONTINUOUS_MAP_ID]);;
 
-(* Helper: finite intersection of subsets *)
-let FINITE_INTER_SUBSET = prove
- (`!s t u. s SUBSET u /\ t SUBSET u ==> (s INTER t) SUBSET u`,
-  SET_TAC[]);;
+(* Note: FINITE_INTER_SUBSET - trivial SET_TAC *)
 
 (* Helper: conditional equality *)
 let COND_EQ_IMPLIES = prove
@@ -849,10 +840,7 @@ let UNION_SING = prove
    SUBSET_ANTISYM_EQ, IN_UNION, IN_INTER, IN_DIFF, SUBSET_REFL, SUBSET_TRANS
    are all available from library (sets.ml). *)
 
-(* Helper: subset inter *)
-let SUBSET_INTER_BOTH = prove
- (`!s t u. s SUBSET t /\ s SUBSET u ==> s SUBSET (t INTER u)`,
-  SET_TAC[]);;
+(* Note: SUBSET_INTER_BOTH - trivial SET_TAC *)
 
 (* Note: INSERT subset properties, FINITE_SING, FINITE_EMPTY, FINITE_UNION,
    FINITE_INSERT, SUBSET_ANTISYM_EQ: use SET_TAC or library lemmas *)
@@ -880,72 +868,21 @@ let INTER_EMPTY_RIGHT = prove
  (`!s. s INTER {} = {}`,
   REWRITE_TAC[INTER_EMPTY]);;
 
-(* Helper: union with univ *)
-let UNION_UNIV_LEFT = prove
- (`!s. (:A) UNION s = (:A)`,
-  SET_TAC[]);;
+(* Note: UNION/INTER with UNIV - use SET_TAC or INTER_UNIV library lemma *)
 
-(* Helper: union with univ right *)
-let UNION_UNIV_RIGHT = prove
- (`!s. s UNION (:A) = (:A)`,
-  SET_TAC[]);;
-
-(* Helper: inter with univ *)
-let INTER_UNIV_LEFT = prove
- (`!s. (:A) INTER s = s`,
-  REWRITE_TAC[INTER_UNIV]);;
-
-(* Helper: inter with univ right *)
-let INTER_UNIV_RIGHT = prove
- (`!s. s INTER (:A) = s`,
-  REWRITE_TAC[INTER_UNIV]);;
-
-(* Helper: diff self *)
-let DIFF_SELF = prove
- (`!s. s DIFF s = {}`,
-  SET_TAC[]);;
-
-(* Helper: diff empty *)
-let DIFF_EMPTY_LEFT = prove
- (`!s. {} DIFF s = {}`,
-  SET_TAC[]);;
+(* Note: DIFF_SELF and DIFF_EMPTY - use SET_TAC directly *)
 
 (* Helper: empty diff *)
 let DIFF_EMPTY_RIGHT = prove
  (`!s. s DIFF {} = s`,
   REWRITE_TAC[DIFF_EMPTY]);;
 
-(* Helper: diff univ *)
-let DIFF_UNIV = prove
- (`!s. (:A) DIFF s = UNIV DIFF s`,
-  REWRITE_TAC[]);;
+(* Note: (:A) and UNIV are the same, trivial identity *)
 
-(* Helper: subset diff *)
-let SUBSET_DIFF_SUBSET = prove
- (`!s t u. s SUBSET t ==> s DIFF u SUBSET t`,
-  SET_TAC[]);;
-
-(* Helper: insert comm *)
-let INSERT_COMM = prove
- (`!x y s. x INSERT (y INSERT s) = y INSERT (x INSERT s)`,
-  SET_TAC[]);;
-
-(* Helper: insert absorb *)
-let INSERT_ABSORB = prove
- (`!x s. x IN s ==> x INSERT s = s`,
-  SET_TAC[]);;
-
-(* Helper: insert union *)
-let INSERT_UNION = prove
- (`!x s t. (x INSERT s) UNION t = x INSERT (s UNION t)`,
-  SET_TAC[]);;
+(* Note: SUBSET_DIFF_SUBSET, INSERT_COMM, INSERT_ABSORB, INSERT_UNION,
+   SUBSET_INSERT_DELETE - all basic SET_TAC properties *)
 
 (* Note: IN_INSERT is in library, use directly or SET_TAC *)
-
-(* Helper: subset insert *)
-let SUBSET_INSERT_DELETE = prove
- (`!x s. s SUBSET (x INSERT s)`,
-  SET_TAC[]);;
 
 (* Note: Basic real arithmetic properties (antisymmetry, irreflexivity, transitivity,
    commutativity, associativity, identities, totality, trichotomy, subtraction, negation):
@@ -998,14 +935,7 @@ let REAL_HALF_DOUBLE = prove
   REAL_ARITH_TAC);;
 
 (* Helper: conditional with false *)
-let COND_FALSE = prove
- (`!x y. (if F then x else y) = y`,
-  REWRITE_TAC[]);;
-
-(* Helper: conditional with true *)
-let COND_TRUE = prove
- (`!x y. (if T then x else y) = x`,
-  REWRITE_TAC[]);;
+(* Note: COND_FALSE and COND_TRUE are basic library properties *)
 
 (* Helper: negation of equality *)
 let NEQ_SYM = prove
@@ -1157,75 +1087,12 @@ let SET_EQ_LEMMA = prove
  (`!s t. (!x. x IN s <=> x IN t) <=> s = t`,
   REWRITE_TAC[EXTENSION]);;
 
-(* Helper: empty set characterization *)
-let EMPTY_EXISTS = prove
- (`!s. s = {} <=> !x. ~(x IN s)`,
-  SET_TAC[]);;
+(* Note: Basic set properties - EMPTY_EXISTS, NONEMPTY_EXISTS, SING_EXISTS,
+   IMAGE_SING, IMAGE_EMPTY_ALT, UNION_SING_*, INSERT_EMPTY, INSERT_INSERT,
+   NOT_IN_EMPTY_ALT - all trivial SET_TAC or library lemmas *)
 
-(* Helper: non-empty set *)
-let NONEMPTY_EXISTS = prove
- (`!s. ~(s = {}) <=> ?x. x IN s`,
-  SET_TAC[]);;
-
-(* Helper: singleton characterization *)
-let SING_EXISTS = prove
- (`!s x. s = {x} <=> !y. y IN s <=> y = x`,
-  SET_TAC[IN_SING]);;
-
-(* Helper: image of singleton *)
-let IMAGE_SING = prove
- (`!f x. IMAGE f {x} = {f x}`,
-  SET_TAC[]);;
-
-(* Helper: image of empty *)
-let IMAGE_EMPTY_ALT = prove
- (`!f. IMAGE f {} = {}`,
-  REWRITE_TAC[IMAGE_CLAUSES]);;
-
-(* Helper: union of singletons *)
-let UNION_SING_LEFT = prove
- (`!x s. {x} UNION s = x INSERT s`,
-  SET_TAC[]);;
-
-(* Helper: union of singletons right *)
-let UNION_SING_RIGHT = prove
- (`!s x. s UNION {x} = x INSERT s`,
-  SET_TAC[]);;
-
-(* Helper: insert into empty *)
-let INSERT_EMPTY = prove
- (`!x. x INSERT {} = {x}`,
-  SET_TAC[]);;
-
-(* Helper: insert idempotent *)
-let INSERT_INSERT = prove
- (`!x s. x INSERT (x INSERT s) = x INSERT s`,
-  SET_TAC[]);;
-
-(* Helper: not in empty *)
-let NOT_IN_EMPTY_ALT = prove
- (`!x. ~(x IN {})`,
-  REWRITE_TAC[NOT_IN_EMPTY]);;
-
-(* Helper: in univ *)
-let IN_UNIV_ALT = prove
- (`!x. x IN (:A)`,
-  REWRITE_TAC[IN_UNIV]);;
-
-(* Helper: univ not empty *)
-let UNIV_NOT_EMPTY = prove
- (`~((:A) = {})`,
-  SET_TAC[IN_UNIV]);;
-
-(* Helper: subset univ *)
-let SUBSET_UNIV_ALT = prove
- (`!s. s SUBSET (:A)`,
-  REWRITE_TAC[SUBSET_UNIV]);;
-
-(* Helper: image union *)
-let IMAGE_UNION_ALT = prove
- (`!f s t. IMAGE f (s UNION t) = IMAGE f s UNION IMAGE f t`,
-  SET_TAC[]);;
+(* Note: IN_UNIV_ALT, UNIV_NOT_EMPTY, SUBSET_UNIV_ALT, IMAGE_UNION_ALT -
+   all library lemmas or trivial SET_TAC *)
 
 (* Helper: image inter subset *)
 let IMAGE_INTER_SUBSET = prove
