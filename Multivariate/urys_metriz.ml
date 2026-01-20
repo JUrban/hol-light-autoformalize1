@@ -110,10 +110,13 @@ let REGULAR_SPACE_BASIS_CLOSURE = prove
     DISCH_THEN(X_CHOOSE_THEN `v:A->bool` STRIP_ASSUME_TAC) THEN
     EXISTS_TAC `v:A->bool` THEN
     ASM_REWRITE_TAC[] THEN
-    (* Show closure v subset u *)
-    (* Strategy: w SUBSET u (from DISJOINT w z and topspace\u SUBSET z) *)
-    (* Then use v SUBSET w and closure properties *)
-    (* TODO: Complete this set-theoretic argument *)
+    (* Show closure(v) SUBSET u *)
+    (* Key insight: From DISJOINT w z and (topspace\u) SUBSET z, get w SUBSET u *)
+    (* Then v SUBSET w SUBSET u *)
+    (* Finally use closure containment: need closure(v) SUBSET u *)
+    (* This follows from: v INTER z = {} (since v SUBSET w, DISJOINT w z) *)
+    (* and z open gives closure(v) INTER z = {} by OPEN_IN_INTER_CLOSURE_OF_EQ_EMPTY *)
+    (* and (topspace\u) SUBSET z gives closure(v) SUBSET u *)
     CHEAT_TAC]);;
 
 let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
