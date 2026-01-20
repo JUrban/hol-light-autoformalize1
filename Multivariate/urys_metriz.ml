@@ -975,20 +975,7 @@ let REAL_LE_01 = prove
  (`&0 <= &1`,
   REAL_ARITH_TAC);;
 
-(* Helper: negation of one *)
-let REAL_NEG_1 = prove
- (`--(&1) = --(&1)`,
-  REWRITE_TAC[]);;
-
-(* Helper: absolute value basic *)
-let REAL_ABS_0 = prove
- (`abs(&0) = &0`,
-  REAL_ARITH_TAC);;
-
-(* Helper: absolute value of one *)
-let REAL_ABS_1 = prove
- (`abs(&1) = &1`,
-  REAL_ARITH_TAC);;
+(* Note: REAL_NEG_1, REAL_ABS_0, REAL_ABS_1 - trivial REAL_ARITH_TAC, use directly *)
 
 (* Helper: abs neg *)
 let REAL_ABS_NEG = prove
@@ -1000,15 +987,7 @@ let REAL_ABS_POS = prove
  (`!x. &0 <= abs x`,
   REAL_ARITH_TAC);;
 
-(* Helper: max basic *)
-let REAL_MAX_REFL = prove
- (`!x. max x x = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: min basic *)
-let REAL_MIN_REFL = prove
- (`!x. min x x = x`,
-  REAL_ARITH_TAC);;
+(* Note: REAL_MAX_REFL, REAL_MIN_REFL - trivial REAL_ARITH_TAC, use directly *)
 
 (* Helper: max comm *)
 let REAL_MAX_SYM = prove
@@ -1020,15 +999,7 @@ let REAL_MIN_SYM = prove
  (`!x y. min x y = min y x`,
   REAL_ARITH_TAC);;
 
-(* Helper: division by one *)
-let REAL_DIV_1 = prove
- (`!x. x / &1 = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: one not zero *)
-let REAL_1_NE_0 = prove
- (`~(&1 = &0)`,
-  REAL_ARITH_TAC);;
+(* Note: REAL_DIV_1, REAL_1_NE_0 - trivial REAL_ARITH_TAC, use directly *)
 
 (* Helper: comparison with zero *)
 let REAL_LT_LE = prove
@@ -1397,10 +1368,7 @@ let PREIMAGE_SUBSET = prove
  (`!f:A->B s t. s SUBSET t ==> {x | f x IN s} SUBSET {x | f x IN t}`,
   SET_TAC[SUBSET]);;
 
-(* Helper: preimage univ *)
-let PREIMAGE_UNIV = prove
- (`!f:A->B. {x | f x IN (:B)} = (:A)`,
-  SET_TAC[IN_UNIV]);;
+(* Note: PREIMAGE_UNIV - trivial SET_TAC[IN_UNIV], use directly *)
 
 (* Helper: image of preimage *)
 let IMAGE_PREIMAGE_SUBSET = prove
@@ -1424,15 +1392,7 @@ let REAL_BETWEEN_HALF = prove
  (`!x y. x < y ==> x < (x + y) / &2 /\ (x + y) / &2 < y`,
   REAL_ARITH_TAC);;
 
-(* Helper: one half less than one *)
-let REAL_HALF_LT_ONE = prove
- (`&1 / &2 < &1`,
-  REAL_ARITH_TAC);;
-
-(* Helper: zero less than half *)
-let REAL_ZERO_LT_HALF = prove
- (`&0 < &1 / &2`,
-  REAL_ARITH_TAC);;
+(* Note: REAL_HALF_LT_ONE, REAL_ZERO_LT_HALF - basic REAL_ARITH_TAC, use directly *)
 
 (* Helper: specific interval containment *)
 let REAL_ONE_IN_UNIT_INTERVAL = prove
@@ -1449,32 +1409,15 @@ let REAL_HALF_IN_UNIT_INTERVAL = prove
  (`&1 / &2 IN real_interval[&0, &1]`,
   REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
-(* Helper: interval subset relation *)
-let REAL_INTERVAL_SUBSET_SELF = prove
- (`!a b. real_interval[a,b] SUBSET real_interval[a,b]`,
-  REWRITE_TAC[SUBSET_REFL]);;
+(* Note: REAL_INTERVAL_SUBSET_SELF - just SUBSET_REFL, use directly *)
 
 (* Note: INTER_SUBSET - basic SET_TAC *)
 
-(* Helper: finite union with singleton *)
-let FINITE_UNION_SING = prove
- (`!s x. FINITE s ==> FINITE (s UNION {x})`,
-  SIMP_TAC[FINITE_UNION; FINITE_SING]);;
+(* Note: FINITE_UNION_SING - basic SIMP_TAC[FINITE_UNION;FINITE_SING], use directly *)
+(* Note: IMAGE_COMPOSE_GEN - just IMAGE_o from library, use directly *)
 
-(* Helper: image composition *)
-let IMAGE_COMPOSE_GEN = prove
- (`!f g s. IMAGE f (IMAGE g s) = IMAGE (f o g) s`,
-  REWRITE_TAC[IMAGE_o]);;
-
-(* Helper: function application *)
-let FUN_APP_THM = prove
- (`!f x. f x = f x`,
-  REWRITE_TAC[]);;
-
-(* Helper: conditional equality *)
-let COND_ID = prove
- (`!b x. (if b then x else x) = x`,
-  MESON_TAC[]);;
+(* Note: FUN_APP_THM - trivial (f x = f x), use REFL_TAC directly *)
+(* Note: COND_ID - trivial MESON_TAC, use directly *)
 
 (* Helper: inequality from membership *)
 let IN_INTERVAL_IMP_LE = prove
