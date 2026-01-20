@@ -621,9 +621,6 @@ let COND_FUNCTION_APPLY = prove
   MESON_TAC[]);;
 
 (* Helper: equality with lambda *)
-let LAMBDA_ETA = prove
- (`!f:A->B. (\x. f x) = f`,
-  REWRITE_TAC[ETA_AX]);;
 
 (* Note: Lambda/function composition - trivial beta reduction *)
 
@@ -813,9 +810,6 @@ let UNIT_INTERVAL_ENDPOINTS = prove
    are available from library. *)
 
 (* Helper: conditional equality cases *)
-let COND_EQ_CASES = prove
- (`!b x y z. (if b then x else y) = z <=> b /\ x = z \/ ~b /\ y = z`,
-  MESON_TAC[]);;
 
 (* Helper: forall with conditional *)
 let FORALL_COND = prove
@@ -891,9 +885,6 @@ let INTER_EMPTY_RIGHT = prove
    use REAL_ARITH_TAC directly *)
 
 (* Helper: conditional set not equal when one choice differs *)
-let COND_SET_NE = prove
- (`!b s t u. ~(s = u) ==> (b ==> ~((if b then s else t) = u))`,
-  MESON_TAC[]);;
 
 (* Helper: whole space is open *)
 let OPEN_IN_TOPSPACE_SUBTOPOLOGY = prove
@@ -904,10 +895,6 @@ let OPEN_IN_TOPSPACE_SUBTOPOLOGY = prove
   ASM_REWRITE_TAC[OPEN_IN_TOPSPACE] THEN
   ASM SET_TAC[]);;
 
-(* Helper: real number in open interval *)
-let IN_REAL_INTERVAL_OPEN_1 = prove
- (`&1 IN real_interval(&1 / &2, &1 + &1)`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
 (* Helper: membership in conditional interval *)
 let IN_COND_INTERVAL = prove
@@ -1007,15 +994,7 @@ let o_ASSOC = prove
  (`!f g h. f o (g o h) = (f o g) o h`,
   REWRITE_TAC[o_ASSOC]);;
 
-(* Helper: composition with identity left *)
-let o_ID_LEFT = prove
- (`!f. (\x. x) o f = f`,
-  REWRITE_TAC[FUN_EQ_THM; o_THM]);;
 
-(* Helper: composition with identity right *)
-let o_ID_RIGHT = prove
- (`!f. f o (\x. x) = f`,
-  REWRITE_TAC[FUN_EQ_THM; o_THM]);;
 
 (* Note: Injection definition - basic MESON_TAC property *)
 
@@ -1024,10 +1003,6 @@ let o_ID_RIGHT = prove
 
 (* Note: FORALL_IN_INSERT, EXISTS_IN_INSERT - basic SET_TAC properties *)
 
-(* Helper: finite union *)
-let FINITE_UNION_EQ = prove
- (`!s t. FINITE (s UNION t) <=> FINITE s /\ FINITE t`,
-  MESON_TAC[FINITE_UNION; FINITE_SUBSET; SUBSET_UNION]);;
 
 (* Note: CARD_CLAUSES, CARD_SING, NUM addition - all library lemmas or ARITH_TAC *)
 
@@ -1067,72 +1042,26 @@ let PAIR_EQ = prove
  (`!(x1:A) (y1:B) x2 y2. (x1,y1) = (x2,y2) <=> x1 = x2 /\ y1 = y2`,
   REWRITE_TAC[PAIR_EQ]);;
 
-(* Helper: fst and snd *)
-let FST_SND = prove
- (`!x y. FST (x,y) = x /\ SND (x,y) = y`,
-  REWRITE_TAC[FST; SND]);;
 
 (* Helper: pair surjective *)
 let PAIR_SURJECTIVE = prove
  (`!p. p = (FST p, SND p)`,
   REWRITE_TAC[PAIR]);;
 
-(* Helper: exists pair *)
-let EXISTS_PAIR = prove
- (`!P. (?p. P p) <=> (?x y. P (x,y))`,
-  MESON_TAC[PAIR_SURJECTIVE]);;
 
 (* Helper: forall pair *)
 let FORALL_PAIR = prove
  (`!P. (!p. P p) <=> (!x y. P (x,y))`,
   MESON_TAC[PAIR_SURJECTIVE]);;
 
-(* Helper: lambda pair *)
-let LAMBDA_PAIR = prove
- (`!f. (\(x,y). f x y) = (\p. f (FST p) (SND p))`,
-  REWRITE_TAC[FUN_EQ_THM; FORALL_PAIR; FST; SND]);;
 
-(* Helper: injection preserves distinctness *)
-let INJECTION_IMP_DISTINCT = prove
- (`!f x y. (!a b. f a = f b ==> a = b) /\ ~(x = y) ==> ~(f x = f y)`,
-  MESON_TAC[]);;
 
-(* Helper: surjection *)
-let SURJECTION_EXISTS = prove
- (`!f:A->B. (!y. ?x. f x = y) <=> !y. y IN IMAGE f (:A)`,
-  REWRITE_TAC[IN_IMAGE; IN_UNIV] THEN MESON_TAC[]);;
 
-(* Helper: bijection characterization *)
-let BIJECTION_CHAR = prove
- (`!f:A->B. (!x y. f x = f y ==> x = y) /\ (!y. ?x. f x = y)
-            ==> (!y. ?!x. f x = y)`,
-  REPEAT STRIP_TAC THEN REWRITE_TAC[EXISTS_UNIQUE_THM] THEN
-  ASM_MESON_TAC[]);;
 
-(* Helper: function equality pointwise *)
-let FUN_EQ_POINTWISE = prove
- (`!f g:A->B. f = g <=> (!x. f x = g x)`,
-  REWRITE_TAC[FUN_EQ_THM]);;
 
-(* Helper: composition application *)
-let o_APP = prove
- (`!f:B->C g:A->B x. (f o g) x = f (g x)`,
-  REWRITE_TAC[o_THM]);;
 
-(* Helper: eta conversion *)
-let ETA_CONV = prove
- (`!f:A->B. (\x. f x) = f`,
-  REWRITE_TAC[ETA_AX]);;
 
-(* Helper: lambda application *)
-let LAMBDA_APP = prove
- (`!f:A->B x. (\y. f y) x = f x`,
-  REWRITE_TAC[]);;
 
-(* Helper: constant function *)
-let CONST_FUN = prove
- (`!c:B x:A y:A. (\z. c) x = (\z. c) y`,
-  REWRITE_TAC[]);;
 
 (* Helper: image of constant *)
 let IMAGE_CONST = prove
@@ -1369,14 +1298,7 @@ let SUBSET_DIFF_EQ = prove
    subtopology, use REWRITE_TAC[continuous_map; TOPSPACE_SUBTOPOLOGY] with SET_TAC. *)
 
 (* Helper: conditional with different branches not equal to second branch *)
-let COND_DIFF_IMP = prove
- (`!b x y z. ~(x = z) /\ b ==> ~((if b then x else y) = z)`,
-  MESON_TAC[]);;
 
-(* Helper: basic property of conditionals and equality *)
-let COND_ELIM_THM = prove
- (`!b x y. (if b then x else y) = (if b then x else y)`,
-  REWRITE_TAC[]);;
 
 (* Helper: 1 is in the half-open interval (&1/&2, &1) - wait, that's wrong! *)
 (* &1 is NOT in the open interval (&1/&2, &1) which is OPEN on both ends *)
