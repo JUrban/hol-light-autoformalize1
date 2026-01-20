@@ -925,10 +925,7 @@ let REAL_HALF_DOUBLE = prove
 (* Helper: conditional with false *)
 (* Note: COND_FALSE and COND_TRUE are basic library properties *)
 
-(* Helper: negation of equality *)
-let NEQ_SYM = prove
- (`!x y. ~(x = y) <=> ~(y = x)`,
-  MESON_TAC[]);;
+(* Note: NEQ_SYM - basic MESON_TAC symmetry *)
 
 (* Helper: inequality and bounds *)
 let REAL_LT_IMP_NE = prove
@@ -1082,10 +1079,7 @@ let SET_EQ_LEMMA = prove
 (* Note: IN_UNIV_ALT, UNIV_NOT_EMPTY, SUBSET_UNIV_ALT, IMAGE_UNION_ALT -
    all library lemmas or trivial SET_TAC *)
 
-(* Helper: image inter subset *)
-let IMAGE_INTER_SUBSET = prove
- (`!f s t. IMAGE f (s INTER t) SUBSET (IMAGE f s) INTER (IMAGE f t)`,
-  SET_TAC[]);;
+(* Note: IMAGE intersection subset - basic SET_TAC *)
 
 (* Helper: preimage basic *)
 let IN_PREIMAGE = prove
@@ -1437,10 +1431,7 @@ let REAL_INTERVAL_SUBSET_SELF = prove
  (`!a b. real_interval[a,b] SUBSET real_interval[a,b]`,
   REWRITE_TAC[SUBSET_REFL]);;
 
-(* Helper: intersection with subset *)
-let INTER_SUBSET_SECOND = prove
- (`!s t. s INTER t SUBSET t`,
-  SET_TAC[]);;
+(* Note: INTER_SUBSET - basic SET_TAC *)
 
 (* Helper: finite union with singleton *)
 let FINITE_UNION_SING = prove
@@ -1558,15 +1549,7 @@ let IN_OPEN_INTERVAL_BOUNDS = prove
 
 (* Note: REAL_NOT_LT, REAL_NOT_LE - basic REAL_ARITH_TAC *)
 
-(* Helper: subset of intersection *)
-let SUBSET_INTER_ABSORPTION = prove
- (`!s t. s SUBSET t ==> s INTER t = s`,
-  SET_TAC[]);;
-
-(* Helper: subset of union *)
-let SUBSET_UNION_ABSORPTION = prove
- (`!s t. s SUBSET t ==> s UNION t = t`,
-  SET_TAC[]);;
+(* Note: SUBSET absorption - basic SET_TAC properties *)
 
 (* Helper: diff and subset *)
 let DIFF_SUBSET = prove
@@ -1592,15 +1575,7 @@ let REAL_INTERVAL_UBOUND = prove
 
 (* Note: Complement/DIFF characterization - use SET_TAC directly *)
 
-(* Helper: De Morgan's laws *)
-let COMPL_UNION = prove
- (`!s t u. u DIFF (s UNION t) = (u DIFF s) INTER (u DIFF t)`,
-  SET_TAC[]);;
-
-(* Helper: De Morgan's laws *)
-let COMPL_INTER = prove
- (`!s t u. u DIFF (s INTER t) = (u DIFF s) UNION (u DIFF t)`,
-  SET_TAC[]);;
+(* Note: De Morgan's laws - basic SET_TAC *)
 
 (* Helper: double complement *)
 let DIFF_DIFF_SUBSET = prove
