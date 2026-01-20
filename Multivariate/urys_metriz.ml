@@ -209,7 +209,315 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      Key: Given x₀ and neighborhood U, regularity gives basis elements B_n, B_m
      with x₀ ∈ B_n, closure(B_n) ⊆ B_m ⊆ U. Then g_{n,m} works. *)
 
-  CHEAT_TAC);;
+  (* Construct separating family indexed by NUMPAIR *)
+  (* For each k, decode as n=NUMFST k, m=NUMSND k *)
+  (* If closure(e n) SUBSET e m, use Urysohn function; else use constant &0 *)
+  EXISTS_TAC
+    `\k:num. \x:A.
+       let n = NUMFST k in
+       let m = NUMSND k in
+       if ?un. un IN b /\ e n = un /\
+           ?um. um IN b /\ e m = um /\
+           closure_of top un SUBSET um
+       then @g. continuous_map (top,subtopology euclideanreal (real_interval[&0,&1])) g /\
+                (!z. z IN closure_of top (e n) ==> g z = &1) /\
+                (!z. z IN topspace top DIFF e m ==> g z = &0)
+       else \y. &0` THEN
+  (* Now need to prove the 4 properties - this requires substantial work *)
+  (* Property 1: bounds, Property 2: continuity, Property 3: point separation *)
+  (* Property 4: closed set separation *)
+  REPEAT CONJ_TAC THENL
+   [(* Property 1: Prove bounds &0 <= f n x <= &1 for all n, x *)
+    REPEAT GEN_TAC THEN DISCH_TAC THEN
+    REWRITE_TAC[LET_DEF; LET_END_DEF] THEN
+    (* Case split on the if-then-else *)
+    COND_CASES_TAC THENL
+     [(* Case: condition holds, use Urysohn function *)
+      (* The chosen function maps to [0,1] by Urysohn property *)
+      (* From continuous_map (top, subtopology euclideanreal (real_interval[&0,&1])) g *)
+      (* we get: !x. x IN topspace top ==> g x IN topspace (subtopology ...) *)
+      (* And topspace (subtopology euclideanreal (real_interval[&0,&1])) = *)
+      (*   real_interval[&0,&1] INTER topspace euclideanreal = real_interval[&0,&1] *)
+      (* So g x IN real_interval[&0,&1], giving us &0 <= g x <= &1 *)
+      BETA_TAC THEN
+      SUBGOAL_THEN
+        `?g. continuous_map (top,subtopology euclideanreal (real_interval[&0,&1])) g /\
+             (!z. z IN closure_of top (e (NUMFST n)) ==> g z = &1) /\
+             (!z. z IN topspace top DIFF e (NUMSND n) ==> g z = &0)`
+      MP_TAC THENL
+       [MATCH_MP_TAC NORMAL_SPACE_URYSOHN_FUNCTION THEN
+        ASM_REWRITE_TAC[] THEN
+        REPEAT CONJ_TAC THENL
+         [REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
+          UNDISCH_TAC
+            `?un. un IN b /\ e (NUMFST n) = un /\
+                  ?um. um IN b /\ e (NUMSND n) = um /\
+                       closure_of top un SUBSET um` THEN
+          STRIP_TAC THEN
+          MATCH_MP_TAC CLOSED_IN_DIFF THEN
+          REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN
+          FIRST_X_ASSUM(MP_TAC o SPECL [`NUMSND n`]) THEN
+          ASM_REWRITE_TAC[] THEN DISCH_TAC THEN
+          MATCH_MP_TAC OPEN_IN_IMP_SUBSET THEN ASM_REWRITE_TAC[];
+          ASM SET_TAC[]];
+        DISCH_THEN(MP_TAC o SELECT_RULE) THEN
+        STRIP_TAC THEN
+        FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [continuous_map]) THEN
+        DISCH_THEN(MP_TAC o CONJUNCT1) THEN
+        DISCH_THEN(MP_TAC o SPEC `x:A`) THEN
+        ANTS_TAC THENL [ASM_REWRITE_TAC[]; DISCH_TAC] THEN
+        FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [TOPSPACE_SUBTOPOLOGY]) THEN
+        REWRITE_TAC[IN_INTER; TOPSPACE_EUCLIDEANREAL; IN_UNIV; REAL_INTERVAL_INTERVAL] THEN
+        REWRITE_TAC[IN_INTERVAL_1; DROP_VEC; LIFT_DROP]];
+      (* Case: condition false, use constant &0 *)
+      BETA_TAC THEN REAL_ARITH_TAC];
+
+    (* Property 2: Prove continuity *)
+    GEN_TAC THEN
+    REWRITE_TAC[LET_DEF; LET_END_DEF] THEN
+    COND_CASES_TAC THENL
+     [(* Case: condition holds, chosen function is continuous *)
+      (* The condition gives existence of un, um with closure(un) SUBSET um *)
+      (* From NORMAL_SPACE_URYSOHN_FUNCTION, such a function exists *)
+      (* Need to use SELECT_AX to extract that chosen function is continuous *)
+      (* Strategy: establish existence, then apply SELECT properties *)
+      BETA_TAC THEN
+      SUBGOAL_THEN
+        `?g. continuous_map (top,subtopology euclideanreal (real_interval[&0,&1])) g /\
+             (!z. z IN closure_of top (e (NUMFST n)) ==> g z = &1) /\
+             (!z. z IN topspace top DIFF e (NUMSND n) ==> g z = &0)`
+      MP_TAC THENL
+       [MATCH_MP_TAC NORMAL_SPACE_URYSOHN_FUNCTION THEN
+        ASM_REWRITE_TAC[] THEN
+        REPEAT CONJ_TAC THENL
+         [REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
+          UNDISCH_TAC
+            `?un. un IN b /\ e (NUMFST n) = un /\
+                  ?um. um IN b /\ e (NUMSND n) = um /\
+                       closure_of top un SUBSET um` THEN
+          STRIP_TAC THEN
+          MATCH_MP_TAC CLOSED_IN_DIFF THEN
+          REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN
+          FIRST_X_ASSUM(MP_TAC o SPECL [`NUMSND n`]) THEN
+          ASM_REWRITE_TAC[] THEN DISCH_TAC THEN
+          MATCH_MP_TAC OPEN_IN_IMP_SUBSET THEN ASM_REWRITE_TAC[];
+          ASM SET_TAC[]];
+        DISCH_THEN(MP_TAC o SELECT_RULE) THEN
+        DISCH_TAC THEN ASM_REWRITE_TAC[]];
+      (* Case: constant function is continuous *)
+      MATCH_MP_TAC CONTINUOUS_MAP_CONST THEN
+      REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; IN_INTER; IN_UNIV; REAL_INTERVAL_INTERVAL] THEN
+      REWRITE_TAC[IN_INTERVAL_1; DROP_VEC; LIFT_DROP] THEN
+      REAL_ARITH_TAC];
+
+    (* Property 3: Prove point separation *)
+    REPEAT STRIP_TAC THEN
+    (* Given x <> y, use Hausdorff to get disjoint opens U, V *)
+    (* Then use basis and regularity to find n, m with e n, e m such that *)
+    (* x IN e n, closure(e n) SUBSET e m, and y NOT IN e m *)
+    (* Then f (NUMPAIR n m) x = 1 and f (NUMPAIR n m) y = 0 *)
+    FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [hausdorff_space]) THEN
+    DISCH_THEN(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `u:A->bool` (X_CHOOSE_THEN `v:A->bool`
+      STRIP_ASSUME_TAC)) THEN
+    (* u is open, x IN u, v is open, y IN v, u and v disjoint *)
+    (* Use basis to find w IN b with x IN w SUBSET u *)
+    UNDISCH_TAC
+      `!u x:A. open_in top u /\ x IN u ==> ?v. v IN b /\ x IN v /\ v SUBSET u` THEN
+    DISCH_THEN(fun th ->
+      MP_TAC(SPECL [`u:A->bool`; `x:A`] th) THEN
+      MP_TAC(SPECL [`v:A->bool`; `y:A`] th)) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `wy:A->bool` STRIP_ASSUME_TAC) THEN
+    DISCH_THEN(X_CHOOSE_THEN `wx:A->bool` STRIP_ASSUME_TAC) THEN
+    (* wx IN b, x IN wx SUBSET u; wy IN b, y IN wy SUBSET v *)
+    (* Use REGULAR_SPACE_BASIS_CLOSURE to get w' with closure(w') SUBSET wx *)
+    MP_TAC(ISPECL [`top:A topology`; `b:(A->bool)->bool`; `wx:A->bool`; `x:A`]
+                  REGULAR_SPACE_BASIS_CLOSURE) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `wprime:A->bool` STRIP_ASSUME_TAC) THEN
+    (* wprime IN b, x IN wprime, closure(wprime) SUBSET wx *)
+    (* Since wx SUBSET u and u, v disjoint, we have y NOT IN wx *)
+    SUBGOAL_THEN `~((y:A) IN wx)` ASSUME_TAC THENL
+     [UNDISCH_TAC `DISJOINT (u:A->bool) v` THEN
+      REWRITE_TAC[DISJOINT] THEN SET_TAC[];
+      ALL_TAC] THEN
+    (* Find n, m with e n = wprime and e m = wx *)
+    UNDISCH_TAC `!u:A->bool. u IN b ==> ?n. e n = u` THEN
+    DISCH_THEN(fun th ->
+      MP_TAC(SPEC `wprime:A->bool` th) THEN
+      MP_TAC(SPEC `wx:A->bool` th)) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_TAC `m:num`) THEN
+    DISCH_THEN(X_CHOOSE_TAC `n:num`) THEN
+    (* Now take k = NUMPAIR n m *)
+    EXISTS_TAC `NUMPAIR n m` THEN
+    (* Need to show f (NUMPAIR n m) x <> f (NUMPAIR n m) y *)
+    REWRITE_TAC[LET_DEF; LET_END_DEF; NUMFST_NUMPAIR; NUMSND_NUMPAIR] THEN
+    COND_CASES_TAC THENL
+     [(* Urysohn case: chosen function separates x and y *)
+      (* The condition gives existence, so by SELECT_AX the chosen g has the properties *)
+      (* Need to show x IN closure(e n) and y IN topspace DIFF e m *)
+      BETA_TAC THEN
+      SUBGOAL_THEN `(x:A) IN closure_of top wprime` ASSUME_TAC THENL
+       [REWRITE_TAC[CLOSURE_OF_SUBSET_EQ] THEN ASM SET_TAC[];
+        ALL_TAC] THEN
+      SUBGOAL_THEN `(y:A) IN topspace top DIFF wx` ASSUME_TAC THENL
+       [ASM_SIMP_TAC[IN_DIFF];
+        ALL_TAC] THEN
+      (* Now we have x IN closure(wprime) = closure(e n) and y IN topspace DIFF wx = topspace DIFF e m *)
+      (* The chosen function g satisfies g z = 1 for z IN closure(e n) and g z = 0 for z IN topspace DIFF e m *)
+      (* So g x = 1 and g y = 0, hence g x <> g y *)
+      (* Extract properties from Hilbert choice using existence *)
+      SUBGOAL_THEN
+        `?g. continuous_map (top,subtopology euclideanreal (real_interval[&0,&1])) g /\
+             (!z. z IN closure_of top (e n) ==> g z = &1) /\
+             (!z. z IN topspace top DIFF e m ==> g z = &0)`
+      MP_TAC THENL
+       [MATCH_MP_TAC NORMAL_SPACE_URYSOHN_FUNCTION THEN
+        ASM_REWRITE_TAC[] THEN
+        REPEAT CONJ_TAC THENL
+         [REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
+          MATCH_MP_TAC CLOSED_IN_DIFF THEN
+          REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN
+          FIRST_X_ASSUM(MP_TAC o SPECL [`n:num`]) THEN
+          ASM_REWRITE_TAC[] THEN DISCH_TAC THEN
+          MATCH_MP_TAC OPEN_IN_IMP_SUBSET THEN ASM_REWRITE_TAC[];
+          ASM SET_TAC[]];
+        DISCH_THEN(MP_TAC o SELECT_RULE) THEN
+        DISCH_TAC THEN
+        FIRST_X_ASSUM(MP_TAC o SPEC `(x:A)`) THEN
+        ANTS_TAC THENL [ASM_REWRITE_TAC[]; DISCH_TAC] THEN
+        FIRST_X_ASSUM(MP_TAC o SPEC `(y:A)`) THEN
+        ANTS_TAC THENL [ASM_REWRITE_TAC[]; DISCH_TAC] THEN
+        ASM_REWRITE_TAC[] THEN REAL_ARITH_TAC];
+      (* This case shouldn't happen - we constructed n, m so condition holds *)
+      UNDISCH_TAC
+        `~(?un. un IN b /\ e n = un /\ ?um. um IN b /\ e m = um /\
+                closure_of top un SUBSET um)` THEN
+      REWRITE_TAC[] THEN
+      MAP_EVERY EXISTS_TAC [`wprime:A->bool`; `wx:A->bool`] THEN
+      ASM_REWRITE_TAC[]];
+
+    (* Property 4: Prove closed set separation *)
+    REPEAT STRIP_TAC THEN
+    (* Given x NOT IN c where c is closed, find n,m with e n, e m such that *)
+    (* x IN e n, closure(e n) SUBSET e m, and c SUBSET complement of e m *)
+    (* Then f (NUMPAIR n m) x = 1 and f (NUMPAIR n m) z = 0 for all z IN c *)
+    (* Since c is closed and x NOT IN c, topspace DIFF c is open containing x *)
+    SUBGOAL_THEN `open_in (top:A topology) (topspace top DIFF c)` ASSUME_TAC THENL
+     [ASM_SIMP_TAC[OPEN_IN_DIFF; OPEN_IN_TOPSPACE];
+      ALL_TAC] THEN
+    SUBGOAL_THEN `(x:A) IN topspace top DIFF c` ASSUME_TAC THENL
+     [ASM_SIMP_TAC[IN_DIFF];
+      ALL_TAC] THEN
+    (* Use basis to find w IN b with x IN w SUBSET (topspace DIFF c) *)
+    UNDISCH_TAC
+      `!u x:A. open_in top u /\ x IN u ==> ?v. v IN b /\ x IN v /\ v SUBSET u` THEN
+    DISCH_THEN(MP_TAC o SPECL [`topspace top DIFF c:A->bool`; `x:A`]) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
+    (* w IN b, x IN w, w SUBSET topspace DIFF c *)
+    (* Use REGULAR_SPACE_BASIS_CLOSURE to get w' with x IN w', closure(w') SUBSET w *)
+    MP_TAC(ISPECL [`top:A topology`; `b:(A->bool)->bool`; `w:A->bool`; `x:A`]
+                  REGULAR_SPACE_BASIS_CLOSURE) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `wprime:A->bool` STRIP_ASSUME_TAC) THEN
+    (* wprime IN b, x IN wprime, closure(wprime) SUBSET w *)
+    (* Since w SUBSET topspace DIFF c, we have c SUBSET topspace DIFF w *)
+    SUBGOAL_THEN `(c:A->bool) SUBSET topspace top DIFF w` ASSUME_TAC THENL
+     [REWRITE_TAC[SUBSET; IN_DIFF] THEN X_GEN_TAC `z:A` THEN STRIP_TAC THEN
+      CONJ_TAC THENL
+       [UNDISCH_TAC `closed_in (top:A topology) c` THEN
+        REWRITE_TAC[CLOSED_IN_SUBSET] THEN SET_TAC[];
+        UNDISCH_TAC `(w:A->bool) SUBSET topspace top DIFF c` THEN
+        REWRITE_TAC[SUBSET; IN_DIFF] THEN SET_TAC[]];
+      ALL_TAC] THEN
+    (* Find n, m with e n = wprime and e m = w *)
+    UNDISCH_TAC `!u:A->bool. u IN b ==> ?n. e n = u` THEN
+    DISCH_THEN(fun th ->
+      MP_TAC(SPEC `wprime:A->bool` th) THEN
+      MP_TAC(SPEC `w:A->bool` th)) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_TAC `m:num`) THEN
+    DISCH_THEN(X_CHOOSE_TAC `n:num`) THEN
+    (* Now take k = NUMPAIR n m *)
+    EXISTS_TAC `NUMPAIR n m` THEN
+    (* Need to show f (NUMPAIR n m) x = 1 and f (NUMPAIR n m) z = 0 for all z IN c *)
+    REWRITE_TAC[LET_DEF; LET_END_DEF; NUMFST_NUMPAIR; NUMSND_NUMPAIR] THEN
+    COND_CASES_TAC THENL
+     [(* Urysohn case: chosen function separates x from c *)
+      BETA_TAC THEN
+      SUBGOAL_THEN `(x:A) IN closure_of top wprime` ASSUME_TAC THENL
+       [REWRITE_TAC[CLOSURE_OF_SUBSET_EQ] THEN ASM SET_TAC[]; ALL_TAC] THEN
+      CONJ_TAC THENL
+       [(* Show g x = 1 *)
+        SUBGOAL_THEN
+          `?g. continuous_map (top,subtopology euclideanreal (real_interval[&0,&1])) g /\
+               (!z. z IN closure_of top (e n) ==> g z = &1) /\
+               (!z. z IN topspace top DIFF e m ==> g z = &0)`
+        MP_TAC THENL
+         [MATCH_MP_TAC NORMAL_SPACE_URYSOHN_FUNCTION THEN
+          ASM_REWRITE_TAC[] THEN
+          REPEAT CONJ_TAC THENL
+           [REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
+            UNDISCH_TAC
+              `?un. un IN b /\ e n = un /\
+                    ?um. um IN b /\ e m = um /\
+                         closure_of top un SUBSET um` THEN
+            STRIP_TAC THEN
+            MATCH_MP_TAC CLOSED_IN_DIFF THEN
+            REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN
+            FIRST_X_ASSUM(MP_TAC o SPECL [`m:num`]) THEN
+            ASM_REWRITE_TAC[] THEN DISCH_TAC THEN
+            MATCH_MP_TAC OPEN_IN_IMP_SUBSET THEN ASM_REWRITE_TAC[];
+            ASM SET_TAC[]];
+          DISCH_THEN(MP_TAC o SELECT_RULE) THEN
+          DISCH_THEN(MP_TAC o CONJUNCT2) THEN
+          DISCH_THEN(MP_TAC o CONJUNCT1) THEN
+          DISCH_THEN(MP_TAC o SPEC `(x:A)`) THEN
+          ANTS_TAC THENL [ASM_REWRITE_TAC[]; DISCH_TAC] THEN
+          ASM_REWRITE_TAC[]];
+        (* Show !z. z IN c ==> g z = 0 *)
+        X_GEN_TAC `z:A` THEN DISCH_TAC THEN
+        SUBGOAL_THEN
+          `?g. continuous_map (top,subtopology euclideanreal (real_interval[&0,&1])) g /\
+               (!y. y IN closure_of top (e n) ==> g y = &1) /\
+               (!y. y IN topspace top DIFF e m ==> g y = &0)`
+        MP_TAC THENL
+         [MATCH_MP_TAC NORMAL_SPACE_URYSOHN_FUNCTION THEN
+          ASM_REWRITE_TAC[] THEN
+          REPEAT CONJ_TAC THENL
+           [REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
+            UNDISCH_TAC
+              `?un. un IN b /\ e n = un /\
+                    ?um. um IN b /\ e m = um /\
+                         closure_of top un SUBSET um` THEN
+            STRIP_TAC THEN
+            MATCH_MP_TAC CLOSED_IN_DIFF THEN
+            REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN
+            FIRST_X_ASSUM(MP_TAC o SPECL [`m:num`]) THEN
+            ASM_REWRITE_TAC[] THEN DISCH_TAC THEN
+            MATCH_MP_TAC OPEN_IN_IMP_SUBSET THEN ASM_REWRITE_TAC[];
+            ASM SET_TAC[]];
+          DISCH_THEN(MP_TAC o SELECT_RULE) THEN
+          DISCH_THEN(MP_TAC o CONJUNCT2) THEN
+          DISCH_THEN(MP_TAC o CONJUNCT2) THEN
+          DISCH_THEN(MP_TAC o SPEC `(z:A)`) THEN
+          ANTS_TAC THENL
+           [UNDISCH_TAC `(c:A->bool) SUBSET topspace top DIFF w` THEN
+            ASM_REWRITE_TAC[] THEN SET_TAC[];
+            DISCH_TAC] THEN
+          ASM_REWRITE_TAC[]]];
+      (* This case shouldn't happen - we constructed n, m so condition holds *)
+      UNDISCH_TAC
+        `~(?un. un IN b /\ e n = un /\ ?um. um IN b /\ e m = um /\
+                closure_of top un SUBSET um)` THEN
+      REWRITE_TAC[] THEN
+      MAP_EVERY EXISTS_TAC [`wprime:A->bool`; `w:A->bool`] THEN
+      ASM_REWRITE_TAC[]]]);;
+
 
 (* Note: Pairing function NUMPAIR and properties NUMPAIR_INJ, NUMPAIR_DEST
    are available from the library (ind_types.ml). Use those instead of
