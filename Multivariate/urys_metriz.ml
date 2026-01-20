@@ -29,11 +29,8 @@ let URYSOHN_METRIZATION_FWD = prove
 let REGULAR_SECOND_COUNTABLE_IMP_NORMAL = prove
  (`!top:A topology.
         regular_space top /\ second_countable top ==> normal_space top`,
-  REPEAT STRIP_TAC THEN
-  MATCH_MP_TAC REGULAR_LINDELOF_IMP_NORMAL_SPACE THEN
-  ASM_REWRITE_TAC[] THEN
-  MATCH_MP_TAC SECOND_COUNTABLE_IMP_LINDELOF_SPACE THEN
-  ASM_REWRITE_TAC[]);;
+  MESON_TAC[REGULAR_LINDELOF_IMP_NORMAL_SPACE;
+            SECOND_COUNTABLE_IMP_LINDELOF_SPACE]);;
 
 (* Helper: normal space gives Urysohn functions for closed sets *)
 let NORMAL_SPACE_URYSOHN_FUNCTION = prove
