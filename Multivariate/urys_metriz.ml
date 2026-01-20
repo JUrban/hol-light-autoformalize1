@@ -666,15 +666,6 @@ let IMAGE_SUBSET_FROM_POINTWISE = prove
         ==> IMAGE f s SUBSET t`,
   REWRITE_TAC[SUBSET; IN_IMAGE] THEN MESON_TAC[]);;
 
-(* Helper: set inequality *)
-let SET_NEQ_EXISTS_ELEMENT = prove
- (`!s:A->bool t. ~(s = t) <=> (?x. x IN s /\ ~(x IN t) \/ ~(x IN s) /\ x IN t)`,
-  REWRITE_TAC[EXTENSION] THEN MESON_TAC[]);;
-
-(* Helper: nonempty set has element *)
-let NONEMPTY_HAS_ELEMENT = prove
- (`!s:A->bool. ~(s = {}) <=> (?x. x IN s)`,
-  REWRITE_TAC[EXTENSION; NOT_IN_EMPTY] THEN MESON_TAC[]);;
 
 (* Helper: topspace of unit interval subtopology *)
 let TOPSPACE_UNIT_INTERVAL = prove
@@ -935,15 +926,6 @@ let REAL_INTERVAL_OPEN_NONEMPTY = prove
 (* Note: More real arithmetic (multiplication associativity, zero identities,
    distributivity, negation/subtraction): use REAL_ARITH_TAC directly *)
 
-(* Helper: double *)
-let REAL_DOUBLE = prove
- (`!x. x + x = &2 * x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: half *)
-let REAL_HALF_DOUBLE = prove
- (`!x. x / &2 + x / &2 = x`,
-  REAL_ARITH_TAC);;
 
 (* Helper: conditional with false *)
 (* Note: COND_FALSE and COND_TRUE are basic library properties *)
@@ -957,15 +939,6 @@ let REAL_HALF_DOUBLE = prove
 (* Note: REAL_ABS_NEG, REAL_ABS_POS - trivial REAL_ARITH_TAC, use directly *)
 (* Note: REAL_MAX_REFL, REAL_MIN_REFL - trivial REAL_ARITH_TAC, use directly *)
 
-(* Helper: max comm *)
-let REAL_MAX_SYM = prove
- (`!x y. max x y = max y x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: min comm *)
-let REAL_MIN_SYM = prove
- (`!x y. min x y = min y x`,
-  REAL_ARITH_TAC);;
 
 (* Note: REAL_DIV_1, REAL_1_NE_0 - trivial REAL_ARITH_TAC, use directly *)
 
@@ -1009,10 +982,6 @@ let REAL_MUL_RINV = prove
  (`!x. ~(x = &0) ==> x * inv x = &1`,
   SIMP_TAC[REAL_MUL_RINV]);;
 
-(* Helper: set membership extensionality *)
-let SET_EQ_LEMMA = prove
- (`!s t. (!x. x IN s <=> x IN t) <=> s = t`,
-  REWRITE_TAC[EXTENSION]);;
 
 (* Note: Basic set properties - EMPTY_EXISTS, NONEMPTY_EXISTS, SING_EXISTS,
    IMAGE_SING, IMAGE_EMPTY_ALT, UNION_SING_*, INSERT_EMPTY, INSERT_INSERT,
@@ -1138,15 +1107,6 @@ let OPEN_IN_SUBTOPOLOGY_REFL = prove
   REWRITE_TAC[GSYM TOPSPACE_SUBTOPOLOGY; OPEN_IN_TOPSPACE]);;
 
 (* Helper: closed interval subset *)
-let REAL_CLOSED_INTERVAL_SUBSET = prove
- (`!a b c d. a <= c /\ d <= b
-             ==> real_interval[c,d] SUBSET real_interval[a,b]`,
-  REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
-
-(* Helper: open subset closed interval *)
-let REAL_OPEN_SUBSET_CLOSED_INTERVAL = prove
- (`!a b. a < b ==> real_interval(a,b) SUBSET real_interval[a,b]`,
-  REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
 (* Helper: 1 in half-open interval *)
 let REAL_1_IN_INTERVAL = prove
@@ -1181,19 +1141,6 @@ let REAL_LT_NE = prove
   REAL_ARITH_TAC);;
 
 (* Helper: between bounds *)
-let REAL_BETWEEN_BOUNDS_LT = prove
- (`!a b x. a < x /\ x < b ==> a < b`,
-  REAL_ARITH_TAC);;
-
-(* Helper: interval containment *)
-let REAL_IN_INTERVAL_IMP_LE = prove
- (`!a b x. x IN real_interval[a,b] ==> a <= x /\ x <= b`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
-
-(* Helper: open interval containment *)
-let REAL_IN_OPEN_INTERVAL_IMP_LT = prove
- (`!a b x. x IN real_interval(a,b) ==> a < x /\ x < b`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
 (* Helper: image of function *)
 let IN_IMAGE_F = prove
@@ -1335,22 +1282,9 @@ let OPEN_IN_CLOSED_IN_EQ = prove
            ==> (open_in top s <=> closed_in top (topspace top DIFF s))`,
   SIMP_TAC[OPEN_IN_CLOSED_IN_EQ]);;
 
-(* Helper: real between *)
-let REAL_BETWEEN_HALF = prove
- (`!x y. x < y ==> x < (x + y) / &2 /\ (x + y) / &2 < y`,
-  REAL_ARITH_TAC);;
 
 (* Note: REAL_HALF_LT_ONE, REAL_ZERO_LT_HALF - basic REAL_ARITH_TAC, use directly *)
 
-(* Helper: specific interval containment *)
-let REAL_ONE_IN_UNIT_INTERVAL = prove
- (`&1 IN real_interval[&0, &1]`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
-
-(* Helper: specific interval containment *)
-let REAL_ZERO_IN_UNIT_INTERVAL = prove
- (`&0 IN real_interval[&0, &1]`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
 (* Helper: half in unit interval *)
 let REAL_HALF_IN_UNIT_INTERVAL = prove
@@ -1478,14 +1412,6 @@ let TOPSPACE_EUCLIDEANREAL_UNIV = prove
   REWRITE_TAC[TOPSPACE_EUCLIDEANREAL]);;
 
 (* Helper: real interval arithmetic *)
-let REAL_INTERVAL_LBOUND = prove
- (`!a b x. x IN real_interval[a,b] ==> a <= x`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
-
-(* Helper: real interval arithmetic *)
-let REAL_INTERVAL_UBOUND = prove
- (`!a b x. x IN real_interval[a,b] ==> x <= b`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
 (* Note: Complement/DIFF characterization - use SET_TAC directly *)
 
@@ -1523,10 +1449,6 @@ let SUBSET_DIFF_EQ = prove
 
 (* Note: DIFF/INTER/UNION distributivity: use SET_TAC directly *)
 
-(* Helper: real abs properties *)
-let REAL_ABS_REFL = prove
- (`!x. abs(abs(x)) = abs(x)`,
-  REAL_ARITH_TAC);;
 
 (* Note: Real abs triangle inequality: use REAL_ARITH_TAC directly *)
 
