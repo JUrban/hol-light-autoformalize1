@@ -172,18 +172,6 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      2. Define f k = g n m where k = NUMPAIR n m (or &1/&2 if invalid)
      3. Verify four properties using regularity to find suitable basis pairs *)
 
-  (* Unused SUBGOAL_THEN from Attempt 21 - should be removed in next cleanup *)
-  SUBGOAL_THEN
-    `!n m. (e n) IN b /\ (e m) IN b /\
-           (top closure_of (e n)) SUBSET (e m) /\
-           ~((e n) = {}) /\ ~((e m) = {})
-           ==> ?g. continuous_map
-                     (top,subtopology euclideanreal (real_interval[&0,&1]))
-                     (g:A->real) /\
-                   (!x. x IN (top closure_of (e n)) ==> g x = &0) /\
-                   (!x. x IN topspace top /\ ~(x IN e m) ==> g x = &1)`
-    (fun th -> ALL_TAC) THEN
-
   CHEAT_TAC);;
 
 (* Note: Pairing function NUMPAIR and properties NUMPAIR_INJ, NUMPAIR_DEST
