@@ -176,13 +176,6 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
    defining custom pairing functions, per CLAUDE.md guidance to avoid
    duplicating library infrastructure. *)
 
-(* Note: SECOND_COUNTABLE_IMP_SEPARABLE_SPACE from metric.ml shows that
-   second-countable spaces have countable dense subsets. This could potentially
-   be useful for constructing the separating function family, as a countable
-   dense subset can be enumerated and used to index separation requirements.
-   The separable_space property gives ?c. COUNTABLE c /\ c SUBSET topspace /\
-   closure_of c = topspace. For future work on SEPARATING_FUNCTIONS. *)
-
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
  (`!top:A topology f:num->A->real.
@@ -203,7 +196,7 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
   REPEAT STRIP_TAC THEN
   EXISTS_TAC `\x:A. \n:num. (f:num->A->real) n x` THEN
   CONJ_TAC THENL
-   [(* Attempt 10: Prove embedding directly using definition *)
+   [(* Prove embedding directly using definition *)
     (* Following textbook Step 2: embedding_map = homeomorphic onto image *)
     REWRITE_TAC[embedding_map; homeomorphic_map] THEN
     CONJ_TAC THENL
@@ -256,7 +249,7 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                       open set manipulation tactics, IMAGE/preimage reasoning
           *)
 
-          (* Attempt 13: Add proof structure to construct witness *)
+          (* Add proof structure to construct witness *)
           REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
           (* Goal: ?t. open_in (product_topology...) t /\ u = t INTER IMAGE g topspace *)
 
