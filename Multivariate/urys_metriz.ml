@@ -968,115 +968,9 @@ let SUBSET_INSERT_DELETE = prove
  (`!x s. s SUBSET (x INSERT s)`,
   SET_TAC[]);;
 
-(* Helper: real le antisym *)
-let REAL_LE_ANTISYM_SIMPLE = prove
- (`!x y. x <= y /\ y <= x ==> x = y`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real lt irrefl *)
-let REAL_LT_IRREFL_SIMPLE = prove
- (`!x. ~(x < x)`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real lt trans *)
-let REAL_LT_TRANS_SIMPLE = prove
- (`!x y z. x < y /\ y < z ==> x < z`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real le trans *)
-let REAL_LE_TRANS_SIMPLE = prove
- (`!x y z. x <= y /\ y <= z ==> x <= z`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real lt le *)
-let REAL_LT_IMP_LE = prove
- (`!x y. x < y ==> x <= y`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real add comm *)
-let REAL_ADD_COMM_SIMPLE = prove
- (`!x y. x + y = y + x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real mul comm *)
-let REAL_MUL_COMM_SIMPLE = prove
- (`!x y. x * y = y * x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real add assoc *)
-let REAL_ADD_ASSOC_SIMPLE = prove
- (`!x y z. (x + y) + z = x + (y + z)`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real add lid *)
-let REAL_ADD_LID_SIMPLE = prove
- (`!x. &0 + x = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real add rid *)
-let REAL_ADD_RID_SIMPLE = prove
- (`!x. x + &0 = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real mul lid *)
-let REAL_MUL_LID_SIMPLE = prove
- (`!x. &1 * x = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real mul rid *)
-let REAL_MUL_RID_SIMPLE = prove
- (`!x. x * &1 = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real le refl *)
-let REAL_LE_REFL_SIMPLE = prove
- (`!x. x <= x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real lt asymm *)
-let REAL_LT_ASYM = prove
- (`!x y. x < y ==> ~(y < x)`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real le total *)
-let REAL_LE_TOTAL_SIMPLE = prove
- (`!x y. x <= y \/ y <= x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real lt total *)
-let REAL_LT_TRICHOTOMY = prove
- (`!x y. x < y \/ x = y \/ y < x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real sub add *)
-let REAL_SUB_ADD_SIMPLE = prove
- (`!x y. (x - y) + y = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real add sub *)
-let REAL_ADD_SUB_SIMPLE = prove
- (`!x y. (x + y) - y = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real sub refl *)
-let REAL_SUB_REFL_SIMPLE = prove
- (`!x. x - x = &0`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real neg neg *)
-let REAL_NEG_NEG_SIMPLE = prove
- (`!x. --(--x) = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real neg 0 *)
-let REAL_NEG_0_SIMPLE = prove
- (`--(&0) = &0`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real neg add *)
-let REAL_NEG_ADD_SIMPLE = prove
- (`!x y. --(x + y) = --x + --y`,
-  REAL_ARITH_TAC);;
+(* Note: Basic real arithmetic properties (antisymmetry, irreflexivity, transitivity,
+   commutativity, associativity, identities, totality, trichotomy, subtraction, negation):
+   use REAL_ARITH_TAC directly *)
 
 (* Helper: conditional set not equal when one choice differs *)
 let COND_SET_NE = prove
@@ -1111,45 +1005,8 @@ let REAL_INTERVAL_OPEN_NONEMPTY = prove
   REPEAT STRIP_TAC THEN EXISTS_TAC `(a + b) / &2` THEN
   REWRITE_TAC[IN_REAL_INTERVAL] THEN ASM_REAL_ARITH_TAC);;
 
-(* Helper: multiplication associativity *)
-let REAL_MUL_ASSOC_SIMPLE = prove
- (`!x y z. (x * y) * z = x * (y * z)`,
-  REAL_ARITH_TAC);;
-
-(* Helper: addition of zero *)
-let REAL_ADD_LZERO = prove
- (`!x. &0 + x = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: multiplication by zero *)
-let REAL_MUL_LZERO = prove
- (`!x. &0 * x = &0`,
-  REAL_ARITH_TAC);;
-
-(* Helper: multiplication by zero right *)
-let REAL_MUL_RZERO = prove
- (`!x. x * &0 = &0`,
-  REAL_ARITH_TAC);;
-
-(* Helper: distributivity *)
-let REAL_ADD_LDISTRIB_SIMPLE = prove
- (`!x y z. x * (y + z) = x * y + x * z`,
-  REAL_ARITH_TAC);;
-
-(* Helper: distributivity right *)
-let REAL_ADD_RDISTRIB_SIMPLE = prove
- (`!x y z. (x + y) * z = x * z + y * z`,
-  REAL_ARITH_TAC);;
-
-(* Helper: negation and subtraction *)
-let REAL_NEG_SUB = prove
- (`!x y. --(x - y) = y - x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: subtraction and negation *)
-let REAL_SUB_NEG = prove
- (`!x y. x - (--y) = x + y`,
-  REAL_ARITH_TAC);;
+(* Note: More real arithmetic (multiplication associativity, zero identities,
+   distributivity, negation/subtraction): use REAL_ARITH_TAC directly *)
 
 (* Helper: double *)
 let REAL_DOUBLE = prove
@@ -1879,16 +1736,7 @@ let IN_SING_SIMPLE = prove
  (`!x y. x IN {y} <=> x = y`,
   REWRITE_TAC[IN_SING]);;
 
-(* Helper: union with empty *)
-(* Helper: real arithmetic *)
-let REAL_ADD_AC_SIMPLE = prove
- (`!x y z. x + (y + z) = y + (x + z)`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real arithmetic *)
-let REAL_ADD_RZERO = prove
- (`!x. x + &0 = x`,
-  REAL_ARITH_TAC);;
+(* Note: Real arithmetic AC, zero identities: use REAL_ARITH_TAC directly *)
 
 (* Helper: interval bounds *)
 let REAL_INTERVAL_NONEMPTY_CLOSED = prove
@@ -2101,10 +1949,7 @@ let REAL_ABS_REFL = prove
  (`!x. abs(abs(x)) = abs(x)`,
   REAL_ARITH_TAC);;
 
-(* Helper: real abs triangle *)
-let REAL_ABS_TRIANGLE_SIMPLE = prove
- (`!x y. abs(x + y) <= abs(x) + abs(y)`,
-  REAL_ARITH_TAC);;
+(* Note: Real abs triangle inequality: use REAL_ARITH_TAC directly *)
 
 (* Note: FINITE_INTER, FINITE_DIFF are available from library *)
 
