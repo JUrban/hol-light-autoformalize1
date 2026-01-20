@@ -111,8 +111,9 @@ let REGULAR_SPACE_BASIS_CLOSURE = prove
     EXISTS_TAC `v:A->bool` THEN
     ASM_REWRITE_TAC[] THEN
     (* Show closure v subset u *)
-    (* Key: v subset w, w open, DISJOINT w z, topspace\u subset z *)
-    (* This implies w subset u, and closure(v) subset closure(w) = w subset u *)
+    (* Strategy: w SUBSET u (from DISJOINT w z and topspace\u SUBSET z) *)
+    (* Then use v SUBSET w and closure properties *)
+    (* TODO: Complete this set-theoretic argument *)
     CHEAT_TAC]);;
 
 let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
