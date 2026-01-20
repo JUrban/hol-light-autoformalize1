@@ -169,32 +169,38 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (* Following textbook Step 1: construct {g_{n,m}} for pairs where cl(B_n) ⊂ B_m *)
+  (* Attempt 18: Admitting the complex enumeration construction *)
 
-  (* Attempt 17: More explicit construction with partial admits *)
+  (* We have established:
+     - For any distinct points x,y: ∃g continuous [0,1] with g(x) ≠ g(y)
+     - For any closed c and x ∉ c: ∃g continuous [0,1] with g(x)=1, g(c)={0}
 
-  (* Step 1: For pairs where closure(e n) ⊆ e m, construct separating function *)
-  (* This follows textbook approach: use Urysohn for each valid pair *)
-  (* Then enumerate the countable family of pairs to get sequence {f_n} *)
-  (* The enumeration and choice construction are complex, so we admit this step *)
-  (* with clear documentation of the strategy *)
+     To complete the proof, we need to:
+     1. Enumerate the countable family of "valid pairs" from the basis:
+        pairs (n,m) where closure(e n) ⊆ e m
+     2. For each valid pair, use Urysohn to get g_{n,m}: X → [0,1]
+     3. Use NUMPAIR to enumerate ℕ×ℕ → ℕ to get sequence {f_i}
+     4. Verify separation properties are preserved under this enumeration
 
-  (* Textbook strategy from Munkres Topology §34, Theorem 34.1, Step 1:
-     - For each pair (n,m) where closure(B_n) ⊂ B_m in the countable basis,
-       use Urysohn lemma to construct g_{n,m}: X → [0,1] with:
-       * g_{n,m}(closure(B_n)) = {1}
-       * g_{n,m}(X - B_m) = {0}
-     - The set of such pairs is countable (subset of ℕ × ℕ)
-     - Enumerate these pairs and their functions to get {f_n: n ∈ ℕ}
-     - This family separates points and points from closed sets by regularity
+     Textbook strategy (Munkres §34.1, Step 1, pages 213-214):
+     - The set of valid pairs is countable (subset of ℕ×ℕ)
+     - Each g_{n,m} separates closure(B_n) from X \ B_m
+     - Regularity ensures: for x≠y, ∃B_n,B_m with x∈B_n⊆closure(B_n)⊆B_m, y∉B_m
+     - Therefore {f_i} separates all points
+     - Similarly for closed sets: if x∉c closed, regularity gives separation
 
-     Implementation requires:
-     - Dependent choice to extract function for each valid pair
-     - Pairing enumeration (e.g., via Cantor pairing or library NUMPAIR)
-     - Verification that separation properties are preserved under reindexing
-  *)
+     Technical requirements:
+     - NUMPAIR and its properties (NUMPAIR_INJ, inverse functions)
+     - Dependent choice to select g_{n,m} for each valid pair
+     - Verification that separation works through the reindexing
+     - Careful handling of empty/degenerate cases
+
+     This is the core difficultly of the Urysohn metrization theorem.
+     Admitting for now. *)
 
   CHEAT_TAC);;
+
+
 
 (* Note: Pairing function NUMPAIR and properties NUMPAIR_INJ, NUMPAIR_DEST
    are available from the library (ind_types.ml). Use those instead of
