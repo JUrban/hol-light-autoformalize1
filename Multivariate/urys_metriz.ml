@@ -877,20 +877,7 @@ let FINITE_SINGLETON = prove
  (`!x. FINITE {x}`,
   REWRITE_TAC[FINITE_SING]);;
 
-(* Helper: finite empty *)
-let FINITE_EMPTY_SIMPLE = prove
- (`FINITE {}`,
-  REWRITE_TAC[FINITE_EMPTY]);;
-
-(* Helper: finite union *)
-let FINITE_UNION_SIMPLE = prove
- (`!s t. FINITE s /\ FINITE t ==> FINITE (s UNION t)`,
-  REWRITE_TAC[FINITE_UNION]);;
-
-(* Helper: finite insert *)
-let FINITE_INSERT_SIMPLE = prove
- (`!x s. FINITE s ==> FINITE (x INSERT s)`,
-  REWRITE_TAC[FINITE_INSERT]);;
+(* Note: FINITE_EMPTY, FINITE_UNION, FINITE_INSERT are available from library *)
 
 (* Helper: subset antisymmetric *)
 let SUBSET_ANTISYM = prove
@@ -2176,15 +2163,7 @@ let REAL_ABS_TRIANGLE_SIMPLE = prove
  (`!x y. abs(x + y) <= abs(x) + abs(y)`,
   REAL_ARITH_TAC);;
 
-(* Helper: finite operations *)
-let FINITE_INTER_SIMPLE = prove
- (`!s t. FINITE s \/ FINITE t ==> FINITE (s INTER t)`,
-  MESON_TAC[FINITE_INTER; INTER_COMM]);;
-
-(* Helper: finite diff *)
-let FINITE_DIFF_SIMPLE = prove
- (`!s t. FINITE s ==> FINITE (s DIFF t)`,
-  SIMP_TAC[FINITE_DIFF]);;
+(* Note: FINITE_INTER, FINITE_DIFF are available from library *)
 
 (* Helper: forall in insert *)
 let FORALL_IN_INSERT_SIMPLE = prove
