@@ -556,56 +556,18 @@ let HALF_IN_UNIT_INTERVAL = prove
   REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
 (* Helper: 0 and 1 in unit interval *)
-let ZERO_ONE_IN_UNIT_INTERVAL = prove
- (`&0 IN real_interval[&0,&1] /\ &1 IN real_interval[&0,&1]`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
-(* Helper: function application in image *)
-let IN_IMAGE_LAMBDA_COMPONENT = prove
- (`!f:A->num->B s x n.
-        x IN s ==> f x n IN IMAGE (\y. f y n) s`,
-  REWRITE_TAC[IN_IMAGE] THEN MESON_TAC[]);;
 
-(* Helper: real number comparison *)
-let REAL_LT_HALF_BETWEEN = prove
- (`!x. &1 / &2 < x /\ x < &1 ==> &0 < x /\ x < &1`,
-  REAL_ARITH_TAC);;
 
-(* Helper: closed set complement *)
-let IN_TOPSPACE_NOT_CLOSED_COMPLEMENT = prove
- (`!top:A topology c x.
-        closed_in top c /\ x IN topspace top /\ ~(x IN c)
-        ==> x IN topspace top DIFF c`,
-  REWRITE_TAC[IN_DIFF] THEN MESON_TAC[]);;
 
-(* Helper: function values in range *)
-let FUNCTION_RANGE_SUBSET = prove
- (`!f:A->B s t.
-        (!x. x IN s ==> f x IN t)
-        ==> IMAGE f s SUBSET t`,
-  REWRITE_TAC[SUBSET; IN_IMAGE] THEN MESON_TAC[]);;
 
-(* Helper: equal functions give equal values *)
-let FUNCTION_EQ_IMP_VALUE_EQ = prove
- (`!f:num->A g n. f = g ==> f n = g n`,
-  MESON_TAC[]);;
 
-(* Helper: contrapositive for function inequality *)
-let FUNCTION_NEQ_EXISTS_COMPONENT = prove
- (`!f:num->A g. ~(f = g) <=> (?n. ~(f n = g n))`,
-  REWRITE_TAC[FUN_EQ_THM] THEN MESON_TAC[]);;
 
 (* Helper: open set properties *)
 (* Note: Several basic lemmas like OPEN_IN_SUBSET, FINITE_SING,
    FINITE_SUBSET, IN_SING are available from the library and used
    directly instead of defining wrapper versions. *)
 
-(* Helper: conditional function application *)
-let COND_FUNCTION_APPLY = prove
- (`!(f:num->A) g n m.
-        (if n = m then f n else g n) =
-        if n = m then f m else g n`,
-  MESON_TAC[]);;
 
 (* Helper: equality with lambda *)
 
