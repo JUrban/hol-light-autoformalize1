@@ -798,10 +798,7 @@ let COND_NE_EXPAND = prove
  (`!b x y z. ~((if b then x else y) = z) <=> (b /\ ~(x = z)) \/ (~b /\ ~(y = z))`,
   MESON_TAC[]);;
 
-(* Helper: conditional set membership *)
-let IN_COND_SET_SIMPLE = prove
- (`!b s t x. x IN (if b then s else t) <=> (b ==> x IN s) /\ (~b ==> x IN t)`,
-  MESON_TAC[]);;
+(* Note: Conditional set membership: use MESON_TAC directly *)
 
 (* Helper: unit interval contains specific points *)
 let UNIT_INTERVAL_ENDPOINTS = prove
@@ -848,32 +845,17 @@ let UNION_SING = prove
  (`!s x. s UNION {x} = x INSERT s`,
   REWRITE_TAC[EXTENSION; IN_UNION; IN_INSERT; IN_SING] THEN MESON_TAC[]);;
 
-(* Helper: intersection with universe *)
-let INTER_UNIV_SIMPLE = prove
- (`!s. s INTER (:A) = s`,
-  REWRITE_TAC[INTER_UNIV]);;
-
-(* Helper: diff empty *)
-let DIFF_EMPTY_SIMPLE = prove
- (`!s. s DIFF {} = s`,
-  REWRITE_TAC[DIFF_EMPTY]);;
-
-(* Note: EMPTY_SUBSET, UNION_COMM, INTER_COMM, SUBSET_ANTISYM_EQ,
-   IN_UNION, IN_INTER, IN_DIFF, SUBSET_REFL, SUBSET_TRANS are all
-   available from library (sets.ml). *)
+(* Note: INTER_UNIV, DIFF_EMPTY, EMPTY_SUBSET, UNION_COMM, INTER_COMM,
+   SUBSET_ANTISYM_EQ, IN_UNION, IN_INTER, IN_DIFF, SUBSET_REFL, SUBSET_TRANS
+   are all available from library (sets.ml). *)
 
 (* Helper: subset inter *)
 let SUBSET_INTER_BOTH = prove
  (`!s t u. s SUBSET t /\ s SUBSET u ==> s SUBSET (t INTER u)`,
   SET_TAC[]);;
 
-(* Helper: insert subset *)
-let INSERT_SUBSET_SIMPLE = prove
- (`!x s t. x IN t /\ s SUBSET t ==> (x INSERT s) SUBSET t`,
-  SET_TAC[]);;
-
-(* Note: FINITE_SING, FINITE_EMPTY, FINITE_UNION, FINITE_INSERT, SUBSET_ANTISYM_EQ
-   are available from library *)
+(* Note: INSERT subset properties, FINITE_SING, FINITE_EMPTY, FINITE_UNION,
+   FINITE_INSERT, SUBSET_ANTISYM_EQ: use SET_TAC or library lemmas *)
 
 (* Note: De Morgan laws, DIFF distributivity, UNION_ASSOC, INTER_ASSOC, UNION_IDEMPOT,
    INTER_IDEMPOT: use SET_TAC or REWRITE_TAC with library lemmas directly *)
@@ -958,10 +940,7 @@ let INSERT_UNION = prove
  (`!x s t. (x INSERT s) UNION t = x INSERT (s UNION t)`,
   SET_TAC[]);;
 
-(* Helper: in insert *)
-let IN_INSERT_SIMPLE = prove
- (`!x y s. x IN (y INSERT s) <=> x = y \/ x IN s`,
-  REWRITE_TAC[IN_INSERT]);;
+(* Note: IN_INSERT is in library, use directly or SET_TAC *)
 
 (* Helper: subset insert *)
 let SUBSET_INSERT_DELETE = prove
@@ -1731,10 +1710,7 @@ let IN_OPEN_INTERVAL_IMP_LT = prove
  (`!x a b. x IN real_interval(a,b) ==> a < x /\ x < b`,
   REWRITE_TAC[IN_REAL_INTERVAL]);;
 
-(* Helper: element in singleton *)
-let IN_SING_SIMPLE = prove
- (`!x y. x IN {y} <=> x = y`,
-  REWRITE_TAC[IN_SING]);;
+(* Note: IN_SING is in library, use directly or SET_TAC *)
 
 (* Note: Real arithmetic AC, zero identities: use REAL_ARITH_TAC directly *)
 
@@ -1773,44 +1749,19 @@ let SUBSET_ELEMENT = prove
  (`!s t x. s SUBSET t /\ x IN s ==> x IN t`,
   SET_TAC[]);;
 
-(* Helper: subset and image *)
-let IMAGE_SUBSET_SIMPLE = prove
- (`!f s t. s SUBSET t ==> IMAGE f s SUBSET IMAGE f t`,
-  REWRITE_TAC[IMAGE_SUBSET]);;
+(* Note: IMAGE_SUBSET is in library *)
 
-(* Helper: preimage of universal set *)
-let PREIMAGE_UNIV_SIMPLE = prove
- (`!f. {x | f x IN (:real)} = (:A)`,
-  REWRITE_TAC[EXTENSION; IN_ELIM_THM; IN_UNIV]);;
+(* Note: Preimage of universal set - use SET_TAC directly *)
 
-(* Helper: preimage subset *)
-let PREIMAGE_SUBSET_SIMPLE = prove
- (`!f s t. s SUBSET t ==> {x | f x IN s} SUBSET {x | f x IN t}`,
-  REWRITE_TAC[SUBSET; IN_ELIM_THM] THEN SET_TAC[]);;
+(* Note: Preimage subset - use SET_TAC directly *)
 
-(* Helper: continuous map composition is continuous *)
-let CONTINUOUS_MAP_COMPOSE_SIMPLE = prove
- (`!top1 top2 top3 f g.
-     continuous_map (top1, top2) f /\
-     continuous_map (top2, top3) g
-     ==> continuous_map (top1, top3) (g o f)`,
-  REWRITE_TAC[CONTINUOUS_MAP_COMPOSE]);;
+(* Note: CONTINUOUS_MAP_COMPOSE is in library *)
 
-(* Helper: image of empty set *)
-let IMAGE_EMPTY_SIMPLE = prove
- (`!f. IMAGE f {} = {}`,
-  REWRITE_TAC[IMAGE_CLAUSES]);;
+(* Note: IMAGE_CLAUSES includes this *)
 
-(* Helper: cartesian product subset *)
-let CARTESIAN_PRODUCT_SUBSET_SIMPLE = prove
- (`!k f g. (!i. i IN k ==> f i SUBSET g i)
-           ==> cartesian_product k f SUBSET cartesian_product k g`,
-  REWRITE_TAC[cartesian_product; SUBSET; IN_ELIM_THM] THEN SET_TAC[]);;
+(* Note: Cartesian product subset - use SET_TAC directly *)
 
-(* Helper: element not in empty set *)
-let NOT_IN_EMPTY_SIMPLE = prove
- (`!x. ~(x IN {})`,
-  REWRITE_TAC[NOT_IN_EMPTY]);;
+(* Note: NOT_IN_EMPTY is in library *)
 
 (* Helper: singleton nonempty *)
 let SING_NONEMPTY = prove
@@ -1837,10 +1788,7 @@ let IN_OPEN_INTERVAL_BOUNDS = prove
   REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
 (* Helper: nonempty has element *)
-(* Helper: element in universal set *)
-let IN_UNIV_SIMPLE = prove
- (`!x:A. x IN (:A)`,
-  REWRITE_TAC[IN_UNIV]);;
+(* Note: IN_UNIV is in library *)
 
 (* Helper: universal set nonempty *)
 let UNIV_NONEMPTY = prove
@@ -1877,10 +1825,7 @@ let DIFF_SUBSET = prove
  (`!s t. s DIFF t SUBSET s`,
   SET_TAC[]);;
 
-(* Helper: image and union *)
-let IMAGE_UNION_SIMPLE = prove
- (`!f s t. IMAGE f (s UNION t) = IMAGE f s UNION IMAGE f t`,
-  REWRITE_TAC[IMAGE_UNION]);;
+(* Note: IMAGE_UNION is in library *)
 
 (* Helper: topspace of euclideanreal *)
 let TOPSPACE_EUCLIDEANREAL_UNIV = prove
@@ -1897,10 +1842,7 @@ let REAL_INTERVAL_UBOUND = prove
  (`!a b x. x IN real_interval[a,b] ==> x <= b`,
   REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
-(* Helper: complement characterization *)
-let COMPLEMENT_SIMPLE = prove
- (`!s t u. s = u DIFF t <=> !x. x IN s <=> x IN u /\ ~(x IN t)`,
-  REWRITE_TAC[EXTENSION; IN_DIFF]);;
+(* Note: Complement/DIFF characterization - use SET_TAC directly *)
 
 (* Helper: De Morgan's laws *)
 let COMPL_UNION = prove
