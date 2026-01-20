@@ -166,34 +166,40 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (* Attempt 18: Admitting the complex enumeration construction *)
+  (* Attempt 19: Use basis-dependent construction with Urysohn functions *)
 
-  (* We have established:
-     - For any distinct points x,y: ∃g continuous [0,1] with g(x) ≠ g(y)
-     - For any closed c and x ∉ c: ∃g continuous [0,1] with g(x)=1, g(c)={0}
+  (* Strategy: For each pair of basis elements (n,m) where closure(e_n) ⊆ e_m,
+     apply Urysohn lemma to get function g_{n,m} that equals 0 on closure(e_n)
+     and 1 outside e_m. These functions will separate points and closed sets
+     by regularity. Enumerate using NUMPAIR to get sequence {f_i}. *)
 
-     To complete the proof, we need to:
-     1. Enumerate the countable family of "valid pairs" from the basis:
-        pairs (n,m) where closure(e n) ⊆ e m
-     2. For each valid pair, use Urysohn to get g_{n,m}: X → [0,1]
-     3. Use NUMPAIR to enumerate ℕ×ℕ → ℕ to get sequence {f_i}
-     4. Verify separation properties are preserved under this enumeration
+  (* Define the function family f : num -> A -> real *)
+  (* For each k, let n = NUMFST k and m = NUMSND k *)
+  (* If closure(e_n) ⊆ e_m, use Urysohn on them; otherwise use constant &1/&2 *)
 
-     Textbook strategy (Munkres §34.1, Step 1, pages 213-214):
-     - The set of valid pairs is countable (subset of ℕ×ℕ)
-     - Each g_{n,m} separates closure(B_n) from X \ B_m
-     - Regularity ensures: for x≠y, ∃B_n,B_m with x∈B_n⊆closure(B_n)⊆B_m, y∉B_m
-     - Therefore {f_i} separates all points
-     - Similarly for closed sets: if x∉c closed, regularity gives separation
+  (* The challenge is expressing this dependent construction formally *)
+  (* We need:
+     1. For each valid pair (n,m): closure(e_n) ⊆ e_m
+        Define g_{n,m} via Urysohn with g_{n,m} = 0 on closure(e_n), = 1 outside e_m
+     2. For invalid pairs: define as constant &1/&2
+     3. Show this family separates points:
+        - Given x ≠ y, regularity + basis give B_n, B_m with desired inclusion
+        - Use corresponding g_{n,m} = f_{NUMPAIR n m} to separate
+     4. Show this family separates closed sets from external points similarly
+  *)
 
-     Technical requirements:
-     - NUMPAIR and its properties (NUMPAIR_INJ, inverse functions)
-     - Dependent choice to select g_{n,m} for each valid pair
-     - Verification that separation works through the reindexing
-     - Careful handling of empty/degenerate cases
+  (* This requires:
+     - Dependent choice/function definition over conditionals on topology
+     - CLOSED_IN_CLOSURE properties for the basis
+     - NUMFST, NUMSND from NUMPAIR_DEST
+     - Careful case analysis for when closure(e_n) ⊆ e_m holds
+  *)
 
-     This is the core difficultly of the Urysohn metrization theorem.
-     Admitting for now. *)
+  (* Key difficulty: The construction needs to be done using choice principles
+     or explicit recursive definition, which requires careful setup in HOL Light.
+     The textbook glosses over this by assuming we can "just enumerate" the
+     countable family, but formally we need to extract functions from the
+     existence statements and verify all properties hold after enumeration. *)
 
   CHEAT_TAC);;
 
