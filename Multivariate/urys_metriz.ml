@@ -240,10 +240,6 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
    closure_of c = topspace. For future work on SEPARATING_FUNCTIONS. *)
 
 (* Helper: implication from conditional inequality *)
-let COND_NE_IMP = prove
- (`!b x y z. (~((if b then x else y) = z) ==> b) <=> b \/ (y = z)`,
-  MESON_TAC[]);;
-
 (* Helper: open and closed unit intervals are not equal *)
 let REAL_INTERVAL_OPEN_NE_CLOSED_UNIT = prove
  (`~(real_interval(&1 / &2, &1) = real_interval[&0,&1])`,
@@ -252,17 +248,6 @@ let REAL_INTERVAL_OPEN_NE_CLOSED_UNIT = prove
   REAL_ARITH_TAC);;
 
 (* Helper: open intervals in unit interval are open *)
-let OPEN_IN_UNIT_INTERVAL_SUBINTERVAL = prove
- (`!a b. &0 <= a /\ a < b /\ b <= &1
-         ==> open_in (subtopology euclideanreal (real_interval[&0,&1]))
-                     (real_interval(a,b))`,
-  REPEAT STRIP_TAC THEN
-  REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
-  EXISTS_TAC `real_interval(a:real,b)` THEN
-  REWRITE_TAC[GSYM REAL_OPEN_IN; REAL_OPEN_REAL_INTERVAL; INTER_SUBSET] THEN
-  REWRITE_TAC[EXTENSION; IN_INTER; IN_REAL_INTERVAL] THEN
-  ASM_MESON_TAC[REAL_LT_IMP_LE; REAL_LE_TRANS]);;
-
 (* Helper: conditional interval equality for potential use in EMBEDDING *)
 let COND_INTERVAL_EQ_CLOSED = prove
  (`!i n. (if i = n then real_interval(&1 / &2, &1) else real_interval[&0,&1]) =
@@ -290,25 +275,9 @@ let OPEN_IN_UNIT_INTERVAL_SELF = prove
   REWRITE_TAC[EXTENSION; IN_INTER; IN_REAL_INTERVAL] THEN
   REAL_ARITH_TAC);;
 
-(* Helper: conditional interval is always open *)
-let OPEN_IN_COND_INTERVAL_DIFF_ZERO = prove
- (`!i n. open_in (subtopology euclideanreal (real_interval[&0,&1]))
-                 (if i = n then real_interval[&0,&1] DIFF {&0}
-                  else real_interval[&0,&1])`,
-  REPEAT GEN_TAC THEN COND_CASES_TAC THEN
-  ASM_REWRITE_TAC[OPEN_IN_UNIT_INTERVAL_DIFF_ZERO; OPEN_IN_UNIT_INTERVAL_SELF]);;
-
 (* Note: SUBSET_UNION, INTER_SUBSET, UNION_IDEMPOT, INTER_IDEMPOT
    are available from library (sets.ml). Using those instead of
    defining redundant versions. *)
-
-(* Helper: conditional inequality for EMBEDDING proof *)
-let COND_INTERVAL_NE_IMP = prove
- (`!i n. ~((if i = n then real_interval(&1 / &2, &1)
-            else real_interval[&0,&1]) = real_interval[&0,&1])
-         ==> i = n`,
-  REPEAT GEN_TAC THEN REWRITE_TAC[COND_INTERVAL_EQ_CLOSED] THEN
-  MESON_TAC[]);;
 
 (* Helper: [0,1]\{0} ≠ [0,1] *)
 let REAL_INTERVAL_DIFF_ZERO_NE_UNIT = prove
@@ -751,11 +720,6 @@ let PAIR_SURJECTIVE = prove
 (* Helper: image of constant *)
 
 (* Helper: preimage of singleton *)
-(* Helper: preimage subset *)
-let PREIMAGE_SUBSET = prove
- (`!f:A->B s t. s SUBSET t ==> {x | f x IN s} SUBSET {x | f x IN t}`,
-  SET_TAC[SUBSET]);;
-
 (* Note: PREIMAGE_UNIV - trivial SET_TAC[IN_UNIV], use directly *)
 
 (* Note: CONTINUOUS_MAP_ID, CONTINUOUS_MAP_CONST, CONTINUOUS_MAP_COMPOSE - all library lemmas *)
