@@ -485,10 +485,6 @@ let HALF_IN_UNIT_INTERVAL = prove
 (* Note: Lambda/function composition - trivial beta reduction *)
 
 (* Helper: image under identity *)
-let IMAGE_ID = prove
- (`!s:A->bool. IMAGE (\x. x) s = s`,
-  REWRITE_TAC[IMAGE_ID]);;
-
 (* Helper: continuous map image in topspace *)
 let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
  (`!top top' (f:A->B).
@@ -503,12 +499,6 @@ let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
 (* Helper: membership in conditional sets *)
 (* Note: INTER_SUBSET, UNION_SUBSET, IN_UNION are available from
    library (sets.ml). Using those instead of redundant versions. *)
-
-(* Helper: continuity composition *)
-let CONTINUOUS_MAP_CONST = prove
- (`!top top' c. c IN topspace top' 
-                ==> continuous_map (top,top') (\x. c)`,
-  SIMP_TAC[CONTINUOUS_MAP_CONST]);;
 
 (* Helper: intervals and open sets *)
 
@@ -604,21 +594,7 @@ let IN_COND_INTERVAL = prove
 (* Note: REAL_LTE_TRANS, REAL_LET_TRANS - basic REAL_ARITH_TAC, use directly *)
 (* Note: REAL_LT_ADD2, REAL_LE_ADD2 - basic REAL_ARITH_TAC, use directly *)
 
-(* Helper: left addition *)
-(* Helper: division basics *)
-let REAL_DIV_REFL = prove
- (`!x. ~(x = &0) ==> x / x = &1`,
-  SIMP_TAC[REAL_DIV_REFL]);;
-
-(* Helper: inverse basics *)
-let REAL_MUL_LINV = prove
- (`!x. ~(x = &0) ==> inv x * x = &1`,
-  SIMP_TAC[REAL_MUL_LINV]);;
-
-(* Helper: inverse basics right *)
-let REAL_MUL_RINV = prove
- (`!x. ~(x = &0) ==> x * inv x = &1`,
-  SIMP_TAC[REAL_MUL_RINV]);;
+(* Note: REAL_DIV_REFL, REAL_MUL_LINV, REAL_MUL_RINV - trivial library wrappers, use library directly *)
 
 
 (* Note: Basic set properties - EMPTY_EXISTS, NONEMPTY_EXISTS, SING_EXISTS,
