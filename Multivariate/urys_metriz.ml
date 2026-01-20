@@ -491,21 +491,8 @@ let CLOSED_IN_TOPSPACE_DIFF_OPEN = prove
   SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE]);;
 
 (* Helper: membership in diff *)
-let IN_DIFF_CONTRAPOS = prove
- (`!s t x:A. x IN s /\ ~(x IN t) ==> x IN s DIFF t`,
-  REWRITE_TAC[IN_DIFF]);;
 
-(* Helper: subset and image *)
-let SUBSET_IMAGE_INJ = prove
- (`!f:A->B s t. (!x y. x IN s /\ y IN s /\ f x = f y ==> x = y) /\
-                 t SUBSET s
-                 ==> (IMAGE f t SUBSET IMAGE f s)`,
-  REWRITE_TAC[SUBSET; IN_IMAGE] THEN MESON_TAC[]);;
 
-(* Helper: function values and intervals *)
-let IN_INTERVAL_1_2 = prove
- (`&1 / &2 < &1`,
-  REAL_ARITH_TAC);;
 
 (* Helper: image under injection preserves non-emptiness *)
 let IMAGE_EQ_EMPTY_INJ = prove
@@ -783,26 +770,11 @@ let REAL_INTERVAL_NONEMPTY_OPEN = prove
   ]);;
 
 (* Helper: open interval subset closed *)
-let REAL_INTERVAL_OPEN_SUBSET_CLOSED = prove
- (`!a b. a < b ==> real_interval(a,b) SUBSET real_interval[a,b]`,
-  REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
-(* Helper: conditional equality *)
-let COND_EXPAND_EQ = prove
- (`!b x y z. (if b then x else y) = z <=> (b ==> x = z) /\ (~b ==> y = z)`,
-  MESON_TAC[]);;
 
-(* Helper: negation of conditional equality *)
-let COND_NE_EXPAND = prove
- (`!b x y z. ~((if b then x else y) = z) <=> (b /\ ~(x = z)) \/ (~b /\ ~(y = z))`,
-  MESON_TAC[]);;
 
 (* Note: Conditional set membership: use MESON_TAC directly *)
 
-(* Helper: unit interval contains specific points *)
-let UNIT_INTERVAL_ENDPOINTS = prove
- (`&0 IN real_interval[&0,&1] /\ &1 IN real_interval[&0,&1]`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
 (* Note: HALF_IN_UNIT_INTERVAL already defined (duplicate) *)
 
@@ -905,10 +877,6 @@ let IN_COND_INTERVAL = prove
   MESON_TAC[]);;
 
 (* Helper: open intervals *)
-let REAL_INTERVAL_OPEN_NONEMPTY = prove
- (`!a b. a < b ==> ?x. x IN real_interval(a,b)`,
-  REPEAT STRIP_TAC THEN EXISTS_TAC `(a + b) / &2` THEN
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN ASM_REAL_ARITH_TAC);;
 
 (* Note: More real arithmetic (multiplication associativity, zero identities,
    distributivity, negation/subtraction): use REAL_ARITH_TAC directly *)
@@ -980,19 +948,12 @@ let REAL_MUL_RINV = prove
 (* Note: IMAGE intersection subset - basic SET_TAC *)
 
 (* Helper: preimage basic *)
-let IN_PREIMAGE = prove
- (`!f s x. x IN {y | f y IN s} <=> f x IN s`,
-  SET_TAC[]);;
 
 (* Helper: function extensionality *)
 let FUN_EQ = prove
  (`!f g. (!x. f x = g x) <=> f = g`,
   REWRITE_TAC[FUN_EQ_THM]);;
 
-(* Helper: composition associativity *)
-let o_ASSOC = prove
- (`!f g h. f o (g o h) = (f o g) o h`,
-  REWRITE_TAC[o_ASSOC]);;
 
 
 
