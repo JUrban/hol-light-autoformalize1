@@ -1032,125 +1032,34 @@ let FINITE_UNION_EQ = prove
 (* Note: CARD_CLAUSES, CARD_SING, NUM addition - all library lemmas or ARITH_TAC *)
 
 (* Helper: simple arithmetic *)
-let NUM_MUL_COMM = prove
- (`!m n. m * n = n * m`,
-  ARITH_TAC);;
 
-(* Helper: simple arithmetic *)
-let NUM_MUL_ASSOC = prove
- (`!m n p. (m * n) * p = m * (n * p)`,
-  ARITH_TAC);;
 
-(* Helper: zero *)
-let NUM_ADD_0 = prove
- (`!n. 0 + n = n /\ n + 0 = n`,
-  ARITH_TAC);;
 
-(* Helper: one *)
-let NUM_MUL_1 = prove
- (`!n. 1 * n = n /\ n * 1 = n`,
-  ARITH_TAC);;
 
-(* Helper: comparison *)
-let NUM_LE_REFL = prove
- (`!n. n <= n`,
-  ARITH_TAC);;
 
-(* Helper: comparison *)
-let NUM_LT_IRREFL = prove
- (`!n. ~(n < n)`,
-  ARITH_TAC);;
 
-(* Helper: comparison *)
-let NUM_LE_ANTISYM = prove
- (`!m n. m <= n /\ n <= m <=> m = n`,
-  ARITH_TAC);;
 
-(* Helper: successor *)
-let NUM_SUC_ADD = prove
- (`!n. SUC n = n + 1`,
-  ARITH_TAC);;
 
-(* Helper: zero less than successor *)
-let NUM_0_LT_SUC = prove
- (`!n. 0 < SUC n`,
-  ARITH_TAC);;
 
-(* Helper: half less than one *)
-let REAL_HALF_LT_1 = prove
- (`&1 / &2 < &1`,
-  REAL_ARITH_TAC);;
 
-(* Helper: zero less than half *)
-let REAL_0_LT_HALF = prove
- (`&0 < &1 / &2`,
-  REAL_ARITH_TAC);;
 
-(* Helper: half in bounds *)
-let REAL_HALF_BETWEEN_0_1 = prove
- (`&0 <= &1 / &2 /\ &1 / &2 <= &1`,
-  REAL_ARITH_TAC);;
 
-(* Helper: one in open interval *)
-let REAL_1_IN_HALF_OPEN = prove
- (`&1 / &2 < &1 /\ &1 < &1 + &1`,
-  REAL_ARITH_TAC);;
 
-(* Helper: topspace equality *)
-let TOPSPACE_EQ = prove
- (`!top s. topspace (subtopology top s) = topspace top INTER s`,
-  REWRITE_TAC[TOPSPACE_SUBTOPOLOGY]);;
 
-(* Helper: open in subtopology whole space *)
-let OPEN_IN_SUBTOPOLOGY_REFL = prove
- (`!top s. open_in (subtopology top s) (topspace top INTER s)`,
-  REWRITE_TAC[GSYM TOPSPACE_SUBTOPOLOGY; OPEN_IN_TOPSPACE]);;
 
 (* Helper: closed interval subset *)
 
-(* Helper: 1 in half-open interval *)
-let REAL_1_IN_INTERVAL = prove
- (`&1 IN real_interval(&1 / &2, &1 + &1)`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
-(* Helper: image subset image *)
-let IMAGE_SUBSET_IMAGE = prove
- (`!f s t. s SUBSET t ==> IMAGE f s SUBSET IMAGE f t`,
-  REWRITE_TAC[SUBSET; IN_IMAGE] THEN MESON_TAC[]);;
 
 (* Note: SUBSET_REFL is available from library *)
 
-(* Helper: conditional not equal *)
-let COND_NOT_EQ = prove
- (`!b x y z. b /\ ~(x = z) ==> ~((if b then x else y) = z)`,
-  MESON_TAC[]);;
 
-(* Helper: conditional equal case *)
-let COND_EQ_CASE_T = prove
- (`!x y z. (if T then x else y) = z <=> x = z`,
-  REWRITE_TAC[]);;
 
-(* Helper: conditional equal case *)
-let COND_EQ_CASE_F = prove
- (`!x y z. (if F then x else y) = z <=> y = z`,
-  REWRITE_TAC[]);;
 
-(* Helper: inequality strict *)
-let REAL_LT_NE = prove
- (`!x y. x < y ==> ~(x = y)`,
-  REAL_ARITH_TAC);;
 
 (* Helper: between bounds *)
 
-(* Helper: image of function *)
-let IN_IMAGE_F = prove
- (`!f x s. x IN s ==> f x IN IMAGE f s`,
-  REWRITE_TAC[IN_IMAGE] THEN MESON_TAC[]);;
 
-(* Helper: subset from member *)
-let SUBSET_FROM_MEMBER = prove
- (`!s t. (!x. x IN s ==> x IN t) <=> s SUBSET t`,
-  REWRITE_TAC[SUBSET]);;
 
 
 (* Helper: pair equality *)
@@ -1321,14 +1230,7 @@ let REAL_INTERVAL_NONEMPTY_CLOSED = prove
   REWRITE_TAC[REAL_INTERVAL_NE_EMPTY]);;
 
 (* Helper: subset of self *)
-let DIFF_EQ_EMPTY = prove
- (`!s. s DIFF s = {}`,
-  SET_TAC[]);;
 
-(* Helper: real subtraction *)
-let REAL_SUB_REFL = prove
- (`!x. x - x = &0`,
-  REAL_ARITH_TAC);;
 
 (* Helper: real negation *)
 let REAL_NEG_0 = prove
