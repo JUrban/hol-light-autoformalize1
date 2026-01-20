@@ -424,6 +424,14 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
         (* The (=>) direction needs the separation property from textbook *)
         REPEAT STRIP_TAC THEN EQ_TAC THENL
          [(*=> direction: preimage open ==> u open (hard - needs separation)  *)
+          (* Goal: open_in (subtopology product (IMAGE g topspace)) u *)
+          (* Assume: u SUBSET IMAGE g topspace /\ *)
+          (*         open_in top {x | x IN topspace /\ g x IN u} *)
+          DISCH_TAC THEN
+          (* Use OPEN_IN_SUBTOPOLOGY: need to find v open in product with u = v INTER IMAGE *)
+          (* Since u SUBSET IMAGE g topspace, if we show u open in product, we're done *)
+          (* Strategy: Show u is open in full product_topology using separation property *)
+          (* This requires: cylinder sets, point separation, and textbook argument *)
           CHEAT_TAC;
           (* <= direction: u open ==> preimage open (follows from continuity) *)
           DISCH_TAC THEN
