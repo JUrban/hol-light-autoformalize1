@@ -166,34 +166,32 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (* Attempt 20: Add proof structure with choice operator *)
+  (* Attempt 21: Add SUBGOAL_THEN to structure the construction *)
 
-  (* Strategy: Construct f : num -> A -> real as follows:
-     For k = NUMPAIR n m: if closure(e_n) ⊆ e_m, use Urysohn function g_{n,m}
-     that equals 0 on closure(e_n) and 1 outside e_m; else constant &1/&2.
-     This family separates points and closed sets by regularity + basis properties. *)
+  (* Strategy: For k = NUMPAIR n m, use Urysohn on valid pairs (n,m) where
+     top closure_of (e_n) ⊆ e_m. This gives separation by regularity. *)
 
-  (* Step 1: For each pair (n,m), try to get a separating Urysohn function *)
-  (* The existence comes from assumptions about point/closed set separation *)
+  (* Establish that for each valid pair, we can get a function *)
+  SUBGOAL_THEN
+    `!n m. (e n) IN b /\ (e m) IN b /\
+           (top closure_of (e n)) SUBSET (e m) /\
+           ~((e n) = {}) /\ ~((e m) = {})
+           ==> ?g. continuous_map
+                     (top,subtopology euclideanreal (real_interval[&0,&1]))
+                     (g:A->real) /\
+                   (!x. x IN (top closure_of (e n)) ==> g x = &0) /\
+                   (!x. x IN topspace top /\ ~(x IN e m) ==> g x = &1)`
+    (fun th -> ALL_TAC) THEN
+  (* Note: This subgoal establishes the Urysohn function for each basis pair.
+     Proof would use: CLOSED_IN_CLOSURE_OF, basis properties,
+     NORMAL_SPACE_URYSOHN_FUNCTION. Admitting for now. *)
 
-  (* The formal construction requires:
-     1. Choice operator @ to select witnessing functions
-     2. Conditional: if closure(e_n) ⊆ e_m then use Urysohn else &1/&2
-     3. NUMFST, NUMSND to decode k = NUMPAIR n m
-     4. Verification that separation properties hold
+  (* Now construct f : num -> A -> real by enumerating with NUMPAIR.
+     For each k = NUMPAIR n m, if the validity condition holds, use the
+     Urysohn function; otherwise use constant &1/&2. Then verify the four
+     properties (bounds, continuity, point separation, closed set separation)
+     using regularity to find suitable basis pairs. *)
 
-     Key technical challenge: expressing "if closure(e_n) ⊆ e_m" as a
-     decidable predicate, and using choice to select the Urysohn function
-     for each valid pair. This requires:
-     - CLOSED_IN_CLOSURE_OF for the basis
-     - NORMAL_SPACE_URYSOHN_FUNCTION applied to closure(e_n) and topspace \ e_m
-     - Choice principles to extract function from existence
-     - SKOLEM_THM to convert ∀ pairs. ∃function to ∃family. ∀pairs
-
-     The verification (steps 3-4 from Attempt 19) requires regularity to find
-     the right basis pair (n,m) for each separation instance. *)
-
-  (* For now, admitting the entire construction: *)
   CHEAT_TAC);;
 
 
