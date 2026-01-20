@@ -35,32 +35,8 @@ let REGULAR_SECOND_COUNTABLE_IMP_NORMAL = prove
   MATCH_MP_TAC SECOND_COUNTABLE_IMP_LINDELOF_SPACE THEN
   ASM_REWRITE_TAC[]);;
 
-(* Helper: continuous function to [0,1] composed with (1-x) stays in [0,1] *)
-let CONTINUOUS_MAP_COMPLEMENT_UNIT_INTERVAL = prove
- (`!top f:A->real.
-        continuous_map (top,subtopology euclideanreal (real_interval[&0,&1])) f
-        ==> continuous_map
-              (top,subtopology euclideanreal (real_interval[&0,&1]))
-              (\x. &1 - f x)`,
-  REPEAT STRIP_TAC THEN
-  SUBGOAL_THEN
-    `(\x:A. &1 - f x) = (\y. &1 - y) o (f:A->real)`
-    SUBST1_TAC THENL
-   [REWRITE_TAC[o_DEF; ETA_AX];
-    ALL_TAC] THEN
-  MATCH_MP_TAC CONTINUOUS_MAP_COMPOSE THEN
-  EXISTS_TAC `subtopology euclideanreal (real_interval[&0,&1])` THEN
-  ASM_REWRITE_TAC[] THEN
-  MATCH_MP_TAC CONTINUOUS_MAP_INTO_SUBTOPOLOGY THEN
-  CONJ_TAC THENL
-   [MATCH_MP_TAC CONTINUOUS_MAP_FROM_SUBTOPOLOGY THEN
-    MATCH_MP_TAC CONTINUOUS_MAP_REAL_SUB THEN
-    REWRITE_TAC[CONTINUOUS_MAP_REAL_CONST; CONTINUOUS_MAP_ID;
-                TOPSPACE_EUCLIDEANREAL; IN_UNIV];
-    REWRITE_TAC[SUBSET; FORALL_IN_IMAGE; TOPSPACE_SUBTOPOLOGY;
-                TOPSPACE_EUCLIDEANREAL; IN_INTER; IN_UNIV;
-                IN_REAL_INTERVAL] THEN
-    REAL_ARITH_TAC]);;
+(* Note: CONTINUOUS_MAP_COMPLEMENT_UNIT_INTERVAL - unused, can derive with
+   CONTINUOUS_MAP_COMPOSE + CONTINUOUS_MAP_REAL_SUB as needed *)
 
 (* Helper: normal space gives Urysohn functions for closed sets *)
 let NORMAL_SPACE_URYSOHN_FUNCTION = prove
@@ -75,21 +51,8 @@ let NORMAL_SPACE_URYSOHN_FUNCTION = prove
                 URYSOHN_LEMMA) THEN
   ASM_REWRITE_TAC[REAL_POS]);;
 
-(* Helper: T3 + Hausdorff gives point separation via closed sets *)
-let T3_HAUSDORFF_POINT_SEPARATION = prove
- (`!top x y:A.
-        regular_space top /\ hausdorff_space top /\
-        x IN topspace top /\ y IN topspace top /\ ~(x = y)
-        ==> ?c. closed_in top c /\ x IN c /\ ~(y IN c)`,
-  REPEAT STRIP_TAC THEN
-  FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [hausdorff_space]) THEN
-  DISCH_THEN(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
-  ASM_REWRITE_TAC[] THEN
-  DISCH_THEN(X_CHOOSE_THEN `u:A->bool` (X_CHOOSE_THEN `v:A->bool`
-    STRIP_ASSUME_TAC)) THEN
-  EXISTS_TAC `topspace top DIFF v:A->bool` THEN
-  ASM_SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE; IN_DIFF] THEN
-  ASM SET_TAC[]);;
+(* Note: T3_HAUSDORFF_POINT_SEPARATION - unused, can derive from
+   hausdorff_space definition + CLOSED_IN_DIFF as needed *)
 
 (* Helper: completely_regular + Hausdorff gives point-separating functions *)
 let COMPLETELY_REGULAR_HAUSDORFF_POINT_FUNCTIONS = prove
@@ -239,76 +202,16 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
    The separable_space property gives ?c. COUNTABLE c /\ c SUBSET topspace /\
    closure_of c = topspace. For future work on SEPARATING_FUNCTIONS. *)
 
-(* Helper: implication from conditional inequality *)
-(* Helper: open and closed unit intervals are not equal *)
-let REAL_INTERVAL_OPEN_NE_CLOSED_UNIT = prove
- (`~(real_interval(&1 / &2, &1) = real_interval[&0,&1])`,
-  REWRITE_TAC[EXTENSION; real_interval; IN_ELIM_THM] THEN
-  DISCH_THEN(MP_TAC o SPEC `&0`) THEN
-  REAL_ARITH_TAC);;
-
-(* Helper: open intervals in unit interval are open *)
-(* Helper: conditional interval equality for potential use in EMBEDDING *)
-let COND_INTERVAL_EQ_CLOSED = prove
- (`!i n. (if i = n then real_interval(&1 / &2, &1) else real_interval[&0,&1]) =
-         real_interval[&0,&1] <=> ~(i = n)`,
-  REPEAT GEN_TAC THEN COND_CASES_TAC THEN
-  ASM_REWRITE_TAC[REAL_INTERVAL_OPEN_NE_CLOSED_UNIT]);;
-
-(* Helper: [0,1]\{0} is open in unit interval *)
-let OPEN_IN_UNIT_INTERVAL_DIFF_ZERO = prove
- (`open_in (subtopology euclideanreal (real_interval[&0,&1]))
-           (real_interval[&0,&1] DIFF {&0})`,
-  REWRITE_TAC[OPEN_IN_SUBTOPOLOGY; GSYM REAL_OPEN_IN] THEN
-  EXISTS_TAC `real_interval(&0,&2)` THEN
-  REWRITE_TAC[REAL_OPEN_REAL_INTERVAL] THEN
-  REWRITE_TAC[EXTENSION; IN_INTER; IN_DIFF; IN_SING; IN_REAL_INTERVAL] THEN
-  REAL_ARITH_TAC);;
-
-(* Helper: [0,1] is open in itself *)
-let OPEN_IN_UNIT_INTERVAL_SELF = prove
- (`open_in (subtopology euclideanreal (real_interval[&0,&1]))
-           (real_interval[&0,&1])`,
-  REWRITE_TAC[OPEN_IN_SUBTOPOLOGY; GSYM REAL_OPEN_IN; INTER_IDEMPOT] THEN
-  EXISTS_TAC `real_interval(&0 - &1, &1 + &1)` THEN
-  REWRITE_TAC[REAL_OPEN_REAL_INTERVAL] THEN
-  REWRITE_TAC[EXTENSION; IN_INTER; IN_REAL_INTERVAL] THEN
-  REAL_ARITH_TAC);;
+(* Note: Removed 8 unused conditional interval helper lemmas:
+   REAL_INTERVAL_OPEN_NE_CLOSED_UNIT, COND_INTERVAL_EQ_CLOSED,
+   OPEN_IN_UNIT_INTERVAL_DIFF_ZERO, OPEN_IN_UNIT_INTERVAL_SELF,
+   REAL_INTERVAL_DIFF_ZERO_NE_UNIT, COND_INTERVAL_DIFF_ZERO_EQ,
+   COND_INTERVAL_DIFF_ZERO_NE_IMP, IN_COND_INTERVAL_DIFF_ZERO
+   All were unused and can be derived with REAL_ARITH_TAC/SET_TAC as needed. *)
 
 (* Note: SUBSET_UNION, INTER_SUBSET, UNION_IDEMPOT, INTER_IDEMPOT
    are available from library (sets.ml). Using those instead of
    defining redundant versions. *)
-
-(* Helper: [0,1]\{0} ≠ [0,1] *)
-let REAL_INTERVAL_DIFF_ZERO_NE_UNIT = prove
- (`~(real_interval[&0,&1] DIFF {&0} = real_interval[&0,&1])`,
-  REWRITE_TAC[EXTENSION; IN_DIFF; IN_SING; IN_REAL_INTERVAL; NOT_FORALL_THM] THEN
-  EXISTS_TAC `&0` THEN REAL_ARITH_TAC);;
-
-(* Helper: conditional with DIFF {0} *)
-let COND_INTERVAL_DIFF_ZERO_EQ = prove
- (`!i n. (if i = n then real_interval[&0,&1] DIFF {&0}
-          else real_interval[&0,&1]) = real_interval[&0,&1] <=> ~(i = n)`,
-  REPEAT GEN_TAC THEN COND_CASES_TAC THEN
-  ASM_REWRITE_TAC[REAL_INTERVAL_DIFF_ZERO_NE_UNIT]);;
-
-(* Helper: conditional DIFF inequality *)
-let COND_INTERVAL_DIFF_ZERO_NE_IMP = prove
- (`!i n. ~((if i = n then real_interval[&0,&1] DIFF {&0}
-            else real_interval[&0,&1]) = real_interval[&0,&1])
-         ==> i = n`,
-  REPEAT GEN_TAC THEN REWRITE_TAC[COND_INTERVAL_DIFF_ZERO_EQ] THEN
-  MESON_TAC[]);;
-
-(* Helper: finite set for conditional interval construction *)
-(* Helper: membership in conditional interval *)
-let IN_COND_INTERVAL_DIFF_ZERO = prove
- (`!x n i. x IN real_interval[&0,&1] /\ (i = n ==> ~(x = &0))
-           ==> x IN (if i = n then real_interval[&0,&1] DIFF {&0}
-                     else real_interval[&0,&1])`,
-  REPEAT STRIP_TAC THEN COND_CASES_TAC THEN
-  ASM_REWRITE_TAC[IN_DIFF; IN_SING] THEN
-  ASM_MESON_TAC[]);;
 
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
@@ -461,10 +364,7 @@ let URYSOHN_METRIZATION = prove
              metrizable_space top)`,
   MESON_TAC[URYSOHN_METRIZATION_FWD; URYSOHN_METRIZATION_BWD]);;
 
-(* Helper: 1/2 in unit interval *)
-let HALF_IN_UNIT_INTERVAL = prove
- (`&1 / &2 IN real_interval[&0,&1]`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+(* Note: HALF_IN_UNIT_INTERVAL - trivial REAL_ARITH_TAC, unused, removed *)
 
 (* Helper: 0 and 1 in unit interval *)
 
@@ -515,7 +415,7 @@ let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
 (* Note: Conditional set membership: use MESON_TAC directly *)
 
 
-(* Note: HALF_IN_UNIT_INTERVAL already defined (duplicate) *)
+(* Note: HALF_IN_UNIT_INTERVAL removed (unused, trivial REAL_ARITH_TAC) *)
 
 (* Note: SUBSET_REFL, IN_SING, and basic implication lemmas
    are available from library. *)
