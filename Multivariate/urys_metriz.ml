@@ -191,8 +191,6 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
 
   CHEAT_TAC);;
 
-
-
 (* Note: Pairing function NUMPAIR and properties NUMPAIR_INJ, NUMPAIR_DEST
    are available from the library (ind_types.ml). Use those instead of
    defining custom pairing functions, per CLAUDE.md guidance to avoid
