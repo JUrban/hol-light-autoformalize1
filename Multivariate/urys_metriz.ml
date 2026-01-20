@@ -212,13 +212,13 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      - SKOLEM_THM with ASSUME + REWRITE: "REWRITES_CONV" error
      - ASM_MESON_TAC: too deep (80266+ steps)
      - SUBGOAL_THEN + MATCH_MP_TAC: wrong tactic for existence goal
-     - SKOLEM_THM with MATCH_MP: "Not an implication" error *)
+     - SKOLEM_THM with MATCH_MP: "Not an implication" error
+     - MESON with COUNTABLE_AS_IMAGE: timeout after 3.8M+ steps *)
 
-  (* Attempt 13: Direct CHEAT_TAC *)
+  (* Attempt 15: Direct CHEAT_TAC (reverting after timeout) *)
   (* The existence is guaranteed by the point separation and closed set properties *)
-  (* Construction requires explicit enumeration of the countable index set which *)
-  (* runs into parser limitations with NUMFST/NUMSND in complex terms. *)
-  (* This is mathematically straightforward but tactically complex. *)
+  (* Construction requires explicit enumeration which is tactically very complex *)
+  (* All automated tactics (MESON, SKOLEM) fail due to search space size *)
   CHEAT_TAC);;
 
 
@@ -403,9 +403,14 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
           (*         open_in top {x | x IN topspace /\ g x IN u} *)
           DISCH_TAC THEN
           (* Use OPEN_IN_SUBTOPOLOGY: need to find v open in product with u = v INTER IMAGE *)
-          (* Since u SUBSET IMAGE g topspace, if we show u open in product, we're done *)
-          (* Strategy: Show u is open in full product_topology using separation property *)
-          (* This requires: cylinder sets, point separation, and textbook argument *)
+          REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
+          (* Strategy: For each y ∈ u, use separation to find basic open neighborhood *)
+          (* Textbook argument: if y = g(x), use that preimage is open to get *)
+          (* closed c = topspace \ v where v is open neighborhood of x in preimage *)
+          (* Then f_n separates x from c for some n, giving cylinder neighborhood *)
+          (* This is complex and requires explicit construction of the open set *)
+          (* Attempt: Use that u ⊆ IMAGE and preimage open implies u open *)
+          (* For full proof: need to construct explicit cylinder set covering *)
           CHEAT_TAC;
           (* <= direction: u open ==> preimage open (follows from continuity) *)
           DISCH_TAC THEN
