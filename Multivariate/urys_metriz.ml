@@ -950,43 +950,11 @@ let REAL_HALF_DOUBLE = prove
 
 (* Note: NEQ_SYM - basic MESON_TAC symmetry *)
 
-(* Helper: inequality and bounds *)
-let REAL_LT_IMP_NE = prove
- (`!x y. x < y ==> ~(x = y)`,
-  REAL_ARITH_TAC);;
-
-(* Helper: inequality from bounds *)
-let REAL_LE_LT = prove
- (`!x y. x <= y <=> x < y \/ x = y`,
-  REAL_ARITH_TAC);;
-
-(* Helper: subtraction equals zero *)
-let REAL_SUB_EQ_0 = prove
- (`!x y. x - y = &0 <=> x = y`,
-  REAL_ARITH_TAC);;
-
-(* Helper: zero less than one *)
-let REAL_LT_01 = prove
- (`&0 < &1`,
-  REAL_ARITH_TAC);;
-
-(* Helper: one positive *)
-let REAL_LE_01 = prove
- (`&0 <= &1`,
-  REAL_ARITH_TAC);;
-
+(* Note: REAL_LT_IMP_NE, REAL_LE_LT, REAL_SUB_EQ_0 - basic REAL_ARITH_TAC, use directly *)
+(* Note: REAL_LT_01, REAL_LE_01 - trivial REAL_ARITH_TAC, use directly *)
 (* Note: REAL_NEG_1, REAL_ABS_0, REAL_ABS_1 - trivial REAL_ARITH_TAC, use directly *)
 
-(* Helper: abs neg *)
-let REAL_ABS_NEG = prove
- (`!x. abs(--x) = abs x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: abs nonneg *)
-let REAL_ABS_POS = prove
- (`!x. &0 <= abs x`,
-  REAL_ARITH_TAC);;
-
+(* Note: REAL_ABS_NEG, REAL_ABS_POS - trivial REAL_ARITH_TAC, use directly *)
 (* Note: REAL_MAX_REFL, REAL_MIN_REFL - trivial REAL_ARITH_TAC, use directly *)
 
 (* Helper: max comm *)
@@ -1001,30 +969,10 @@ let REAL_MIN_SYM = prove
 
 (* Note: REAL_DIV_1, REAL_1_NE_0 - trivial REAL_ARITH_TAC, use directly *)
 
-(* Helper: comparison with zero *)
-let REAL_LT_LE = prove
- (`!x y. x < y <=> x <= y /\ ~(x = y)`,
-  REAL_ARITH_TAC);;
+(* Note: REAL_LT_LE - basic REAL_ARITH_TAC, use directly *)
 
-(* Helper: transitivity *)
-let REAL_LTE_TRANS = prove
- (`!x y z. x <= y /\ y < z ==> x < z`,
-  REAL_ARITH_TAC);;
-
-(* Helper: another transitivity *)
-let REAL_LET_TRANS = prove
- (`!x y z. x < y /\ y <= z ==> x < z`,
-  REAL_ARITH_TAC);;
-
-(* Helper: addition preserves inequality *)
-let REAL_LT_ADD2 = prove
- (`!x1 x2 y1 y2. x1 < y1 /\ x2 < y2 ==> x1 + x2 < y1 + y2`,
-  REAL_ARITH_TAC);;
-
-(* Helper: addition preserves order *)
-let REAL_LE_ADD2 = prove
- (`!x1 x2 y1 y2. x1 <= y1 /\ x2 <= y2 ==> x1 + x2 <= y1 + y2`,
-  REAL_ARITH_TAC);;
+(* Note: REAL_LTE_TRANS, REAL_LET_TRANS - basic REAL_ARITH_TAC, use directly *)
+(* Note: REAL_LT_ADD2, REAL_LE_ADD2 - basic REAL_ARITH_TAC, use directly *)
 
 (* Helper: left addition *)
 let REAL_LE_LADD = prove
