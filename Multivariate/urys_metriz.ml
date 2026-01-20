@@ -582,25 +582,13 @@ let IMAGE_SUBSET_FROM_POINTWISE = prove
 
 
 (* Helper: topspace of unit interval subtopology *)
-let TOPSPACE_UNIT_INTERVAL = prove
- (`topspace (subtopology euclideanreal (real_interval[&0,&1])) =
-   real_interval[&0,&1]`,
-  REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL; INTER_UNIV]);;
 
 (* Helper: membership in conditional sets *)
 let IN_COND_SET = prove
  (`!b s t x. x IN (if b then s else t) <=> if b then x IN s else x IN t`,
   MESON_TAC[]);;
 
-(* Helper: function value in range *)
-let FUNCTION_IN_RANGE = prove
- (`!f s x. x IN s /\ (!y. y IN s ==> f y IN t) ==> f x IN t`,
-  SIMP_TAC[]);;
 
-(* Helper: pointwise comparison of functions *)
-let FUNCTION_POINTWISE_EQ = prove
- (`!f g s. (!x. x IN s ==> f x = g x) /\ x IN s ==> f x = g x`,
-  SIMP_TAC[]);;
 
 (* Helper: real number between bounds *)
 let REAL_BETWEEN_BOUNDS = prove
@@ -651,11 +639,6 @@ let CONTINUOUS_MAP_RANGE_SUBSET = prove
   SIMP_TAC[CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE]);;
 
 (* Helper: product topology basics *)
-let CARTESIAN_PRODUCT_SUBSET = prove
- (`!k u v. (!i. u i SUBSET v i)
-           ==> cartesian_product k u SUBSET cartesian_product k v`,
-  REWRITE_TAC[SUBSET; cartesian_product; IN_ELIM_THM] THEN
-  SIMP_TAC[]);;
 
 (* Helper: image under lambda *)
 let IMAGE_LAMBDA_EXTENSIONAL = prove
@@ -677,10 +660,6 @@ let IN_INTERVAL_CONDITIONAL = prove
          (~b ==> x IN real_interval[a2,b2])`,
   MESON_TAC[]);;
 
-(* Helper: function equality from pointwise *)
-let FUNCTION_EQ_POINTWISE = prove
- (`!f g. (!x. f x = g x) <=> f = g`,
-  REWRITE_TAC[FUN_EQ_THM]);;
 
 (* Helper: embedding map injectivity *)
 let EMBEDDING_MAP_IMP_INJECTIVE = prove
@@ -713,24 +692,10 @@ let REAL_INTERVAL_NONEMPTY_OPEN = prove
 
 (* Helper: conditional equality cases *)
 
-(* Helper: forall with conditional *)
-let FORALL_COND = prove
- (`!P b x y. (!z. (if b then z = x else z = y) ==> P z) <=>
-             (b ==> P x) /\ (~b ==> P y)`,
-  MESON_TAC[]);;
 
-(* Helper: exists with conditional *)
-let EXISTS_COND = prove
- (`!P b x y. (?z. (if b then z = x else z = y) /\ P z) <=>
-             (b /\ P x) \/ (~b /\ P y)`,
-  MESON_TAC[]);;
 
 (* Note: CONJ_IMP is basic MESON_TAC property *)
 
-(* Helper: disjunction elimination *)
-let DISJ_IMP_IMP = prove
- (`!p q r. (p \/ q ==> r) <=> (p ==> r) /\ (q ==> r)`,
-  MESON_TAC[]);;
 
 (* Helper: union singleton *)
 let UNION_SING = prove
@@ -955,9 +920,6 @@ let FORALL_PAIR = prove
 
 
 (* Helper: image of constant *)
-let IMAGE_CONST = prove
- (`!c s. ~(s = {}) ==> IMAGE (\x. c) s = {c}`,
-  REWRITE_TAC[EXTENSION; IN_IMAGE; IN_SING] THEN SET_TAC[]);;
 
 (* Helper: preimage of singleton *)
 let PREIMAGE_SING = prove
@@ -1129,9 +1091,6 @@ let DIFF_SUBSET = prove
 (* Note: IMAGE_UNION is in library *)
 
 (* Helper: topspace of euclideanreal *)
-let TOPSPACE_EUCLIDEANREAL_UNIV = prove
- (`topspace euclideanreal = (:real)`,
-  REWRITE_TAC[TOPSPACE_EUCLIDEANREAL]);;
 
 (* Helper: real interval arithmetic *)
 
@@ -1139,10 +1098,6 @@ let TOPSPACE_EUCLIDEANREAL_UNIV = prove
 
 (* Note: De Morgan's laws - basic SET_TAC *)
 
-(* Helper: double complement *)
-let DIFF_DIFF_SUBSET = prove
- (`!s t u. s SUBSET u ==> u DIFF (u DIFF s) = s`,
-  SET_TAC[]);;
 
 (* Helper: distributivity *)
 let INTER_UNION_DISTRIB_LEFT = prove
