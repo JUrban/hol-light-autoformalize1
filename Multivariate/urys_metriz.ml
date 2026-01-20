@@ -875,17 +875,8 @@ let INSERT_SUBSET_SIMPLE = prove
 (* Note: FINITE_SING, FINITE_EMPTY, FINITE_UNION, FINITE_INSERT, SUBSET_ANTISYM_EQ
    are available from library *)
 
-(* Note: De Morgan laws, DIFF distributivity: use SET_TAC directly *)
-
-(* Helper: union assoc *)
-let UNION_ASSOC_SIMPLE = prove
- (`!s t u. (s UNION t) UNION u = s UNION (t UNION u)`,
-  REWRITE_TAC[UNION_ASSOC]);;
-
-(* Helper: inter assoc *)
-let INTER_ASSOC_SIMPLE = prove
- (`!s t u. (s INTER t) INTER u = s INTER (t INTER u)`,
-  REWRITE_TAC[INTER_ASSOC]);;
+(* Note: De Morgan laws, DIFF distributivity, UNION_ASSOC, INTER_ASSOC: use SET_TAC or
+   REWRITE_TAC with library lemmas directly *)
 
 (* Helper: union idempotent *)
 let UNION_IDEMP = prove
@@ -2222,15 +2213,7 @@ let DISJ_CASES_SIMPLE = prove
  (`!p q r. (p \/ q) /\ (p ==> r) /\ (q ==> r) ==> r`,
   MESON_TAC[]);;
 
-(* Helper: equality symmetry *)
-let EQ_SYM_SIMPLE = prove
- (`!x y. x = y ==> y = x`,
-  MESON_TAC[]);;
-
-(* Helper: transitivity of equality *)
-let EQ_TRANS_SIMPLE = prove
- (`!x y z. x = y /\ y = z ==> x = z`,
-  MESON_TAC[]);;
+(* Note: Equality symmetry and transitivity: use MESON_TAC directly *)
 
 (* Helper: conjunction and implication *)
 let CONJ_IMP = prove
