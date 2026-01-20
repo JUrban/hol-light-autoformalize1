@@ -305,35 +305,9 @@ let OPEN_IN_COND_INTERVAL_DIFF_ZERO = prove
   REPEAT GEN_TAC THEN COND_CASES_TAC THEN
   ASM_REWRITE_TAC[OPEN_IN_UNIT_INTERVAL_DIFF_ZERO; OPEN_IN_UNIT_INTERVAL_SELF]);;
 
-(* Helper: simple set lemma *)
-let SUBSET_UNION_LEFT = prove
- (`!s t. s SUBSET s UNION t`,
-  SET_TAC[]);;
-
-(* Helper: simple set lemma *)
-let SUBSET_UNION_RIGHT = prove
- (`!s t. t SUBSET s UNION t`,
-  SET_TAC[]);;
-
-(* Helper: inter subset left *)
-let INTER_SUBSET_LEFT = prove
- (`!s t. s INTER t SUBSET s`,
-  SET_TAC[]);;
-
-(* Helper: inter subset right *)
-let INTER_SUBSET_RIGHT = prove
- (`!s t. s INTER t SUBSET t`,
-  SET_TAC[]);;
-
-(* Helper: union idempotent *)
-let UNION_IDEM = prove
- (`!s. s UNION s = s`,
-  SET_TAC[]);;
-
-(* Helper: inter idempotent *)
-let INTER_IDEM = prove
- (`!s. s INTER s = s`,
-  SET_TAC[]);;
+(* Note: SUBSET_UNION, INTER_SUBSET, UNION_IDEMPOT, INTER_IDEMPOT
+   are available from library (sets.ml). Using those instead of
+   defining redundant versions. *)
 
 (* Helper: conditional inequality for EMBEDDING proof *)
 let COND_INTERVAL_NE_IMP = prove
@@ -1635,7 +1609,7 @@ let EXISTS_IN_INSERT = prove
 (* Helper: finite union *)
 let FINITE_UNION_EQ = prove
  (`!s t. FINITE (s UNION t) <=> FINITE s /\ FINITE t`,
-  MESON_TAC[FINITE_UNION; FINITE_SUBSET; SUBSET_UNION_LEFT; SUBSET_UNION_RIGHT]);;
+  MESON_TAC[FINITE_UNION; FINITE_SUBSET; SUBSET_UNION]);;
 
 (* Helper: card empty *)
 let CARD_EMPTY_ALT = prove
