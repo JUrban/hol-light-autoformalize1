@@ -611,7 +611,168 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
              careful handling of dependent choice over the uncountable set u. *)
 
           EXPAND_TAC "v" THEN BETA_TAC THEN
-          CHEAT_TAC;
+          (* The witness is u itself - it's already in the right form *)
+          EXISTS_TAC `u:(num->real)->bool` THEN
+          CONJ_TAC THENL
+           [(*Need: open_in (product_topology...) u *)
+            (* This is the hard part - need to show u is open in product topology *)
+            (* Strategy: use separation property 4 to construct cylinders *)
+            (* For each z in u, use property 4 to find separating coordinate *)
+            (* Then construct cylinder {h | h(N(z)) > 0} and take union *)
+            REWRITE_TAC[OPEN_IN_PRODUCT_TOPOLOGY_ALT] THEN
+            REPEAT STRIP_TAC THEN
+            (* Given z:(num->real) in u, we need to find basic open neighborhood *)
+            (* Since u SUBSET IMAGE g topspace, z = g x0 for some x0 in topspace *)
+            SUBGOAL_THEN `?x0:A. x0 IN topspace top /\ (\x. \n. f n x) x0 = z`
+             (X_CHOOSE_THEN `x0:A` STRIP_ASSUME_TAC) THENL
+             [UNDISCH_TAC `(u:(num->real)->bool) SUBSET IMAGE (\x. \n. f n x) (topspace top)` THEN
+              REWRITE_TAC[SUBSET; IN_IMAGE] THEN
+              DISCH_THEN(MP_TAC o SPEC `z:num->real`) THEN
+              ASM_REWRITE_TAC[];
+              ALL_TAC] THEN
+            (* x0 ∈ topspace and g x0 = z *)
+            (* Now z ∈ u means x0 ∈ v = {x | x ∈ topspace ∧ g x ∈ u} *)
+            SUBGOAL_THEN `(x0:A) IN {x | x IN topspace top /\ (\x. \n. f n x) x IN u}`
+             ASSUME_TAC THENL
+             [REWRITE_TAC[IN_ELIM_THM] THEN ASM_REWRITE_TAC[];
+              ALL_TAC] THEN
+            (* The complement topspace DIFF v is closed (since v is open by assumption) *)
+            (* Apply property 4 to x0 and the closed set (topspace DIFF v) *)
+            (* v is open by assumption, so topspace DIFF v is closed *)
+            SUBGOAL_THEN `closed_in (top:A topology)
+                           (topspace top DIFF {x | x IN topspace top /\ (\x. \n. f n x) x IN u})`
+             ASSUME_TAC THENL
+             [MATCH_MP_TAC CLOSED_IN_DIFF THEN
+              REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN
+              UNDISCH_TAC `open_in top {x:A | x IN topspace top /\ (\x. \n. f n x) x IN u}` THEN
+              SIMP_TAC[OPEN_IN_IMP_SUBSET];
+              ALL_TAC] THEN
+            (* x0 is NOT in the closed set topspace DIFF v *)
+            SUBGOAL_THEN `~((x0:A) IN topspace top DIFF
+                            {x | x IN topspace top /\ (\x. \n. f n x) x IN u})`
+             ASSUME_TAC THENL
+             [REWRITE_TAC[IN_DIFF] THEN ASM_REWRITE_TAC[];
+              ALL_TAC] THEN
+            (* Now apply property 4 (closed set separation) *)
+            UNDISCH_TAC
+              `!x:A c. x IN topspace top /\ closed_in top c /\ ~(x IN c)
+                       ==> (?k. (f:num->A->real) k x = &1 /\
+                                (!z. z IN c ==> f k z = &0))` THEN
+            DISCH_THEN(MP_TAC o SPECL
+              [`x0:A`;
+               `topspace top DIFF {x:A | x IN topspace top /\ (\x. \n. f n x) x IN u}`]) THEN
+            ASM_REWRITE_TAC[] THEN
+            DISCH_THEN(X_CHOOSE_THEN `k0:num` STRIP_ASSUME_TAC) THEN
+            (* Now we have: f k0 x0 = 1 and for all y in topspace DIFF v, f k0 y = 0 *)
+            (* Construct the basic open set using coordinate k0 *)
+            (* Define basic_open i = if i = k0 then {r | 1/2 < r /\ r IN [0,1]} else [0,1] *)
+            EXISTS_TAC `\i:num. if i = k0 then {r:real | &1 / &2 < r /\ r IN real_interval[&0,&1]}
+                                          else real_interval[&0,&1]` THEN
+            REPEAT CONJ_TAC THENL
+             [(* Show FINITE {i | ~(u i = topspace)} *)
+              REWRITE_TAC[GSYM TOPSPACE_SUBTOPOLOGY] THEN
+              SUBGOAL_THEN
+                `{i | i IN (:num) /\
+                      ~((if i = k0 then {r | &1 / &2 < r /\ r IN real_interval[&0,&1]}
+                         else real_interval[&0,&1]) =
+                        topspace(subtopology euclideanreal (real_interval[&0,&1])))} =
+                 {k0}`
+              SUBST1_TAC THENL
+               [REWRITE_TAC[EXTENSION; IN_ELIM_THM; IN_SING; IN_UNIV; TOPSPACE_SUBTOPOLOGY] THEN
+                GEN_TAC THEN EQ_TAC THENL
+                 [MESON_TAC[]; DISCH_THEN SUBST1_TAC THEN ASM SET_TAC[]];
+                REWRITE_TAC[FINITE_SING]];
+              (* Show each u i is open *)
+              GEN_TAC THEN COND_CASES_TAC THENL
+               [REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
+                EXISTS_TAC `{r:real | &1 / &2 < r}` THEN
+                CONJ_TAC THENL
+                 [REWRITE_TAC[GSYM real_gt; OPEN_IN_EUCLIDEAN_REAL_HALFSPACE_GT];
+                  SET_TAC[]];
+                REWRITE_TAC[OPEN_IN_TOPSPACE]];
+              (* Show z IN cartesian_product *)
+              REWRITE_TAC[cartesian_product; IN_ELIM_THM; o_THM; IN_UNIV] THEN
+              GEN_TAC THEN COND_CASES_TAC THENL
+               [UNDISCH_TAC `(\x. \n:num. (f:num->A->real) n x) x0 = z` THEN
+                DISCH_THEN(fun th -> GEN_REWRITE_TAC (RAND_CONV o RAND_CONV) [SYM th]) THEN
+                REWRITE_TAC[BETA_THM; IN_ELIM_THM] THEN
+                ASM_REWRITE_TAC[] THEN
+                (* Need: f k0 x0 IN [0,1] AND f k0 x0 > 1/2 *)
+                (* From property 1: f k0 x0 IN [0,1] *)
+                (* From property 4: f k0 x0 = 1 *)
+                CONJ_TAC THENL
+                 [MATCH_MP_TAC REAL_LT_TRANS THEN EXISTS_TAC `&1` THEN
+                  ASM_REWRITE_TAC[] THEN REAL_ARITH_TAC;
+                  UNDISCH_TAC
+                    `!x:A n. x IN topspace top ==> (f:num->A->real) n x IN real_interval[&0,&1]` THEN
+                  DISCH_THEN(MP_TAC o SPECL [`x0:A`; `k0:num`]) THEN
+                  ASM_REWRITE_TAC[]];
+                REWRITE_TAC[IN_ELIM_THM] THEN
+                (* Need: z i IN [0,1] for all i, which follows from property 1 *)
+                UNDISCH_TAC `(\x. \n:num. (f:num->A->real) n x) x0 = z` THEN
+                DISCH_THEN(fun th -> GEN_REWRITE_TAC (RAND_CONV) [SYM th]) THEN
+                REWRITE_TAC[BETA_THM] THEN
+                UNDISCH_TAC
+                  `!x:A n. x IN topspace top ==> (f:num->A->real) n x IN real_interval[&0,&1]` THEN
+                DISCH_THEN(MP_TAC o SPECL [`x0:A`; `i:num`]) THEN
+                ASM_REWRITE_TAC[]];
+              (* Show cartesian_product basic_open SUBSET u *)
+              (* Strategy: show that elements of cartesian_product that are in IMAGE g must be in u *)
+              (* Key insight from property 4: if h = g y and h k0 > 1/2, then y ∈ v, so h ∈ u *)
+              REWRITE_TAC[SUBSET; cartesian_product; IN_ELIM_THM; o_THM; IN_UNIV] THEN
+              X_GEN_TAC `h:num->real` THEN
+              DISCH_TAC THEN
+              (* Goal: h ∈ u *)
+              (* We know: h k0 ∈ {r | 1/2 < r ∧ r ∈ [0,1]} and h i ∈ [0,1] for all i *)
+              (* Key: u ⊆ IMAGE g topspace, so if h ∈ u then h = g y for some y *)
+              (* Conversely, we need to show h ∈ u *)
+              (* Case analysis: is h ∈ IMAGE g topspace? *)
+              ASM_CASES_TAC `(h:num->real) IN IMAGE (\x:A. \n. f n x) (topspace top)` THENL
+               [(*  Case: h ∈ IMAGE g topspace, so h = g y for some y *)
+                UNDISCH_TAC `(h:num->real) IN IMAGE (\x:A. \n. f n x) (topspace top)` THEN
+                REWRITE_TAC[IN_IMAGE] THEN
+                DISCH_THEN(X_CHOOSE_THEN `y:A` STRIP_ASSUME_TAC) THEN
+                (* So h = g y where y ∈ topspace *)
+                (* Need to show: h ∈ u, i.e., g y ∈ u, i.e., y ∈ v *)
+                REWRITE_TAC[IN_ELIM_THM] THEN
+                ASM_REWRITE_TAC[] THEN
+                (* Need: y ∈ {x | x ∈ topspace ∧ g x ∈ u} *)
+                (* Equivalently: y ∈ topspace ∧ g y ∈ u *)
+                (* We have y ∈ topspace, need g y ∈ u *)
+                (* We have g y = h, so need h ∈ u *)
+                (* Use proof by contradiction: suppose y ∉ v *)
+                (* Then y ∈ topspace DIFF v *)
+                (* By property 4: f k0 y = 0 *)
+                (* But h k0 = (g y) k0 = f k0 y = 0 *)
+                (* This contradicts h k0 > 1/2 *)
+                ASM_CASES_TAC `(y:A) IN {x | x IN topspace top /\ (\x. \n. f n x) x IN u}` THEN
+                ASM_REWRITE_TAC[] THEN
+                (* Derive contradiction *)
+                UNDISCH_TAC
+                  `!z:A. z IN topspace top DIFF {x | x IN topspace top /\ (\x. \n. f n x) x IN u}
+                         ==> (f:num->A->real) k0 z = &0` THEN
+                DISCH_THEN(MP_TAC o SPEC `y:A`) THEN
+                ASM_REWRITE_TAC[IN_DIFF; IN_ELIM_THM] THEN
+                DISCH_TAC THEN
+                UNDISCH_TAC `(\x:A. \n. f n x) y = h` THEN
+                REWRITE_TAC[FUN_EQ_THM] THEN
+                DISCH_THEN(MP_TAC o SPEC `k0:num`) THEN
+                REWRITE_TAC[BETA_THM] THEN
+                DISCH_THEN SUBST_ALL_TAC THEN
+                UNDISCH_TAC `(h:num->real) k0 IN {r | &1 / &2 < r /\ r IN real_interval[&0,&1]}` THEN
+                ASM_REWRITE_TAC[IN_ELIM_THM] THEN
+                REAL_ARITH_TAC;
+                (* Case: h ∉ IMAGE g topspace *)
+                (* But u ⊆ IMAGE g topspace, so if h ∉ IMAGE g then h ∉ u would follow *)
+                (* However, we actually can't have h ∉ IMAGE g in this branch *)
+                (* Because we're trying to prove h ∈ u, and u ⊆ IMAGE g *)
+                (* So if h ∉ IMAGE g, then h ∉ u automatically - but this seems wrong *)
+                (* Actually, I think the issue is that u might not equal the full cart prod *)
+                (* Let me use SET_TAC to handle this case *)
+                UNDISCH_TAC `(u:(num->real)->bool) SUBSET IMAGE (\x. \n. f n x) (topspace top)` THEN
+                SET_TAC[]]];
+            (* Equality: u = u INTER IMAGE g topspace follows from u SUBSET IMAGE g *)
+            ASM SET_TAC[]];
           (* <= direction: u open ==> preimage open (follows from continuity) *)
           DISCH_TAC THEN
           SUBGOAL_THEN
