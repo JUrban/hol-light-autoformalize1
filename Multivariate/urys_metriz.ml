@@ -278,13 +278,31 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
              - Show: z ∈ W and W ⊆ u
           *)
 
-          (* To implement this needs:
-             1. Unpack z ∈ u to get preimage element x
-             2. Use preimage openness to construct closed complement
-             3. Apply separation to get witnessing index N
-             4. Construct cylinder set explicitly
-             5. Prove containments
-             All tactically complex - leaving as CHEAT_TAC *)
+          (* Implementation strategy from Munkres §34.1, Step 2, pages 214-215:
+
+             Given z ∈ u ⊆ IMAGE g topspace where u is assumed open in subtopology:
+
+             1. Since z ∈ IMAGE g topspace, ∃x₀ ∈ topspace. z = g(x₀) = (f₁(x₀), f₂(x₀), ...)
+
+             2. The preimage {x ∈ topspace | g(x) ∈ u} is open by assumption and contains x₀
+
+             3. By assumption 4 (closed set separation), ∃N. f_N(x₀) = 1 and
+                ∀y ∈ topspace \ {x ∈ topspace | g(x) ∈ u}. f_N(y) = 0
+
+             4. Define cylinder V = π_N^(-1)((0,+∞)) in product topology
+                This is open: V = {h | h(N) > 0}, the basic open for coord N
+
+             5. Set W = V ∩ IMAGE g topspace, open in subtopology
+
+             6. Verify: z ∈ W since π_N(z) = π_N(g(x₀)) = f_N(x₀) = 1 > 0
+
+             7. Verify: W ⊆ u by showing g^(-1)(W) ⊆ g^(-1)(u):
+                If y ∈ topspace and g(y) ∈ W, then f_N(y) = π_N(g(y)) > 0,
+                so y ∉ topspace \ g^(-1)(u), hence y ∈ g^(-1)(u)
+
+             Requires: Product topology library (PRODUCT_TOPOLOGY, π_N projection),
+                      open set manipulation tactics, IMAGE/preimage reasoning
+          *)
           CHEAT_TAC;
           (* <= direction: u open ==> preimage open (follows from continuity) *)
           DISCH_TAC THEN
