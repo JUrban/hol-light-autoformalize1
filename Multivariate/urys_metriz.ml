@@ -270,18 +270,6 @@ let COND_INTERVAL_EQ_CLOSED = prove
   REPEAT GEN_TAC THEN COND_CASES_TAC THEN
   ASM_REWRITE_TAC[REAL_INTERVAL_OPEN_NE_CLOSED_UNIT]);;
 
-(* Helper: half and one bounds *)
-let HALF_ONE_BOUNDS = prove
- (`&0 <= &1 / &2 /\ &1 / &2 < &1 /\ &1 <= &1`,
-  REAL_ARITH_TAC);;
-
-(* Helper: half open interval is open in unit interval *)
-let HALF_ONE_OPEN_IN_UNIT = prove
- (`open_in (subtopology euclideanreal (real_interval[&0,&1]))
-           (real_interval(&1 / &2, &1))`,
-  MATCH_MP_TAC OPEN_IN_UNIT_INTERVAL_SUBINTERVAL THEN
-  REAL_ARITH_TAC);;
-
 (* Helper: [0,1]\{0} is open in unit interval *)
 let OPEN_IN_UNIT_INTERVAL_DIFF_ZERO = prove
  (`open_in (subtopology euclideanreal (real_interval[&0,&1]))
@@ -555,32 +543,6 @@ let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
 
 (* Note: SUBSET_TRANS is in library *)
 
-(* Helper: real interval monotonicity *)
-let REAL_INTERVAL_MONO = prove
- (`!a b c d. a <= c /\ d <= b
-             ==> real_interval[c,d] SUBSET real_interval[a,b]`,
-  REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
-
-(* Helper: open interval in closed interval *)
-let REAL_INTERVAL_OPEN_IN_CLOSED = prove
- (`!a b. a < b ==> real_interval(a,b) SUBSET real_interval[a,b]`,
-  REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
-
-(* Helper: values in range imply function in product *)
-let POINTWISE_IN_PRODUCT = prove
- (`!f:num->real a b n.
-        (!i. a <= f i /\ f i <= b)
-        ==> f n IN real_interval[a,b]`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN MESON_TAC[]);;
-
-(* Helper: image subset from pointwise *)
-let IMAGE_SUBSET_FROM_POINTWISE = prove
- (`!f:A->B s t.
-        (!x. x IN s ==> f x IN t)
-        ==> IMAGE f s SUBSET t`,
-  REWRITE_TAC[SUBSET; IN_IMAGE] THEN MESON_TAC[]);;
-
-
 (* Helper: topspace of unit interval subtopology *)
 
 (* Helper: membership in conditional sets *)
@@ -600,15 +562,6 @@ let CONTINUOUS_MAP_CONST = prove
 (* Note: FINITE_INTER_SUBSET - trivial SET_TAC *)
 
 (* Helper: product topology basics *)
-
-(* Helper: nonempty interval *)
-let REAL_INTERVAL_NONEMPTY_OPEN = prove
- (`!a b. a < b ==> ~(real_interval(a,b) = {})`,
-  REPEAT STRIP_TAC THEN
-  SUBGOAL_THEN `(a + b) / &2 IN real_interval(a,b)` MP_TAC THENL [
-    REWRITE_TAC[IN_REAL_INTERVAL] THEN ASM_REAL_ARITH_TAC;
-    ASM_REWRITE_TAC[NOT_IN_EMPTY]
-  ]);;
 
 (* Helper: open interval subset closed *)
 
@@ -661,16 +614,6 @@ let REAL_INTERVAL_NONEMPTY_OPEN = prove
    use REAL_ARITH_TAC directly *)
 
 (* Helper: conditional set not equal when one choice differs *)
-
-(* Helper: whole space is open *)
-let OPEN_IN_TOPSPACE_SUBTOPOLOGY = prove
- (`!top:A topology s. s SUBSET topspace top ==> open_in (subtopology top s) s`,
-  REPEAT STRIP_TAC THEN
-  REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
-  EXISTS_TAC `topspace (top:A topology)` THEN
-  ASM_REWRITE_TAC[OPEN_IN_TOPSPACE] THEN
-  ASM SET_TAC[]);;
-
 
 (* Helper: membership in conditional interval *)
 let IN_COND_INTERVAL = prove
@@ -808,44 +751,12 @@ let PAIR_SURJECTIVE = prove
 (* Helper: image of constant *)
 
 (* Helper: preimage of singleton *)
-let PREIMAGE_SING = prove
- (`!f:A->B y. {x | f x = y} = {x | f x IN {y}}`,
-  SET_TAC[IN_SING]);;
-
-(* Helper: preimage empty *)
-let PREIMAGE_EMPTY = prove
- (`!f:A->B. {x | f x IN {}} = {}`,
-  SET_TAC[NOT_IN_EMPTY]);;
-
-(* Helper: preimage union *)
-let PREIMAGE_UNION = prove
- (`!f:A->B s t. {x | f x IN (s UNION t)} =
-                {x | f x IN s} UNION {x | f x IN t}`,
-  SET_TAC[IN_UNION]);;
-
-(* Helper: preimage inter *)
-let PREIMAGE_INTER = prove
- (`!f:A->B s t. {x | f x IN (s INTER t)} =
-                {x | f x IN s} INTER {x | f x IN t}`,
-  SET_TAC[IN_INTER]);;
-
-(* Helper: preimage diff *)
-let PREIMAGE_DIFF = prove
- (`!f:A->B s t. {x | f x IN (s DIFF t)} =
-                {x | f x IN s} DIFF {x | f x IN t}`,
-  SET_TAC[IN_DIFF]);;
-
 (* Helper: preimage subset *)
 let PREIMAGE_SUBSET = prove
  (`!f:A->B s t. s SUBSET t ==> {x | f x IN s} SUBSET {x | f x IN t}`,
   SET_TAC[SUBSET]);;
 
 (* Note: PREIMAGE_UNIV - trivial SET_TAC[IN_UNIV], use directly *)
-
-(* Helper: image of preimage *)
-let IMAGE_PREIMAGE_SUBSET = prove
- (`!f:A->B s. IMAGE f {x | f x IN s} SUBSET s`,
-  SET_TAC[IN_IMAGE]);;
 
 (* Note: CONTINUOUS_MAP_ID, CONTINUOUS_MAP_CONST, CONTINUOUS_MAP_COMPOSE - all library lemmas *)
 
@@ -864,10 +775,6 @@ let OPEN_IN_CLOSED_IN_EQ = prove
 
 
 (* Helper: half in unit interval *)
-let REAL_HALF_IN_UNIT_INTERVAL = prove
- (`&1 / &2 IN real_interval[&0, &1]`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
-
 (* Note: REAL_INTERVAL_SUBSET_SELF - just SUBSET_REFL, use directly *)
 
 (* Note: INTER_SUBSET - basic SET_TAC *)
@@ -878,24 +785,9 @@ let REAL_HALF_IN_UNIT_INTERVAL = prove
 (* Note: FUN_APP_THM - trivial (f x = f x), use REFL_TAC directly *)
 (* Note: COND_ID - trivial MESON_TAC, use directly *)
 
-(* Helper: inequality from membership *)
-let IN_INTERVAL_IMP_LE = prove
- (`!x a b. x IN real_interval[a,b] ==> a <= x /\ x <= b`,
-  REWRITE_TAC[IN_REAL_INTERVAL]);;
-
-(* Helper: inequality from membership in open interval *)
-let IN_OPEN_INTERVAL_IMP_LT = prove
- (`!x a b. x IN real_interval(a,b) ==> a < x /\ x < b`,
-  REWRITE_TAC[IN_REAL_INTERVAL]);;
-
 (* Note: IN_SING is in library, use directly or SET_TAC *)
 
 (* Note: Real arithmetic AC, zero identities: use REAL_ARITH_TAC directly *)
-
-(* Helper: interval bounds *)
-let REAL_INTERVAL_NONEMPTY_CLOSED = prove
- (`!a b. ~(real_interval[a,b] = {}) <=> a <= b`,
-  REWRITE_TAC[REAL_INTERVAL_NE_EMPTY]);;
 
 (* Helper: subset of self *)
 
@@ -967,47 +859,12 @@ let REAL_INTERVAL_NONEMPTY_CLOSED = prove
 (* &1 is NOT in the open interval (&1/&2, &1) which is OPEN on both ends *)
 (* Let me check what the actual interval should be *)
 
-(* Helper: bounds for values  in open interval *)
-let IN_REAL_INTERVAL_OPEN_BOUNDS = prove
- (`!x a b. x IN real_interval(a,b) <=> a < x /\ x < b`,
-  REWRITE_TAC[IN_REAL_INTERVAL]);;
-
-(* Helper: if value equals 1 and is in [0,1], express this *)
-let ONE_IN_UNIT_BOUNDS = prove
- (`&1 IN real_interval[&0,&1]`,
-  REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
-
-(* Helper: subset via pointwise inclusion *)
-let SUBSET_POINTWISE = prove
- (`!s t. s SUBSET t <=> (!x. x IN s ==> x IN t)`,
-  REWRITE_TAC[SUBSET]);;
-
-(* Helper: zero in unit interval *)
-let ZERO_IN_UNIT_BOUNDS = prove
- (`&0 IN real_interval[&0,&1]`,
-  REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
-
-(* Helper: half in unit interval *)
-let HALF_IN_UNIT_BOUNDS = prove
- (`&1 / &2 IN real_interval[&0,&1]`,
-  REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
-
 (* Helper: everything is in UNIV *)
 (* Helper: forall in UNIV simplification *)
 (* Note: FORALL_IN_UNIV - basic REWRITE_TAC[IN_UNIV] *)
 
 (* Note: Basic logic properties (implication chain, conjunction intro, reflexivity,
    disjunction cases, equality symmetry/transitivity): use MESON_TAC directly *)
-
-(* Helper: value between 1/2 and 1 *)
-let THREE_QUARTERS_BOUNDS = prove
- (`&1 / &2 < &3 / &4 /\ &3 / &4 < &1`,
-  REAL_ARITH_TAC);;
-
-(* Helper: three quarters in unit interval *)
-let THREE_QUARTERS_IN_UNIT = prove
- (`&3 / &4 IN real_interval[&0,&1]`,
-  REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
 
 (* Note: Additional logic properties (CONJ_IMP, NOT_IFF, contrapositive):
    use MESON_TAC directly *)
