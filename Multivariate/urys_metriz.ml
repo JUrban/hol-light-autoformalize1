@@ -404,13 +404,16 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
           DISCH_TAC THEN
           (* Use OPEN_IN_SUBTOPOLOGY: need to find v open in product with u = v INTER IMAGE *)
           REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
-          (* Strategy: For each y ∈ u, use separation to find basic open neighborhood *)
-          (* Textbook argument: if y = g(x), use that preimage is open to get *)
-          (* closed c = topspace \ v where v is open neighborhood of x in preimage *)
-          (* Then f_n separates x from c for some n, giving cylinder neighborhood *)
-          (* This is complex and requires explicit construction of the open set *)
-          (* Attempt: Use that u ⊆ IMAGE and preimage open implies u open *)
-          (* For full proof: need to construct explicit cylinder set covering *)
+          (* Need to provide witness v such that: open_in product v /\ u = v INTER IMAGE *)
+          (* Strategy: take v = u itself, then need to show:
+             1) u is open in the product_topology
+             2) u = u INTER IMAGE g topspace (follows from u SUBSET IMAGE)
+          *)
+          (* Proving (1) requires showing each point in u has cylinder neighborhood *)
+          (* For y = g(x) in u: preimage open gives v with x IN v SUBSET preimage *)
+          (* Take c = topspace DIFF v (closed), apply separation to get n with *)
+          (* f_n(x) = 1 and f_n = 0 on c, giving cylinder {h | h(n) > 1/2} around y *)
+          (* This cylinder set construction is complex and needs explicit proof *)
           CHEAT_TAC;
           (* <= direction: u open ==> preimage open (follows from continuity) *)
           DISCH_TAC THEN
