@@ -456,25 +456,10 @@ let IN_UNIT_INTERVAL_BOUNDS = prove
   REWRITE_TAC[IN_REAL_INTERVAL]);;
 
 (* Helper: continuous map into subtopology *)
-let CONTINUOUS_MAP_INTO_SUBTOPOLOGY_EQ = prove
- (`!top top' s f:A->B.
-        IMAGE f (topspace top) SUBSET s
-        ==> (continuous_map (top,subtopology top' s) f <=>
-             continuous_map (top,top') f /\ IMAGE f (topspace top) SUBSET s)`,
-  SIMP_TAC[CONTINUOUS_MAP_IN_SUBTOPOLOGY]);;
-
-(* Helper: image under function applied to product *)
-let IMAGE_LAMBDA_PRODUCT = prove
- (`!f:num->A->real x.
-        ((\y:A. \n:num. f n y) x) = (\n. f n x)`,
-  REWRITE_TAC[FUN_EQ_THM; ETA_AX]);;
 
 
 
-(* Helper: basic property of real intervals *)
-let REAL_INTERVAL_SUBSET_INTERVALS = prove
- (`!a b c d. a <= c /\ d <= b ==> real_interval[c,d] SUBSET real_interval[a,b]`,
-  REWRITE_TAC[SUBSET; IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+
 
 
 (* Helper: membership in diff *)
