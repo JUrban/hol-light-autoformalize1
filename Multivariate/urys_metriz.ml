@@ -813,24 +813,12 @@ let HALF_IN_UNIT_INTERVAL_ALT = prove
  (`&1 / &2 IN real_interval[&0,&1]`,
   REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
-(* Helper: subset reflexivity *)
-let SUBSET_REFL_ALT = prove
- (`!s. s SUBSET s`,
-  REWRITE_TAC[SUBSET]);;
+(* Note: SUBSET_REFL, IN_SING, and basic implication lemmas
+   are available from library. *)
 
 (* Helper: conditional equality cases *)
 let COND_EQ_CASES = prove
  (`!b x y z. (if b then x else y) = z <=> b /\ x = z \/ ~b /\ y = z`,
-  MESON_TAC[]);;
-
-(* Helper: element in singleton *)
-let IN_SING_IFF = prove
- (`!x y. x IN {y} <=> x = y`,
-  REWRITE_TAC[IN_SING]);;
-
-(* Helper: implication transitivity *)
-let IMP_TRANS_ALT = prove
- (`!p q r. (p ==> q) /\ (q ==> r) ==> (p ==> r)`,
   MESON_TAC[]);;
 
 (* Helper: forall with conditional *)
