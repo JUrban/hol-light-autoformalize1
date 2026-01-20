@@ -51,9 +51,6 @@ let NORMAL_SPACE_URYSOHN_FUNCTION = prove
                 URYSOHN_LEMMA) THEN
   ASM_REWRITE_TAC[REAL_POS]);;
 
-(* Note: T3_HAUSDORFF_POINT_SEPARATION - unused, can derive from
-   hausdorff_space definition + CLOSED_IN_DIFF as needed *)
-
 (* Helper: completely_regular + Hausdorff gives point-separating functions *)
 let COMPLETELY_REGULAR_HAUSDORFF_POINT_FUNCTIONS = prove
  (`!top x y:A.
@@ -213,17 +210,6 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
    dense subset can be enumerated and used to index separation requirements.
    The separable_space property gives ?c. COUNTABLE c /\ c SUBSET topspace /\
    closure_of c = topspace. For future work on SEPARATING_FUNCTIONS. *)
-
-(* Note: Removed 8 unused conditional interval helper lemmas:
-   REAL_INTERVAL_OPEN_NE_CLOSED_UNIT, COND_INTERVAL_EQ_CLOSED,
-   OPEN_IN_UNIT_INTERVAL_DIFF_ZERO, OPEN_IN_UNIT_INTERVAL_SELF,
-   REAL_INTERVAL_DIFF_ZERO_NE_UNIT, COND_INTERVAL_DIFF_ZERO_EQ,
-   COND_INTERVAL_DIFF_ZERO_NE_IMP, IN_COND_INTERVAL_DIFF_ZERO
-   All were unused and can be derived with REAL_ARITH_TAC/SET_TAC as needed. *)
-
-(* Note: SUBSET_UNION, INTER_SUBSET, UNION_IDEMPOT, INTER_IDEMPOT
-   are available from library (sets.ml). Using those instead of
-   defining redundant versions. *)
 
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
