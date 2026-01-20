@@ -586,35 +586,9 @@ let FUNCTION_NEQ_EXISTS_COMPONENT = prove
   REWRITE_TAC[FUN_EQ_THM] THEN MESON_TAC[]);;
 
 (* Helper: open set properties *)
-let OPEN_IN_SUBSET_TOPSPACE = prove
- (`!top:A topology u. open_in top u ==> u SUBSET topspace top`,
-  MESON_TAC[OPEN_IN_SUBSET]);;
-
-(* Helper: point in open set is in topspace *)
-let IN_OPEN_IN_IMP_IN_TOPSPACE = prove
- (`!top:A topology u x.
-        open_in top u /\ x IN u ==> x IN topspace top`,
-  MESON_TAC[OPEN_IN_SUBSET; SUBSET]);;
-
-(* Helper: image contains preimage elements *)
-let PREIMAGE_IN_IMAGE = prove
- (`!f:A->B s x. x IN s ==> f x IN IMAGE f s`,
-  REWRITE_TAC[IN_IMAGE] THEN MESON_TAC[]);;
-
-(* Helper: singleton is finite *)
-let FINITE_SING_ALT = prove
- (`!x:A. FINITE {x}`,
-  REWRITE_TAC[FINITE_SING]);;
-
-(* Helper: subset of finite set *)
-let SUBSET_FINITE_I = prove
- (`!s:A->bool t. FINITE t /\ s SUBSET t ==> FINITE s`,
-  MESON_TAC[FINITE_SUBSET]);;
-
-(* Helper: membership in singleton set *)
-let IN_SING_EQ = prove
- (`!x:A y. x IN {y} <=> x = y`,
-  REWRITE_TAC[IN_SING]);;
+(* Note: Several basic lemmas like OPEN_IN_SUBSET, FINITE_SING,
+   FINITE_SUBSET, IN_SING are available from the library and used
+   directly instead of defining wrapper versions. *)
 
 (* Helper: conditional function application *)
 let COND_FUNCTION_APPLY = prove
