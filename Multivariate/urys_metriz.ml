@@ -872,17 +872,8 @@ let INSERT_SUBSET_SIMPLE = prove
  (`!x s t. x IN t /\ s SUBSET t ==> (x INSERT s) SUBSET t`,
   SET_TAC[]);;
 
-(* Helper: finite singleton *)
-let FINITE_SINGLETON = prove
- (`!x. FINITE {x}`,
-  REWRITE_TAC[FINITE_SING]);;
-
-(* Note: FINITE_EMPTY, FINITE_UNION, FINITE_INSERT are available from library *)
-
-(* Helper: subset antisymmetric *)
-let SUBSET_ANTISYM = prove
- (`!s t. s SUBSET t /\ t SUBSET s <=> s = t`,
-  REWRITE_TAC[SUBSET_ANTISYM_EQ]);;
+(* Note: FINITE_SING, FINITE_EMPTY, FINITE_UNION, FINITE_INSERT, SUBSET_ANTISYM_EQ
+   are available from library *)
 
 (* Helper: de Morgan union *)
 let DE_MORGAN_UNION = prove
@@ -2168,21 +2159,8 @@ let REAL_ABS_TRIANGLE_SIMPLE = prove
 (* Note: For quantifiers over INSERT, use IN_INSERT with MESON_TAC or SET_TAC.
    For subset characterizations, use SET_TAC directly. *)
 
-(* Helper: disjoint characterization *)
-let DISJOINT_EMPTY_INTER = prove
- (`!s t. DISJOINT s t <=> s INTER t = {}`,
-  REWRITE_TAC[DISJOINT]);;
-
-(* Helper: disjoint symmetry *)
-let DISJOINT_SYM = prove
- (`!s t. DISJOINT s t <=> DISJOINT t s`,
-  REWRITE_TAC[DISJOINT] THEN SET_TAC[]);;
-
-(* Helper: pairwise disjoint *)
-let PAIRWISE_DISJOINT_SIMPLE = prove
- (`!s t u. DISJOINT s t /\ DISJOINT s u /\ DISJOINT t u
-           ==> s INTER t = {} /\ s INTER u = {} /\ t INTER u = {}`,
-  REWRITE_TAC[DISJOINT] THEN SET_TAC[]);;
+(* Note: DISJOINT is defined as `s INTER t = {}` in library. Use REWRITE_TAC[DISJOINT]
+   with SET_TAC for disjoint properties. *)
 
 (* Helper: in elim *)
 let IN_ELIM_SIMPLE = prove
