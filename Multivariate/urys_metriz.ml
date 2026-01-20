@@ -875,17 +875,7 @@ let INSERT_SUBSET_SIMPLE = prove
 (* Note: FINITE_SING, FINITE_EMPTY, FINITE_UNION, FINITE_INSERT, SUBSET_ANTISYM_EQ
    are available from library *)
 
-(* Note: De Morgan laws for sets: use SET_TAC directly *)
-
-(* Helper: diff union *)
-let DIFF_UNION_DIST = prove
- (`!s t u. s DIFF (t UNION u) = (s DIFF t) INTER (s DIFF u)`,
-  SET_TAC[]);;
-
-(* Helper: diff inter *)
-let DIFF_INTER_DIST = prove
- (`!s t u. s DIFF (t INTER u) = (s DIFF t) UNION (s DIFF u)`,
-  SET_TAC[]);;
+(* Note: De Morgan laws, DIFF distributivity: use SET_TAC directly *)
 
 (* Helper: union assoc *)
 let UNION_ASSOC_SIMPLE = prove
@@ -2153,29 +2143,9 @@ let REAL_ABS_TRIANGLE_SIMPLE = prove
 
 (* Note: IN_ELIM_THM, IMAGE_SUBSET are available from library *)
 
-(* Helper: continuous map in subtopology *)
-let CONTINUOUS_MAP_FROM_SUBTOPOLOGY_SIMPLE = prove
- (`!top top' s f. continuous_map (subtopology top s, top') f
-                  ==> !x. x IN s INTER topspace top ==> f x IN topspace top'`,
-  REWRITE_TAC[continuous_map; TOPSPACE_SUBTOPOLOGY; IN_INTER] THEN
-  SET_TAC[IN_IMAGE]);;
-
-(* Helper: open_in subtopology characterization *)
-let OPEN_IN_SUBTOPOLOGY_SIMPLE = prove
- (`!top s u. open_in (subtopology top s) u <=>
-             ?v. open_in top v /\ u = v INTER s`,
-  REWRITE_TAC[OPEN_IN_SUBTOPOLOGY]);;
-
-(* Helper: closed_in subtopology characterization *)
-let CLOSED_IN_SUBTOPOLOGY_SIMPLE = prove
- (`!top s u. closed_in (subtopology top s) u <=>
-             ?v. closed_in top v /\ u = v INTER s`,
-  REWRITE_TAC[CLOSED_IN_SUBTOPOLOGY]);;
-
-(* Helper: subtopology of subtopology *)
-let SUBTOPOLOGY_SUBTOPOLOGY = prove
- (`!top s t. subtopology (subtopology top s) t = subtopology top (s INTER t)`,
-  REWRITE_TAC[SUBTOPOLOGY_SUBTOPOLOGY]);;
+(* Note: OPEN_IN_SUBTOPOLOGY, CLOSED_IN_SUBTOPOLOGY, TOPSPACE_SUBTOPOLOGY,
+   SUBTOPOLOGY_SUBTOPOLOGY are available from library. For continuous_map from
+   subtopology, use REWRITE_TAC[continuous_map; TOPSPACE_SUBTOPOLOGY] with SET_TAC. *)
 
 (* Helper: conditional with different branches not equal to second branch *)
 let COND_DIFF_IMP = prove
