@@ -302,16 +302,31 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                       open set manipulation tactics, IMAGE/preimage reasoning
           *)
 
-          (* Attempt 11: Add structure - show goal is in subtopology form *)
+          (* Attempt 12: Add more structure for cylinder construction *)
           REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
           (* Goal: ?t. open_in (product_topology...) t /\ u = t INTER IMAGE g topspace *)
-          (* Strategy: construct t as union of cylinders, one for each z ∈ u *)
-          (* This requires: for each z, finding the separating index N,
-             then defining the cylinder, then taking their union *)
-          (* Key difficulty: quantifying over u to build the union,
-             while maintaining openness in product topology *)
-          (* The cylinder for each z depends on the choice of N from separation,
-             which requires dependent choice over all elements of u *)
+
+          (* Strategy outline:
+             1. For each z ∈ u, we have z ∈ IMAGE g topspace, so ∃x₀. z = g(x₀)
+             2. Let v = {x | x ∈ topspace ∧ g(x) ∈ u} (the preimage)
+             3. By assumption, v is open and contains x₀
+             4. Let c = topspace \ v (closed set not containing x₀)
+             5. By closed set separation (assumption 4): ∃N. f_N(x₀)=1 ∧ ∀y∈c. f_N(y)=0
+             6. Define cylinder V_z = {h:num->real | h(N) > 0}
+                This is open in product topology (basic open set)
+             7. Let t = ⋃{V_z | z ∈ u} where V_z is the cylinder for z
+             8. Show: t is open (arbitrary union of open sets)
+             9. Show: u = t ∩ IMAGE g topspace by:
+                - z ∈ u ==> g(x₀)(N) = f_N(x₀) = 1 > 0, so g(x₀) = z ∈ V_z ∩ IMAGE g
+                - z ∈ t ∩ IMAGE g ==> ∃x. z = g(x) ∧ z(N) > 0
+                  So f_N(x) > 0, hence x ∉ c, so x ∈ v, thus g(x) ∈ u
+          *)
+
+          (* The main technical challenge: expressing the choice of N(z) for each z,
+             and showing the resulting union is open and equals u ∩ IMAGE g.
+             Requires: dependent function definition, OPEN_IN_PRODUCT_TOPOLOGY_ALT,
+             cylinder set lemmas, choice principles. *)
+
           CHEAT_TAC;
           (* <= direction: u open ==> preimage open (follows from continuity) *)
           DISCH_TAC THEN
