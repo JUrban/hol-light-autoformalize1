@@ -616,10 +616,7 @@ let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
         ==> IMAGE f (topspace top) SUBSET topspace top'`,
   SIMP_TAC[CONTINUOUS_MAP]);;
 
-(* Helper: subset transitivity *)
-let SUBSET_TRANS_ALT = prove
- (`!s:A->bool t u. s SUBSET t /\ t SUBSET u ==> s SUBSET u`,
-  REWRITE_TAC[SUBSET] THEN MESON_TAC[]);;
+(* Note: SUBSET_TRANS is in library *)
 
 (* Helper: real interval monotonicity *)
 let REAL_INTERVAL_MONO = prove
@@ -796,10 +793,7 @@ let UNIT_INTERVAL_ENDPOINTS = prove
  (`&0 IN real_interval[&0,&1] /\ &1 IN real_interval[&0,&1]`,
   REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
 
-(* Helper: 1/2 is in unit interval *)
-let HALF_IN_UNIT_INTERVAL_ALT = prove
- (`&1 / &2 IN real_interval[&0,&1]`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
+(* Note: HALF_IN_UNIT_INTERVAL already defined (duplicate) *)
 
 (* Note: SUBSET_REFL, IN_SING, and basic implication lemmas
    are available from library. *)
@@ -821,10 +815,7 @@ let EXISTS_COND = prove
              (b /\ P x) \/ (~b /\ P y)`,
   MESON_TAC[]);;
 
-(* Helper: conjunction with implication *)
-let CONJ_IMP_ALT = prove
- (`!p q r. (p /\ q ==> r) <=> (p ==> q ==> r)`,
-  MESON_TAC[]);;
+(* Note: CONJ_IMP is basic MESON_TAC property *)
 
 (* Helper: disjunction elimination *)
 let DISJ_IMP_IMP = prove
@@ -1124,22 +1115,9 @@ let o_ID_RIGHT = prove
  (`!f. f o (\x. x) = f`,
   REWRITE_TAC[FUN_EQ_THM; o_THM]);;
 
-(* Helper: injection definition *)
-let INJECTIVE_ALT = prove
- (`!f. (!x y. f x = f y ==> x = y) <=>
-       (!x y. ~(x = y) ==> ~(f x = f y))`,
-  MESON_TAC[]);;
+(* Note: Injection definition - basic MESON_TAC property *)
 
-(* Helper: surjection definition *)
-let SURJECTIVE_DEF = prove
- (`!f:A->B. (!y. ?x. f x = y) <=> IMAGE f (:A) = (:B)`,
-  REWRITE_TAC[EXTENSION; IN_IMAGE; IN_UNIV] THEN MESON_TAC[]);;
-
-(* Helper: bijection *)
-let BIJECTIVE_DEF = prove
- (`!f:A->B. (!x y. f x = f y ==> x = y) /\ (!y. ?x. f x = y) <=>
-            (!x y. f x = f y <=> x = y) /\ (!y. ?x. f x = y)`,
-  MESON_TAC[]);;
+(* Note: SURJECTIVE_DEF, BIJECTIVE_DEF - basic function definitions, use library *)
 
 
 (* Helper: forall in insert *)
@@ -1159,25 +1137,7 @@ let FINITE_UNION_EQ = prove
  (`!s t. FINITE (s UNION t) <=> FINITE s /\ FINITE t`,
   MESON_TAC[FINITE_UNION; FINITE_SUBSET; SUBSET_UNION]);;
 
-(* Helper: card empty *)
-let CARD_EMPTY_ALT = prove
- (`CARD {} = 0`,
-  REWRITE_TAC[CARD_CLAUSES]);;
-
-(* Helper: card sing *)
-let CARD_SING_ALT = prove
- (`!x. CARD {x} = 1`,
-  SIMP_TAC[CARD_SING]);;
-
-(* Helper: simple arithmetic *)
-let NUM_ADD_COMM = prove
- (`!m n. m + n = n + m`,
-  ARITH_TAC);;
-
-(* Helper: simple arithmetic *)
-let NUM_ADD_ASSOC = prove
- (`!m n p. (m + n) + p = m + (n + p)`,
-  ARITH_TAC);;
+(* Note: CARD_CLAUSES, CARD_SING, NUM addition - all library lemmas or ARITH_TAC *)
 
 (* Helper: simple arithmetic *)
 let NUM_MUL_COMM = prove
@@ -1443,63 +1403,11 @@ let IMAGE_PREIMAGE_SUBSET = prove
  (`!f:A->B s. IMAGE f {x | f x IN s} SUBSET s`,
   SET_TAC[IN_IMAGE]);;
 
-(* Helper: continuous map basics *)
-let CONTINUOUS_MAP_ID_ALT = prove
- (`!top. continuous_map (top,top) (\x. x)`,
-  REWRITE_TAC[CONTINUOUS_MAP_ID]);;
+(* Note: CONTINUOUS_MAP_ID, CONTINUOUS_MAP_CONST, CONTINUOUS_MAP_COMPOSE - all library lemmas *)
 
-(* Helper: continuous map const *)
-let CONTINUOUS_MAP_CONST_ALT = prove
- (`!top top' c. c IN topspace top'
-                ==> continuous_map (top,top') (\x. c)`,
-  SIMP_TAC[CONTINUOUS_MAP_CONST]);;
-
-(* Helper: continuous map compose *)
-let CONTINUOUS_MAP_COMPOSE_ALT = prove
- (`!top top' top'' f g.
-     continuous_map (top,top') f /\ continuous_map (top',top'') g
-     ==> continuous_map (top,top'') (g o f)`,
-  REWRITE_TAC[CONTINUOUS_MAP_COMPOSE]);;
-
-(* Helper: open in empty *)
-let OPEN_IN_EMPTY_ALT = prove
- (`!top. open_in top {}`,
-  REWRITE_TAC[OPEN_IN_EMPTY]);;
-
-(* Helper: open in topspace *)
-let OPEN_IN_TOPSPACE_ALT = prove
- (`!top. open_in top (topspace top)`,
-  REWRITE_TAC[OPEN_IN_TOPSPACE]);;
-
-(* Helper: open in union *)
-let OPEN_IN_UNION_ALT = prove
- (`!top s t. open_in top s /\ open_in top t ==> open_in top (s UNION t)`,
-  SIMP_TAC[OPEN_IN_UNION]);;
-
-(* Helper: open in inter *)
-let OPEN_IN_INTER_ALT = prove
- (`!top s t. open_in top s /\ open_in top t ==> open_in top (s INTER t)`,
-  SIMP_TAC[OPEN_IN_INTER]);;
-
-(* Helper: closed in empty *)
-let CLOSED_IN_EMPTY_ALT = prove
- (`!top. closed_in top {}`,
-  REWRITE_TAC[CLOSED_IN_EMPTY]);;
-
-(* Helper: closed in topspace *)
-let CLOSED_IN_TOPSPACE_ALT = prove
- (`!top. closed_in top (topspace top)`,
-  REWRITE_TAC[CLOSED_IN_TOPSPACE]);;
-
-(* Helper: closed in union *)
-let CLOSED_IN_UNION_ALT = prove
- (`!top s t. closed_in top s /\ closed_in top t ==> closed_in top (s UNION t)`,
-  SIMP_TAC[CLOSED_IN_UNION]);;
-
-(* Helper: closed in inter *)
-let CLOSED_IN_INTER_ALT = prove
- (`!top s t. closed_in top s /\ closed_in top t ==> closed_in top (s INTER t)`,
-  SIMP_TAC[CLOSED_IN_INTER]);;
+(* Note: OPEN_IN_EMPTY, OPEN_IN_TOPSPACE, OPEN_IN_UNION, OPEN_IN_INTER,
+   CLOSED_IN_EMPTY, CLOSED_IN_TOPSPACE, CLOSED_IN_UNION, CLOSED_IN_INTER -
+   all library lemmas *)
 
 (* Helper: open closed complement *)
 let OPEN_IN_CLOSED_IN_EQ = prove
