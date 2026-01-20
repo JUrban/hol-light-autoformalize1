@@ -220,9 +220,6 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
           (* Assume: u SUBSET IMAGE g topspace /\ *)
           (*         open_in top {x | x IN topspace /\ g x IN u} *)
           DISCH_TAC THEN
-          (* Following textbook Step 2 proof (topology.tex lines 4662-4683) *)
-          (* Goal: show u is open in subtopology product (IMAGE g topspace) *)
-
           (* Implementation strategy from Munkres §34.1, Step 2, pages 214-215:
 
              Given z ∈ u ⊆ IMAGE g topspace where u is assumed open in subtopology:
@@ -255,18 +252,6 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
 
           (* Introduce abbreviation for the preimage *)
           ABBREV_TAC `v = {x:A | x IN topspace top /\ (\x. \n. f n x) x IN u}` THEN
-
-          (* Key insight: For each z ∈ u, we can find a cylinder containing z
-             that stays within u when intersected with IMAGE g topspace.
-             The cylinder uses closed set separation on topspace \ v. *)
-
-          (* Strategy:
-             - For each z ∈ u: z ∈ IMAGE g ==> ∃x₀. g x₀ = z
-             - The set v = {x | g x ∈ u} is the preimage (open by assumption)
-             - For x₀ ∈ v: topspace \ v is closed and doesn't contain x₀
-             - Closed set separation gives N: f_N(x₀)=1 ∧ ∀y∉v. f_N(y)=0
-             - Cylinder {h | h(N) > 0} contains z and intersects IMAGE g only in u
-             - Union of all such cylinders gives witness t *)
 
           (* The explicit construction requires:
              1. Choice function N : u -> num selecting the separating index
