@@ -875,15 +875,7 @@ let INSERT_SUBSET_SIMPLE = prove
 (* Note: FINITE_SING, FINITE_EMPTY, FINITE_UNION, FINITE_INSERT, SUBSET_ANTISYM_EQ
    are available from library *)
 
-(* Helper: de Morgan union *)
-let DE_MORGAN_UNION = prove
- (`!s t. UNIV DIFF (s UNION t) = (UNIV DIFF s) INTER (UNIV DIFF t)`,
-  SET_TAC[]);;
-
-(* Helper: de Morgan inter *)
-let DE_MORGAN_INTER = prove
- (`!s t. UNIV DIFF (s INTER t) = (UNIV DIFF s) UNION (UNIV DIFF t)`,
-  SET_TAC[]);;
+(* Note: De Morgan laws for sets: use SET_TAC directly *)
 
 (* Helper: diff union *)
 let DIFF_UNION_DIST = prove
@@ -1609,10 +1601,7 @@ let IMAGE_SUBSET_IMAGE = prove
  (`!f s t. s SUBSET t ==> IMAGE f s SUBSET IMAGE f t`,
   REWRITE_TAC[SUBSET; IN_IMAGE] THEN MESON_TAC[]);;
 
-(* Helper: subset reflexive *)
-let SUBSET_REFL_SIMPLE2 = prove
- (`!s. s SUBSET s`,
-  REWRITE_TAC[SUBSET]);;
+(* Note: SUBSET_REFL is available from library *)
 
 (* Helper: conditional not equal *)
 let COND_NOT_EQ = prove
@@ -2162,20 +2151,7 @@ let REAL_ABS_TRIANGLE_SIMPLE = prove
 (* Note: DISJOINT is defined as `s INTER t = {}` in library. Use REWRITE_TAC[DISJOINT]
    with SET_TAC for disjoint properties. *)
 
-(* Helper: in elim *)
-let IN_ELIM_SIMPLE = prove
- (`!P x. x IN {y | P y} <=> P x`,
-  REWRITE_TAC[IN_ELIM_THM]);;
-
-(* Helper: gspec *)
-let IN_GSPEC_SIMPLE = prove
- (`!P x. x IN {f y | P y} <=> ?y. P y /\ x = f y`,
-  REWRITE_TAC[IN_ELIM_THM] THEN MESON_TAC[]);;
-
-(* Helper: image monotone *)
-let IMAGE_MONO = prove
- (`!f s t. s SUBSET t ==> IMAGE f s SUBSET IMAGE f t`,
-  REWRITE_TAC[IMAGE_SUBSET]);;
+(* Note: IN_ELIM_THM, IMAGE_SUBSET are available from library *)
 
 (* Helper: continuous map in subtopology *)
 let CONTINUOUS_MAP_FROM_SUBTOPOLOGY_SIMPLE = prove
