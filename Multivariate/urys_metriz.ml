@@ -109,15 +109,11 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   SUBGOAL_THEN `completely_regular_space (top:A topology)` ASSUME_TAC THENL
    [ASM_MESON_TAC[NORMAL_IMP_COMPLETELY_REGULAR_SPACE];
     ALL_TAC] THEN
-  (* Construct countable family using basis enumeration *)
   (* Enumerate the countable basis b as a sequence *)
   SUBGOAL_THEN `?e:num->A->bool. !u. u IN b ==> ?n. e n = u`
                STRIP_ASSUME_TAC THENL
    [MATCH_MP_TAC COUNTABLE_SURJECTIVE_ENUMERATION THEN ASM_REWRITE_TAC[];
     ALL_TAC] THEN
-
-  (* Now construct the function family *)
-  (* We'll use choice to get separating functions for each needed case *)
 
   (* For each pair of distinct points, completely_regular gives a function *)
   SUBGOAL_THEN
