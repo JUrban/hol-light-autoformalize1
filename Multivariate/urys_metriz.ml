@@ -111,13 +111,12 @@ let REGULAR_SPACE_BASIS_CLOSURE = prove
     EXISTS_TAC `v:A->bool` THEN
     ASM_REWRITE_TAC[] THEN
     (* Show closure(v) SUBSET u *)
-    (* Key insight: From DISJOINT w z and (topspace\u) SUBSET z, get w SUBSET u *)
-    (* Then v SUBSET w SUBSET u *)
-    (* Finally use closure containment: need closure(v) SUBSET u *)
-    (* This follows from: v INTER z = {} (since v SUBSET w, DISJOINT w z) *)
-    (* and z open gives closure(v) INTER z = {} by OPEN_IN_INTER_CLOSURE_OF_EQ_EMPTY *)
-    (* and (topspace\u) SUBSET z gives closure(v) SUBSET u *)
-    CHEAT_TAC]);;
+    (* Use: v ⊆ w, DISJOINT w z, z open, topspace\u ⊆ z, closure(v) ⊆ topspace *)
+    (* From v ⊆ w and DISJOINT w z get v ∩ z = ∅ *)
+    (* From z open and v ∩ z = ∅ get closure(v) ∩ z = ∅ *)
+    (* From closure(v) ∩ z = ∅ and topspace\u ⊆ z get closure(v) ⊆ u *)
+    ASM_MESON_TAC[OPEN_IN_INTER_CLOSURE_OF_EQ_EMPTY; CLOSURE_OF_SUBSET_TOPSPACE;
+                  SUBSET; DISJOINT; IN_DIFF; IN_INTER; NOT_IN_EMPTY]]);;
 
 let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
  (`!top:A topology.
