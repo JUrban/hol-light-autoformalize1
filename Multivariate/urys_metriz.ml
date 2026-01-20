@@ -584,17 +584,6 @@ let IMAGE_SUBSET_FROM_POINTWISE = prove
 (* Helper: topspace of unit interval subtopology *)
 
 (* Helper: membership in conditional sets *)
-let IN_COND_SET = prove
- (`!b s t x. x IN (if b then s else t) <=> if b then x IN s else x IN t`,
-  MESON_TAC[]);;
-
-
-
-(* Helper: real number between bounds *)
-let REAL_BETWEEN_BOUNDS = prove
- (`!a b x. a < x /\ x < b ==> a < b`,
-  REAL_ARITH_TAC);;
-
 (* Note: INTER_SUBSET, UNION_SUBSET, IN_UNION are available from
    library (sets.ml). Using those instead of redundant versions. *)
 
@@ -608,66 +597,9 @@ let CONTINUOUS_MAP_CONST = prove
 
 (* Note: Set difference subset - use SET_TAC directly *)
 
-(* Helper: basic interval property *)
-let IN_INTERVAL_IMP_BOUNDS = prove
- (`!x a b. x IN real_interval[a,b] ==> a <= x /\ x <= b`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
-
-(* Helper: simple continuous map property *)
-let CONTINUOUS_MAP_ID_SUBT = prove
- (`!top s. s SUBSET topspace top
-           ==> continuous_map (subtopology top s, top) (\x. x)`,
-  SIMP_TAC[CONTINUOUS_MAP_FROM_SUBTOPOLOGY; CONTINUOUS_MAP_ID]);;
-
 (* Note: FINITE_INTER_SUBSET - trivial SET_TAC *)
 
-(* Helper: conditional equality *)
-let COND_EQ_IMPLIES = prove
- (`!b x y z. (if b then x else y) = z
-             ==> (b ==> x = z) /\ (~b ==> y = z)`,
-  MESON_TAC[]);;
-
-(* Helper: basic topology lemma *)
-let OPEN_IN_IMP_SUBSET_TOPSPACE = prove
- (`!top u. open_in top u ==> u SUBSET topspace top`,
-  SIMP_TAC[OPEN_IN_SUBSET]);;
-
-(* Helper: continuous map range *)
-let CONTINUOUS_MAP_RANGE_SUBSET = prove
- (`!top top' f. continuous_map (top,top') f
-                ==> IMAGE f (topspace top) SUBSET topspace top'`,
-  SIMP_TAC[CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE]);;
-
 (* Helper: product topology basics *)
-
-(* Helper: image under lambda *)
-let IMAGE_LAMBDA_EXTENSIONAL = prove
- (`!f s. IMAGE (\x. \n. f n x) s =
-         {g | ?x. x IN s /\ (!n. g n = f n x)}`,
-  REWRITE_TAC[EXTENSION; IN_IMAGE; IN_ELIM_THM] THEN
-  MESON_TAC[FUN_EQ_THM]);;
-
-(* Helper: simple real arithmetic *)
-let REAL_HALF_BETWEEN = prove
- (`!a b. a < (a + b) / &2 /\ (a + b) / &2 < b <=> a < b`,
-  REAL_ARITH_TAC);;
-
-(* Helper: conditional in interval *)
-let IN_INTERVAL_CONDITIONAL = prove
- (`!b a1 a2 b1 b2 x.
-     x IN (if b then real_interval[a1,b1] else real_interval[a2,b2])
-     ==> (b ==> x IN real_interval[a1,b1]) /\
-         (~b ==> x IN real_interval[a2,b2])`,
-  MESON_TAC[]);;
-
-
-(* Helper: embedding map injectivity *)
-let EMBEDDING_MAP_IMP_INJECTIVE = prove
- (`!top top' f. embedding_map (top,top') f
-                ==> (!x y. x IN topspace top /\ y IN topspace top /\ f x = f y
-                           ==> x = y)`,
-  REWRITE_TAC[embedding_map; homeomorphic_map] THEN
-  MESON_TAC[]);;
 
 (* Helper: nonempty interval *)
 let REAL_INTERVAL_NONEMPTY_OPEN = prove
@@ -698,10 +630,6 @@ let REAL_INTERVAL_NONEMPTY_OPEN = prove
 
 
 (* Helper: union singleton *)
-let UNION_SING = prove
- (`!s x. s UNION {x} = x INSERT s`,
-  REWRITE_TAC[EXTENSION; IN_UNION; IN_INSERT; IN_SING] THEN MESON_TAC[]);;
-
 (* Note: INTER_UNIV, DIFF_EMPTY, EMPTY_SUBSET, UNION_COMM, INTER_COMM,
    SUBSET_ANTISYM_EQ, IN_UNION, IN_INTER, IN_DIFF, SUBSET_REFL, SUBSET_TRANS
    are all available from library (sets.ml). *)
@@ -715,25 +643,6 @@ let UNION_SING = prove
    INTER_IDEMPOT: use SET_TAC or REWRITE_TAC with library lemmas directly *)
 
 (* Helper: union with empty *)
-let UNION_EMPTY_LEFT = prove
- (`!s. {} UNION s = s`,
-  REWRITE_TAC[UNION_EMPTY]);;
-
-(* Helper: union with empty right *)
-let UNION_EMPTY_RIGHT = prove
- (`!s. s UNION {} = s`,
-  REWRITE_TAC[UNION_EMPTY]);;
-
-(* Helper: inter with empty *)
-let INTER_EMPTY_LEFT = prove
- (`!s. {} INTER s = {}`,
-  REWRITE_TAC[INTER_EMPTY]);;
-
-(* Helper: inter with empty right *)
-let INTER_EMPTY_RIGHT = prove
- (`!s. s INTER {} = {}`,
-  REWRITE_TAC[INTER_EMPTY]);;
-
 (* Note: UNION/INTER with UNIV - use SET_TAC or INTER_UNIV library lemma *)
 
 (* Note: DIFF_SELF and DIFF_EMPTY - use SET_TAC directly *)
@@ -798,25 +707,6 @@ let IN_COND_INTERVAL = prove
 (* Note: REAL_LT_ADD2, REAL_LE_ADD2 - basic REAL_ARITH_TAC, use directly *)
 
 (* Helper: left addition *)
-let REAL_LE_LADD = prove
- (`!x y z. x <= y <=> z + x <= z + y`,
-  REAL_ARITH_TAC);;
-
-(* Helper: right addition *)
-let REAL_LE_RADD = prove
- (`!x y z. x <= y <=> x + z <= y + z`,
-  REAL_ARITH_TAC);;
-
-(* Helper: left subtraction *)
-let REAL_LE_LSUB = prove
- (`!x y z. x - y <= z <=> x <= z + y`,
-  REAL_ARITH_TAC);;
-
-(* Helper: right subtraction *)
-let REAL_LE_RSUB = prove
- (`!x y z. x <= y - z <=> x + z <= y`,
-  REAL_ARITH_TAC);;
-
 (* Helper: division basics *)
 let REAL_DIV_REFL = prove
  (`!x. ~(x = &0) ==> x / x = &1`,
@@ -905,10 +795,6 @@ let PAIR_SURJECTIVE = prove
   REWRITE_TAC[PAIR]);;
 
 
-(* Helper: forall pair *)
-let FORALL_PAIR = prove
- (`!P. (!p. P p) <=> (!x y. P (x,y))`,
-  MESON_TAC[PAIR_SURJECTIVE]);;
 
 
 
@@ -1014,26 +900,6 @@ let REAL_INTERVAL_NONEMPTY_CLOSED = prove
 (* Helper: subset of self *)
 
 
-(* Helper: real negation *)
-let REAL_NEG_0 = prove
- (`--(&0) = &0`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real multiplication by one *)
-let REAL_MUL_LID = prove
- (`!x. &1 * x = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real multiplication by one *)
-let REAL_MUL_RID = prove
- (`!x. x * &1 = x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: subset and element *)
-let SUBSET_ELEMENT = prove
- (`!s t x. s SUBSET t /\ x IN s ==> x IN t`,
-  SET_TAC[]);;
-
 (* Note: IMAGE_SUBSET is in library *)
 
 (* Note: Preimage of universal set - use SET_TAC directly *)
@@ -1049,30 +915,10 @@ let SUBSET_ELEMENT = prove
 (* Note: NOT_IN_EMPTY is in library *)
 
 (* Helper: singleton nonempty *)
-let SING_NONEMPTY = prove
- (`!x. ~({x} = {})`,
-  SET_TAC[]);;
-
-(* Helper: insert nonempty *)
-let INSERT_NONEMPTY = prove
- (`!x s. ~(x INSERT s = {})`,
-  SET_TAC[]);;
-
 (* Helper: union with universe *)
 (* Helper: intersection with universe *)
 (* Helper: diff with empty *)
 (* Helper: diff with universe *)
-(* Helper: real bounds from interval membership *)
-let IN_INTERVAL_BOUNDS = prove
- (`!x a b. x IN real_interval[a,b] ==> a <= b`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
-
-(* Helper: open interval strict bounds *)
-let IN_OPEN_INTERVAL_BOUNDS = prove
- (`!x a b. x IN real_interval(a,b) ==> a < b`,
-  REWRITE_TAC[IN_REAL_INTERVAL] THEN REAL_ARITH_TAC);;
-
-(* Helper: nonempty has element *)
 (* Note: IN_UNIV is in library *)
 
 (* Note: UNIV nonempty - basic SET_TAC[IN_UNIV] *)
@@ -1084,10 +930,6 @@ let IN_OPEN_INTERVAL_BOUNDS = prove
 (* Note: SUBSET absorption - basic SET_TAC properties *)
 
 (* Helper: diff and subset *)
-let DIFF_SUBSET = prove
- (`!s t. s DIFF t SUBSET s`,
-  SET_TAC[]);;
-
 (* Note: IMAGE_UNION is in library *)
 
 (* Helper: topspace of euclideanreal *)
@@ -1098,31 +940,6 @@ let DIFF_SUBSET = prove
 
 (* Note: De Morgan's laws - basic SET_TAC *)
 
-
-(* Helper: distributivity *)
-let INTER_UNION_DISTRIB_LEFT = prove
- (`!s t u. s INTER (t UNION u) = (s INTER t) UNION (s INTER u)`,
-  SET_TAC[]);;
-
-(* Helper: distributivity *)
-let INTER_UNION_DISTRIB_RIGHT = prove
- (`!s t u. (s UNION t) INTER u = (s INTER u) UNION (t INTER u)`,
-  SET_TAC[]);;
-
-(* Helper: distributivity *)
-let UNION_INTER_DISTRIB_LEFT = prove
- (`!s t u. s UNION (t INTER u) = (s UNION t) INTER (s UNION u)`,
-  SET_TAC[]);;
-
-(* Helper: distributivity *)
-let UNION_INTER_DISTRIB_RIGHT = prove
- (`!s t u. (s INTER t) UNION u = (s UNION u) INTER (t UNION u)`,
-  SET_TAC[]);;
-
-(* Helper: subset and diff *)
-let SUBSET_DIFF_EQ = prove
- (`!s t u. s SUBSET t ==> (t DIFF u) SUBSET (s UNION (t DIFF u))`,
-  SET_TAC[]);;
 
 (* Note: DIFF/INTER/UNION distributivity: use SET_TAC directly *)
 
