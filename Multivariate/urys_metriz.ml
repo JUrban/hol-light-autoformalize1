@@ -875,18 +875,8 @@ let INSERT_SUBSET_SIMPLE = prove
 (* Note: FINITE_SING, FINITE_EMPTY, FINITE_UNION, FINITE_INSERT, SUBSET_ANTISYM_EQ
    are available from library *)
 
-(* Note: De Morgan laws, DIFF distributivity, UNION_ASSOC, INTER_ASSOC: use SET_TAC or
-   REWRITE_TAC with library lemmas directly *)
-
-(* Helper: union idempotent *)
-let UNION_IDEMP = prove
- (`!s. s UNION s = s`,
-  SET_TAC[]);;
-
-(* Helper: inter idempotent *)
-let INTER_IDEMP = prove
- (`!s. s INTER s = s`,
-  SET_TAC[]);;
+(* Note: De Morgan laws, DIFF distributivity, UNION_ASSOC, INTER_ASSOC, UNION_IDEMPOT,
+   INTER_IDEMPOT: use SET_TAC or REWRITE_TAC with library lemmas directly *)
 
 (* Helper: union with empty *)
 let UNION_EMPTY_LEFT = prove
@@ -2104,15 +2094,7 @@ let SUBSET_DIFF_EQ = prove
  (`!s t u. s SUBSET t ==> (t DIFF u) SUBSET (s UNION (t DIFF u))`,
   SET_TAC[]);;
 
-(* Helper: diff and inter *)
-let DIFF_INTER = prove
- (`!s t u. (s DIFF t) INTER u = s INTER u DIFF t`,
-  SET_TAC[]);;
-
-(* Helper: diff distributivity *)
-let DIFF_UNION_DISTRIB = prove
- (`!s t u. s DIFF (t UNION u) = (s DIFF t) INTER (s DIFF u)`,
-  SET_TAC[]);;
+(* Note: DIFF/INTER/UNION distributivity: use SET_TAC directly *)
 
 (* Helper: real abs properties *)
 let REAL_ABS_REFL = prove
