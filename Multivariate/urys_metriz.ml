@@ -685,25 +685,8 @@ let REAL_BETWEEN_BOUNDS = prove
  (`!a b x. a < x /\ x < b ==> a < b`,
   REAL_ARITH_TAC);;
 
-(* Helper: subset of intersection *)
-let SUBSET_INTER_LEFT = prove
- (`!s t. s INTER t SUBSET s`,
-  SET_TAC[]);;
-
-(* Helper: subset of intersection right *)
-let SUBSET_INTER_RIGHT = prove
- (`!s t. s INTER t SUBSET t`,
-  SET_TAC[]);;
-
-(* Helper: union and subset *)
-let SUBSET_UNION = prove
- (`!s t u. s SUBSET u /\ t SUBSET u ==> (s UNION t) SUBSET u`,
-  SET_TAC[]);;
-
-(* Helper: element in union *)
-let IN_UNION_ALT = prove
- (`!x s t. x IN (s UNION t) <=> x IN s \/ x IN t`,
-  SET_TAC[]);;
+(* Note: INTER_SUBSET, UNION_SUBSET, IN_UNION are available from
+   library (sets.ml). Using those instead of redundant versions. *)
 
 (* Helper: continuity composition *)
 let CONTINUOUS_MAP_CONST = prove
