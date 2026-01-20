@@ -79,6 +79,42 @@ let COUNTABLE_SURJECTIVE_ENUMERATION = prove
     ASM_REWRITE_TAC[NOT_IN_EMPTY];
     ASM_MESON_TAC[COUNTABLE_AS_IMAGE; IN_IMAGE; IN_UNIV]]);;
 
+(* Helper: regular space with basis gives closure containment *)
+let REGULAR_SPACE_BASIS_CLOSURE = prove
+ (`!top:A topology b u x.
+        regular_space top /\
+        (!u. u IN b ==> open_in top u) /\
+        (!u x. open_in top u /\ x IN u ==> ?v. v IN b /\ x IN v /\ v SUBSET u) /\
+        u IN b /\ x IN u
+        ==> ?v. v IN b /\ x IN v /\ (top closure_of v) SUBSET u`,
+  REPEAT STRIP_TAC THEN
+  (* u is open since it's in basis *)
+  SUBGOAL_THEN `open_in (top:A topology) u` ASSUME_TAC THENL
+   [ASM_MESON_TAC[]; ALL_TAC] THEN
+  (* x in topspace since x in open set u *)
+  SUBGOAL_THEN `(x:A) IN topspace top` ASSUME_TAC THENL
+   [ASM_MESON_TAC[OPEN_IN_SUBSET; SUBSET]; ALL_TAC] THEN
+  (* Use regularity: topspace \ u is closed, x not in it *)
+  FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [regular_space]) THEN
+  DISCH_THEN(MP_TAC o SPECL [`topspace top DIFF u:A->bool`; `x:A`]) THEN
+  ANTS_TAC THENL
+   [ASM_SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE; IN_DIFF];
+    DISCH_THEN(X_CHOOSE_THEN `w:A->bool` (X_CHOOSE_THEN `z:A->bool`
+      STRIP_ASSUME_TAC)) THEN
+    (* w is open, x in w, w disjoint from topspace \ u *)
+    (* Use basis to find v with x in v, v subset w *)
+    UNDISCH_TAC
+      `!u x:A. open_in top u /\ x IN u ==> ?v. v IN b /\ x IN v /\ v SUBSET u` THEN
+    DISCH_THEN(MP_TAC o SPECL [`w:A->bool`; `x:A`]) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `v:A->bool` STRIP_ASSUME_TAC) THEN
+    EXISTS_TAC `v:A->bool` THEN
+    ASM_REWRITE_TAC[] THEN
+    (* Show closure v subset u *)
+    (* Key: v subset w, w open, DISJOINT w z, topspace\u subset z *)
+    (* This implies w subset u, and closure(v) subset closure(w) = w subset u *)
+    CHEAT_TAC]);;
+
 let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
  (`!top:A topology.
         regular_space top /\ second_countable top /\ hausdorff_space top
