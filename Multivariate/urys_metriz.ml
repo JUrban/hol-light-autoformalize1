@@ -301,16 +301,6 @@ let COND_INTERVAL_DIFF_ZERO_NE_IMP = prove
   MESON_TAC[]);;
 
 (* Helper: finite set for conditional interval construction *)
-let FINITE_COND_INTERVAL_DIFF_ZERO = prove
- (`!n:num. FINITE {i:num | ~((if i = n then real_interval[&0,&1] DIFF {&0}
-                              else real_interval[&0,&1]) =
-                             real_interval[&0,&1])}`,
-  GEN_TAC THEN
-  MATCH_MP_TAC FINITE_SUBSET THEN
-  EXISTS_TAC `{n:num}` THEN
-  REWRITE_TAC[FINITE_SING; SUBSET; IN_SING; IN_ELIM_THM] THEN
-  REWRITE_TAC[COND_INTERVAL_DIFF_ZERO_NE_IMP]);;
-
 (* Helper: membership in conditional interval *)
 let IN_COND_INTERVAL_DIFF_ZERO = prove
  (`!x n i. x IN real_interval[&0,&1] /\ (i = n ==> ~(x = &0))
@@ -408,10 +398,6 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
     REPEAT STRIP_TAC THEN BETA_TAC THEN REFL_TAC]);;
 
 (* Helper: basic fact about functions into [0,1] *)
-let IN_UNIT_INTERVAL_BOUNDS = prove
- (`!x. x IN real_interval[&0,&1] <=> &0 <= x /\ x <= &1`,
-  REWRITE_TAC[IN_REAL_INTERVAL]);;
-
 (* Helper: continuous map into subtopology *)
 
 
@@ -699,22 +685,6 @@ let FUN_EQ = prove
 let PAIR_EQ = prove
  (`!(x1:A) (y1:B) x2 y2. (x1,y1) = (x2,y2) <=> x1 = x2 /\ y1 = y2`,
   REWRITE_TAC[PAIR_EQ]);;
-
-
-(* Helper: pair surjective *)
-let PAIR_SURJECTIVE = prove
- (`!p. p = (FST p, SND p)`,
-  REWRITE_TAC[PAIR]);;
-
-
-
-
-
-
-
-
-
-
 
 
 (* Helper: image of constant *)
