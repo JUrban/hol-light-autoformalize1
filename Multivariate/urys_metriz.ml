@@ -340,11 +340,6 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
     (* Prove final property: g x n = f n x where g = \x.\n. f n x *)
     REPEAT STRIP_TAC THEN BETA_TAC THEN REFL_TAC]);;
 
-(* Helper: basic fact about functions into [0,1] *)
-(* Helper: continuous map into subtopology *)
-
-(* Helper: membership in diff *)
-
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
  (`metrizable_space (subtopology euclideanreal (real_interval[&0,&1]))`,
