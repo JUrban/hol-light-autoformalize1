@@ -863,10 +863,7 @@ let INTER_EMPTY_RIGHT = prove
 
 (* Note: DIFF_SELF and DIFF_EMPTY - use SET_TAC directly *)
 
-(* Helper: empty diff *)
-let DIFF_EMPTY_RIGHT = prove
- (`!s. s DIFF {} = s`,
-  REWRITE_TAC[DIFF_EMPTY]);;
+(* Note: DIFF_EMPTY is in library *)
 
 (* Note: (:A) and UNIV are the same, trivial identity *)
 
@@ -1120,17 +1117,7 @@ let o_ID_RIGHT = prove
 (* Note: SURJECTIVE_DEF, BIJECTIVE_DEF - basic function definitions, use library *)
 
 
-(* Helper: forall in insert *)
-let FORALL_IN_INSERT = prove
- (`!P x s. (!y. y IN (x INSERT s) ==> P y) <=>
-           P x /\ (!y. y IN s ==> P y)`,
-  SET_TAC[]);;
-
-(* Helper: exists in insert *)
-let EXISTS_IN_INSERT = prove
- (`!P x s. (?y. y IN (x INSERT s) /\ P y) <=>
-           P x \/ (?y. y IN s /\ P y)`,
-  SET_TAC[]);;
+(* Note: FORALL_IN_INSERT, EXISTS_IN_INSERT - basic SET_TAC properties *)
 
 (* Helper: finite union *)
 let FINITE_UNION_EQ = prove
@@ -1565,25 +1552,11 @@ let IN_OPEN_INTERVAL_BOUNDS = prove
 (* Helper: nonempty has element *)
 (* Note: IN_UNIV is in library *)
 
-(* Helper: universal set nonempty *)
-let UNIV_NONEMPTY = prove
- (`~((:A) = {})`,
-  SET_TAC[IN_UNIV]);;
+(* Note: UNIV nonempty - basic SET_TAC[IN_UNIV] *)
 
-(* Helper: real comparisons *)
-let REAL_LT_TOTAL = prove
- (`!x y. x < y \/ x = y \/ y < x`,
-  REAL_ARITH_TAC);;
+(* Note: REAL_LT_TOTAL - basic REAL_ARITH_TAC *)
 
-(* Helper: real comparisons *)
-let REAL_NOT_LT = prove
- (`!x y. ~(x < y) <=> y <= x`,
-  REAL_ARITH_TAC);;
-
-(* Helper: real comparisons *)
-let REAL_NOT_LE = prove
- (`!x y. ~(x <= y) <=> y < x`,
-  REAL_ARITH_TAC);;
+(* Note: REAL_NOT_LT, REAL_NOT_LE - basic REAL_ARITH_TAC *)
 
 (* Helper: subset of intersection *)
 let SUBSET_INTER_ABSORPTION = prove
@@ -1723,9 +1696,7 @@ let HALF_IN_UNIT_BOUNDS = prove
 
 (* Helper: everything is in UNIV *)
 (* Helper: forall in UNIV simplification *)
-let FORALL_IN_UNIV = prove
- (`!P. (!x. x IN UNIV ==> P x) <=> (!x. P x)`,
-  REWRITE_TAC[IN_UNIV]);;
+(* Note: FORALL_IN_UNIV - basic REWRITE_TAC[IN_UNIV] *)
 
 (* Note: Basic logic properties (implication chain, conjunction intro, reflexivity,
    disjunction cases, equality symmetry/transitivity): use MESON_TAC directly *)
