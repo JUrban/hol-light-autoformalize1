@@ -229,18 +229,6 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
           DISCH_TAC THEN
           (* Following textbook Step 2 proof (topology.tex lines 4662-4683) *)
           (* Goal: show u is open in subtopology product (IMAGE g topspace) *)
-          (* Strategy: For each z ∈ u, construct cylinder neighborhood *)
-
-          (* Textbook approach:
-             - z ∈ u ⊆ IMAGE g topspace, so ∃x. z = g(x) = (f_1(x), f_2(x), ...)
-             - Preimage {y | y ∈ topspace ∧ g(y) ∈ u} is open and contains x
-             - Use regularity/separation to find closed c with x ∉ c
-             - Apply closed set separation (assumption 4) to get index N where:
-               f_N(x) = 1 and ∀z∈c. f_N(z) = 0
-             - Define cylinder V = π_N^(-1)((0, +∞)) = {h | h(N) > 0}
-             - Take W = V ∩ IMAGE g topspace
-             - Show: z ∈ W and W ⊆ u
-          *)
 
           (* Implementation strategy from Munkres §34.1, Step 2, pages 214-215:
 
