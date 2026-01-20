@@ -166,41 +166,34 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (* Attempt 19: Use basis-dependent construction with Urysohn functions *)
+  (* Attempt 20: Add proof structure with choice operator *)
 
-  (* Strategy: For each pair of basis elements (n,m) where closure(e_n) ⊆ e_m,
-     apply Urysohn lemma to get function g_{n,m} that equals 0 on closure(e_n)
-     and 1 outside e_m. These functions will separate points and closed sets
-     by regularity. Enumerate using NUMPAIR to get sequence {f_i}. *)
+  (* Strategy: Construct f : num -> A -> real as follows:
+     For k = NUMPAIR n m: if closure(e_n) ⊆ e_m, use Urysohn function g_{n,m}
+     that equals 0 on closure(e_n) and 1 outside e_m; else constant &1/&2.
+     This family separates points and closed sets by regularity + basis properties. *)
 
-  (* Define the function family f : num -> A -> real *)
-  (* For each k, let n = NUMFST k and m = NUMSND k *)
-  (* If closure(e_n) ⊆ e_m, use Urysohn on them; otherwise use constant &1/&2 *)
+  (* Step 1: For each pair (n,m), try to get a separating Urysohn function *)
+  (* The existence comes from assumptions about point/closed set separation *)
 
-  (* The challenge is expressing this dependent construction formally *)
-  (* We need:
-     1. For each valid pair (n,m): closure(e_n) ⊆ e_m
-        Define g_{n,m} via Urysohn with g_{n,m} = 0 on closure(e_n), = 1 outside e_m
-     2. For invalid pairs: define as constant &1/&2
-     3. Show this family separates points:
-        - Given x ≠ y, regularity + basis give B_n, B_m with desired inclusion
-        - Use corresponding g_{n,m} = f_{NUMPAIR n m} to separate
-     4. Show this family separates closed sets from external points similarly
-  *)
+  (* The formal construction requires:
+     1. Choice operator @ to select witnessing functions
+     2. Conditional: if closure(e_n) ⊆ e_m then use Urysohn else &1/&2
+     3. NUMFST, NUMSND to decode k = NUMPAIR n m
+     4. Verification that separation properties hold
 
-  (* This requires:
-     - Dependent choice/function definition over conditionals on topology
-     - CLOSED_IN_CLOSURE properties for the basis
-     - NUMFST, NUMSND from NUMPAIR_DEST
-     - Careful case analysis for when closure(e_n) ⊆ e_m holds
-  *)
+     Key technical challenge: expressing "if closure(e_n) ⊆ e_m" as a
+     decidable predicate, and using choice to select the Urysohn function
+     for each valid pair. This requires:
+     - CLOSED_IN_CLOSURE_OF for the basis
+     - NORMAL_SPACE_URYSOHN_FUNCTION applied to closure(e_n) and topspace \ e_m
+     - Choice principles to extract function from existence
+     - SKOLEM_THM to convert ∀ pairs. ∃function to ∃family. ∀pairs
 
-  (* Key difficulty: The construction needs to be done using choice principles
-     or explicit recursive definition, which requires careful setup in HOL Light.
-     The textbook glosses over this by assuming we can "just enumerate" the
-     countable family, but formally we need to extract functions from the
-     existence statements and verify all properties hold after enumeration. *)
+     The verification (steps 3-4 from Attempt 19) requires regularity to find
+     the right basis pair (n,m) for each separation instance. *)
 
+  (* For now, admitting the entire construction: *)
   CHEAT_TAC);;
 
 
