@@ -608,10 +608,7 @@ let IN_COND_INTERVAL = prove
 
 (* Helper: preimage basic *)
 
-(* Helper: function extensionality *)
-let FUN_EQ = prove
- (`!f g. (!x. f x = g x) <=> f = g`,
-  REWRITE_TAC[FUN_EQ_THM]);;
+(* Note: FUN_EQ - unused wrapper of FUN_EQ_THM, use FUN_EQ_THM directly *)
 
 
 
@@ -657,10 +654,7 @@ let FUN_EQ = prove
 
 
 
-(* Helper: pair equality *)
-let PAIR_EQ = prove
- (`!(x1:A) (y1:B) x2 y2. (x1,y1) = (x2,y2) <=> x1 = x2 /\ y1 = y2`,
-  REWRITE_TAC[PAIR_EQ]);;
+(* Note: PAIR_EQ - trivial library wrapper, use library PAIR_EQ directly *)
 
 
 (* Helper: image of constant *)
@@ -674,11 +668,7 @@ let PAIR_EQ = prove
    CLOSED_IN_EMPTY, CLOSED_IN_TOPSPACE, CLOSED_IN_UNION, CLOSED_IN_INTER -
    all library lemmas *)
 
-(* Helper: open closed complement *)
-let OPEN_IN_CLOSED_IN_EQ = prove
- (`!top s. s SUBSET topspace top
-           ==> (open_in top s <=> closed_in top (topspace top DIFF s))`,
-  SIMP_TAC[OPEN_IN_CLOSED_IN_EQ]);;
+(* Note: OPEN_IN_CLOSED_IN_EQ - trivial library wrapper, use library directly *)
 
 
 (* Note: REAL_HALF_LT_ONE, REAL_ZERO_LT_HALF - basic REAL_ARITH_TAC, use directly *)
