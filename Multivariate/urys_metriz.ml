@@ -2183,15 +2183,8 @@ let FORALL_IN_UNIV = prove
  (`!P. (!x. x IN UNIV ==> P x) <=> (!x. P x)`,
   REWRITE_TAC[IN_UNIV]);;
 
-(* Helper: implication chain *)
-let IMP_CHAIN = prove
- (`!p q r. (p ==> q) /\ (q ==> r) ==> (p ==> r)`,
-  MESON_TAC[]);;
-
-(* Helper: conjunction introduction *)
-let CONJ_INTRO = prove
- (`!p q. p ==> q ==> p /\ q`,
-  MESON_TAC[]);;
+(* Note: Basic logic properties (implication chain, conjunction intro, reflexivity,
+   disjunction cases, equality symmetry/transitivity): use MESON_TAC directly *)
 
 (* Helper: value between 1/2 and 1 *)
 let THREE_QUARTERS_BOUNDS = prove
@@ -2203,29 +2196,5 @@ let THREE_QUARTERS_IN_UNIT = prove
  (`&3 / &4 IN real_interval[&0,&1]`,
   REWRITE_TAC[IN_UNIT_INTERVAL_BOUNDS] THEN REAL_ARITH_TAC);;
 
-(* Helper: basic implication *)
-let IMP_REFL = prove
- (`!p. p ==> p`,
-  MESON_TAC[]);;
-
-(* Helper: disjunction elimination *)
-let DISJ_CASES_SIMPLE = prove
- (`!p q r. (p \/ q) /\ (p ==> r) /\ (q ==> r) ==> r`,
-  MESON_TAC[]);;
-
-(* Note: Equality symmetry and transitivity: use MESON_TAC directly *)
-
-(* Helper: conjunction and implication *)
-let CONJ_IMP = prove
- (`!p q r. (p /\ q ==> r) <=> (p ==> q ==> r)`,
-  MESON_TAC[]);;
-
-(* Helper: negation and equivalence *)
-let NOT_IFF = prove
- (`!p q. (~p <=> ~q) <=> (p <=> q)`,
-  MESON_TAC[]);;
-
-(* Helper: contrapositive *)
-let CONTRAPOS_SIMPLE = prove
- (`!p q. (p ==> q) ==> (~q ==> ~p)`,
-  MESON_TAC[]);;
+(* Note: Additional logic properties (CONJ_IMP, NOT_IFF, contrapositive):
+   use MESON_TAC directly *)
