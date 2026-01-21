@@ -653,7 +653,11 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
   (* Prove IMAGE g u = t INTER IMAGE g (topspace top) *)
   REWRITE_TAC[EXTENSION; IN_INTER; IN_IMAGE; IN_UNIONS; IN_ELIM_THM] THEN
   X_GEN_TAC `h:num->real` THEN EQ_TAC THENL
-   [CHEAT_TAC;
+   [(* ==> direction: h = g x for some x IN u, show h in union and in image of topspace *)
+    DISCH_THEN(X_CHOOSE_THEN `x:A` STRIP_ASSUME_TAC) THEN
+    CONJ_TAC THENL
+     [CHEAT_TAC;
+      EXISTS_TAC `x:A` THEN ASM SET_TAC[]];
     CHEAT_TAC]);;
 
 (* Helper: embedding into product of [0,1] *)
@@ -679,23 +683,40 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                        (\n. subtopology euclideanreal (real_interval[&0,&1]))` THEN
   ABBREV_TAC `g = \x:A. \n:num. (f:num->A->real) n x` THEN
   CONJ_TAC THENL
-   [(* Prove embedding using INJECTIVE_OPEN_IMP_EMBEDDING_MAP *)
-    MATCH_MP_TAC INJECTIVE_OPEN_IMP_EMBEDDING_MAP THEN
-    EXPAND_TAC "prod" THEN EXPAND_TAC "g" THEN REPEAT CONJ_TAC THENL
-     [(* Prove continuous_map *)
+   [(* Prove embedding: unfold to homeomorphic_map to subtopology *)
+    REWRITE_TAC[embedding_map] THEN
+    EXPAND_TAC "prod" THEN EXPAND_TAC "g" THEN
+    (* Use BIJECTIVE_OPEN_IMP_HOMEOMORPHIC_MAP *)
+    MATCH_MP_TAC BIJECTIVE_OPEN_IMP_HOMEOMORPHIC_MAP THEN
+    REPEAT CONJ_TAC THENL
+     [(* Prove continuous_map to subtopology *)
+      REWRITE_TAC[CONTINUOUS_MAP_IN_SUBTOPOLOGY; SUBSET_REFL] THEN
       REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
       GEN_TAC THEN REWRITE_TAC[ETA_AX] THEN ASM_REWRITE_TAC[];
-      (* Prove open_map to subtopology of image *)
-      MATCH_MP_TAC OPEN_MAP_INTO_PRODUCT_IMAGE THEN
+      (* Prove open_map to subtopology of image - use OPEN_MAP_INTO_PRODUCT_IMAGE *)
+      MATCH_MP_TAC OPEN_MAP_INTO_PRODUCT_IMAGE THEN ASM_REWRITE_TAC[];
+      (* Prove surjectivity: IMAGE g (topspace top) = topspace (subtopology ...) *)
+      REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN
+      MATCH_MP_TAC(SET_RULE `s SUBSET t ==> s = t INTER s`) THEN
+      REWRITE_TAC[SUBSET; IN_IMAGE] THEN
+      GEN_TAC THEN DISCH_THEN(X_CHOOSE_THEN `x:A` STRIP_ASSUME_TAC) THEN
+      ASM_REWRITE_TAC[TOPSPACE_PRODUCT_TOPOLOGY; CARTESIAN_PRODUCT_UNIV] THEN
+      REWRITE_TAC[cartesian_product; IN_ELIM_THM; o_DEF; IN_UNIV] THEN
+      REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL; INTER_UNIV] THEN
+      REWRITE_TAC[IN_REAL_INTERVAL; EXTENSIONAL_UNIV] THEN
+      GEN_TAC THEN FIRST_X_ASSUM(MP_TAC o SPECL [`i:num`; `x:A`]) THEN
       ASM_REWRITE_TAC[];
-      (* Prove injectivity *)
+      (* Prove injectivity: g x = g y <=> x = y *)
       REPEAT GEN_TAC THEN STRIP_TAC THEN EQ_TAC THENL
-       [DISCH_THEN(ASSUME_TAC o GSYM) THEN ASM_REWRITE_TAC[];
-        DISCH_TAC THEN ASM_REWRITE_TAC[]]
-      THEN
-      ASM_CASES_TAC `(x:A) = y` THEN ASM_REWRITE_TAC[] THEN
-      REWRITE_TAC[FUN_EQ_THM; NOT_FORALL_THM] THEN
-      FIRST_ASSUM(MP_TAC o SPECL [`x:A`; `y:A`]) THEN ASM_SIMP_TAC[]];
+       [DISCH_TAC THEN
+        ASM_CASES_TAC `(x:A) = y` THEN ASM_REWRITE_TAC[] THEN
+        FIRST_X_ASSUM(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
+        ASM_REWRITE_TAC[] THEN
+        DISCH_THEN(X_CHOOSE_TAC `n:num`) THEN
+        FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [FUN_EQ_THM]) THEN
+        DISCH_THEN(MP_TAC o SPEC `n:num`) THEN
+        ASM_REWRITE_TAC[];
+        DISCH_TAC THEN ASM_REWRITE_TAC[]]];
     (* Prove final property: g x n = f n x where g = \x.\n. f n x *)
     EXPAND_TAC "g" THEN REPEAT STRIP_TAC THEN BETA_TAC THEN REFL_TAC]);;
 
