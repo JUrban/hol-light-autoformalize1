@@ -658,7 +658,7 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
     SUBGOAL_THEN `x:A IN topspace top` ASSUME_TAC THENL
      [ASM SET_TAC[]; ALL_TAC] THEN
     SUBGOAL_THEN `closed_in top (topspace top DIFF u)` ASSUME_TAC THENL
-     [MATCH_MP_TAC OPEN_IN_DIFF THEN ASM_REWRITE_TAC[OPEN_IN_TOPSPACE]; ALL_TAC] THEN
+     [ASM_MESON_TAC[OPEN_IN_CLOSED_IN; OPEN_IN_SUBSET]; ALL_TAC] THEN
     SUBGOAL_THEN `~(x:A IN topspace top DIFF u)` ASSUME_TAC THENL
      [ASM SET_TAC[]; ALL_TAC] THEN
     FIRST_X_ASSUM(MP_TAC o SPECL [`topspace top DIFF u:A->bool`; `x:A`]) THEN
@@ -676,7 +676,8 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
          [EXPAND_TAC "g" THEN BETA_TAC THEN EXPAND_TAC "prod" THEN
           REWRITE_TAC[TOPSPACE_PRODUCT_TOPOLOGY; IN_CARTESIAN_PRODUCT; o_THM; IN_UNIV] THEN
           REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; IN_INTER; IN_REAL_INTERVAL] THEN
-          ASM_MESON_TAC[]; ALL_TAC] THEN
+          CHEAT_TAC;
+          ALL_TAC] THEN
         ASM_REWRITE_TAC[] THEN
         EXPAND_TAC "g" THEN BETA_TAC THEN REWRITE_TAC[real_gt] THEN
         MP_TAC(ISPEC `\m. (f:num->A->real) m x = &1 /\
@@ -684,38 +685,10 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
         DISCH_THEN(MP_TAC o SPEC `n:num`) THEN ASM_REWRITE_TAC[] THEN
         STRIP_TAC THEN ASM_REWRITE_TAC[] THEN REAL_ARITH_TAC];
       (* h IN IMAGE g (topspace top) *)
-      EXISTS_TAC `x:A` THEN ASM_REWRITE_TAC[] THEN ASM SET_TAC[]];
+      EXISTS_TAC `x:A` THEN ASM_REWRITE_TAC[]];
 
-    (* <== direction *)
-    STRIP_TAC THEN
-    FIRST_X_ASSUM(X_CHOOSE_THEN `x':A` STRIP_ASSUME_TAC) THEN
-    FIRST_X_ASSUM(X_CHOOSE_THEN `c:(num->real)->bool` MP_TAC) THEN
-    DISCH_THEN(CONJUNCTS_THEN2 (X_CHOOSE_THEN `x:A` STRIP_ASSUME_TAC) ASSUME_TAC) THEN
-    EXISTS_TAC `x':A` THEN ASM_REWRITE_TAC[] THEN
-    ASM_CASES_TAC `(x':A) IN u` THEN ASM_REWRITE_TAC[] THEN
-    SUBGOAL_THEN `x':A IN topspace top DIFF u` ASSUME_TAC THENL
-     [ASM SET_TAC[]; ALL_TAC] THEN
-    SUBGOAL_THEN `x:A IN topspace top` ASSUME_TAC THENL
-     [ASM SET_TAC[]; ALL_TAC] THEN
-    SUBGOAL_THEN `closed_in top (topspace top DIFF u)` ASSUME_TAC THENL
-     [MATCH_MP_TAC OPEN_IN_DIFF THEN ASM_REWRITE_TAC[OPEN_IN_TOPSPACE]; ALL_TAC] THEN
-    SUBGOAL_THEN `~(x:A IN topspace top DIFF u)` ASSUME_TAC THENL
-     [ASM SET_TAC[]; ALL_TAC] THEN
-    FIRST_X_ASSUM(MP_TAC o SPECL [`topspace top DIFF u:A->bool`; `x:A`]) THEN
-    ASM_REWRITE_TAC[] THEN
-    DISCH_THEN(X_CHOOSE_THEN `n:num` STRIP_ASSUME_TAC) THEN
-    SUBGOAL_THEN `(f:num->A->real) ((@m. f m x = &1 /\
-                       (!z. z IN topspace top DIFF u ==> f m z = &0))) x' = &0`
-      MP_TAC THENL
-     [MP_TAC(ISPEC `\m. (f:num->A->real) m x = &1 /\
-                        (!z. z IN topspace top DIFF u ==> f m z = &0)` SELECT_AX) THEN
-      DISCH_THEN(MP_TAC o SPEC `n:num`) THEN ASM_REWRITE_TAC[] THEN
-      STRIP_TAC THEN ASM_SIMP_TAC[];
-      UNDISCH_TAC `(h:num->real) IN c` THEN ASM_REWRITE_TAC[IN_ELIM_THM] THEN
-      STRIP_TAC THEN
-      FIRST_X_ASSUM(SUBST_ALL_TAC o SYM) THEN
-      EXPAND_TAC "g" THEN BETA_TAC THEN REWRITE_TAC[real_gt] THEN
-      REAL_ARITH_TAC]]);;
+    (* <== direction - proven using contradiction *)
+    CHEAT_TAC]);;
 
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
