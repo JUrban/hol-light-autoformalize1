@@ -240,23 +240,48 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
               (!z. z IN topspace top DIFF e (NUMSND k) ==> g z = &0)) x
        else &0` THEN
 
+  (* Abbreviate the validity condition for cleaner proof *)
+  ABBREV_TAC
+    `valid (k:num) <=> (e:num->A->bool) (NUMFST k) IN b /\
+                       e (NUMSND k) IN b /\
+                       (top closure_of e (NUMFST k)) SUBSET e (NUMSND k) /\
+                       ~(e (NUMFST k) = {})` THEN
+
   (* Now prove the four required properties *)
   (* Beta-reduce the witness function *)
   BETA_TAC THEN
 
-  (* The proof requires:
-     1. For valid k: show the @ chosen function satisfies range/continuity via SELECT_AX
-        (exists such g from assumption 9 applied to appropriate closed sets)
-     2. For invalid k: show constant 0 satisfies range/continuity (trivial)
-     3. Point separation: use REGULAR_SPACE_BASIS_CLOSURE to find valid k = NUMPAIR n m
-     4. Closed set separation: similar
+  (* Split into 4 conjuncts *)
+  REPEAT CONJ_TAC THENL
+   [(* Property 1: range [0,1] for all n, x in topspace *)
+    REPEAT GEN_TAC THEN DISCH_TAC THEN
+    (* Case split on validity of n *)
+    ASM_CASES_TAC `(valid:num->bool) n` THENL
+     [(* Valid case: use SELECT_AX to extract properties *)
+      CHEAT_TAC;
+      (* Invalid case: constant 0 in [0,1] *)
+      ASM_SIMP_TAC[] THEN REAL_ARITH_TAC];
 
-     Key lemmas needed:
-     - SELECT_AX: !P x. P x ==> P((@) P)
-     - NUMFST (NUMPAIR n m) = n, NUMSND (NUMPAIR n m) = m (from ind_types.ml)
-     - CLOSED_IN_DIFF for complement of open set being closed *)
+    (* Property 2: continuity for each n *)
+    GEN_TAC THEN
+    ASM_CASES_TAC `(valid:num->bool) n` THENL
+     [(* Valid case: chosen function is continuous by SELECT_AX *)
+      CHEAT_TAC;
+      (* Invalid case: constant 0 is continuous *)
+      ASM_SIMP_TAC[ETA_AX] THEN
+      REWRITE_TAC[CONTINUOUS_MAP_CONST; TOPSPACE_SUBTOPOLOGY] THEN
+      REWRITE_TAC[IN_INTER; TOPSPACE_EUCLIDEANREAL; IN_UNIV; IN_REAL_INTERVAL] THEN
+      REAL_ARITH_TAC];
 
-  CHEAT_TAC);;
+    (* Property 3: point separation *)
+    MAP_EVERY X_GEN_TAC [`x0:A`; `y0:A`] THEN STRIP_TAC THEN
+    (* Use REGULAR_SPACE_BASIS_CLOSURE to find basis pair (m,n) separating x0, y0 *)
+    CHEAT_TAC;
+
+    (* Property 4: closed set separation *)
+    MAP_EVERY X_GEN_TAC [`c0:A->bool`; `x0:A`] THEN STRIP_TAC THEN
+    (* Use REGULAR_SPACE_BASIS_CLOSURE with complement of c0 *)
+    CHEAT_TAC]);;
 
 (* Note: Pairing function NUMPAIR and properties NUMPAIR_INJ, NUMPAIR_DEST
    are available from the library (ind_types.ml). Use those instead of
