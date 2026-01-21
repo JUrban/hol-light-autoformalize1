@@ -297,7 +297,35 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
          [(* Prove the 3 preconditions *)
           FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
           ASM_REWRITE_TAC[] THEN
-          REPEAT CONJ_TAC THEN CHEAT_TAC;
+          REPEAT CONJ_TAC THENL
+           [(* 1. closed_in top (topspace \ e(NUMSND n)) *)
+            MATCH_MP_TAC CLOSED_IN_DIFF THEN
+            REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN
+            (* open_in top (e (NUMSND n)) from e(NUMSND n) IN b *)
+            FIRST_ASSUM MATCH_MP_TAC THEN ASM_REWRITE_TAC[];
+            (* 2. (@z. z IN e(NUMFST n)) IN topspace top *)
+            (* From valid n: ~(e(NUMFST n) = {}) and e(NUMFST n) IN b *)
+            (* SELECT_AX: ?z. z IN e(NUMFST n) ==> (@z. z IN ...) IN e(NUMFST n) *)
+            (* Then e(NUMFST n) SUBSET topspace by OPEN_IN_SUBSET *)
+            SUBGOAL_THEN `open_in (top:A topology) (e (NUMFST n))` MP_TAC THENL
+             [ASM_MESON_TAC[]; ALL_TAC] THEN
+            DISCH_THEN(MP_TAC o MATCH_MP OPEN_IN_SUBSET) THEN
+            MP_TAC(ISPEC `\z:A. z IN e (NUMFST n)` SELECT_AX) THEN
+            REWRITE_TAC[MEMBER_NOT_EMPTY] THEN
+            ASM SET_TAC[];
+            (* 3. ~((@z. z IN e(NUMFST n)) IN topspace \ e(NUMSND n)) *)
+            (* (@z. z IN e(NUMFST n)) IN e(NUMFST n) by SELECT_AX *)
+            (* e(NUMFST n) SUBSET closure_of e(NUMFST n) by CLOSURE_OF_SUBSET *)
+            (* closure_of e(NUMFST n) SUBSET e(NUMSND n) from valid n *)
+            (* So @z IN e(NUMSND n), hence ~(@z IN topspace \ e(NUMSND n)) *)
+            REWRITE_TAC[IN_DIFF; DE_MORGAN_THM] THEN DISJ2_TAC THEN
+            MP_TAC(ISPEC `\z:A. z IN e (NUMFST n)` SELECT_AX) THEN
+            REWRITE_TAC[MEMBER_NOT_EMPTY] THEN
+            DISCH_TAC THEN
+            SUBGOAL_THEN `open_in (top:A topology) (e (NUMFST n))` MP_TAC THENL
+             [ASM_MESON_TAC[]; ALL_TAC] THEN
+            DISCH_THEN(MP_TAC o MATCH_MP CLOSURE_OF_SUBSET o MATCH_MP OPEN_IN_SUBSET) THEN
+            ASM SET_TAC[]];
           (* Now ?g. ... ==> ?g. ... trivially *)
           SIMP_TAC[]];
         (* Branch 2: Use the existence to get properties of @ *)
@@ -321,7 +349,65 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     GEN_TAC THEN
     ASM_CASES_TAC `(valid:num->bool) n` THENL
      [(* Valid case: chosen function is continuous by SELECT_AX *)
-      CHEAT_TAC;
+      ASM_SIMP_TAC[] THEN
+      (* Abbreviate the predicate for the chosen function *)
+      ABBREV_TAC `P = \g:A->real.
+        continuous_map (top, subtopology euclideanreal (real_interval[&0,&1])) g /\
+        g (@z:A. z IN e (NUMFST n)) = &1 /\
+        (!z. z IN topspace top DIFF e (NUMSND n) ==> g z = &0)` THEN
+      (* First, show existence of such g using assumption 9 (Urysohn) *)
+      SUBGOAL_THEN `?g:A->real. P g` ASSUME_TAC THENL
+       [(* Branch 1: Prove the existential - same structure as Property 1 *)
+        EXPAND_TAC "P" THEN BETA_TAC THEN
+        SUBGOAL_THEN
+          `closed_in top (topspace top DIFF e (NUMSND n)) /\
+           (@z:A. z IN e (NUMFST n)) IN topspace top /\
+           ~((@z. z IN e (NUMFST n)) IN topspace top DIFF e (NUMSND n))
+           ==> ?g. continuous_map
+                     (top,subtopology euclideanreal (real_interval[&0,&1])) g /\
+                   g (@z. z IN e (NUMFST n)) = &1 /\
+                   (!z. z IN topspace top DIFF e (NUMSND n) ==> g z = &0)`
+          MP_TAC THENL
+         [DISCH_TAC THEN
+          FIRST_X_ASSUM(MP_TAC o SPECL
+            [`topspace top DIFF e (NUMSND n):A->bool`;
+             `(@z:A. z IN e (NUMFST n))`]) THEN
+          ASM_REWRITE_TAC[];
+          ALL_TAC] THEN
+        MATCH_MP_TAC(TAUT `a /\ (b ==> c) ==> (a ==> b) ==> c`) THEN
+        CONJ_TAC THENL
+         [(* Prove the 3 preconditions - same as Property 1 *)
+          FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
+          ASM_REWRITE_TAC[] THEN
+          REPEAT CONJ_TAC THENL
+           [MATCH_MP_TAC CLOSED_IN_DIFF THEN
+            REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN
+            FIRST_ASSUM MATCH_MP_TAC THEN ASM_REWRITE_TAC[];
+            SUBGOAL_THEN `open_in (top:A topology) (e (NUMFST n))` MP_TAC THENL
+             [ASM_MESON_TAC[]; ALL_TAC] THEN
+            DISCH_THEN(MP_TAC o MATCH_MP OPEN_IN_SUBSET) THEN
+            MP_TAC(ISPEC `\z:A. z IN e (NUMFST n)` SELECT_AX) THEN
+            REWRITE_TAC[MEMBER_NOT_EMPTY] THEN
+            ASM SET_TAC[];
+            REWRITE_TAC[IN_DIFF; DE_MORGAN_THM] THEN DISJ2_TAC THEN
+            MP_TAC(ISPEC `\z:A. z IN e (NUMFST n)` SELECT_AX) THEN
+            REWRITE_TAC[MEMBER_NOT_EMPTY] THEN
+            DISCH_TAC THEN
+            SUBGOAL_THEN `open_in (top:A topology) (e (NUMFST n))` MP_TAC THENL
+             [ASM_MESON_TAC[]; ALL_TAC] THEN
+            DISCH_THEN(MP_TAC o MATCH_MP CLOSURE_OF_SUBSET o MATCH_MP OPEN_IN_SUBSET) THEN
+            ASM SET_TAC[]];
+          SIMP_TAC[]];
+        (* Branch 2: Use the existence to extract properties of @ *)
+        SUBGOAL_THEN `(P:((A->real)->bool)) ((@) P)` MP_TAC THENL
+         [FIRST_X_ASSUM(MP_TAC o MATCH_MP
+            (MESON[SELECT_AX] `(?g. P g) ==> P ((@) P)`)) THEN
+          SIMP_TAC[];
+          ALL_TAC] THEN
+        EXPAND_TAC "P" THEN BETA_TAC THEN
+        STRIP_TAC THEN
+        (* Goal is to show continuity, which is the first conjunct of P *)
+        ASM_REWRITE_TAC[]];
       (* Invalid case: constant 0 is continuous *)
       ASM_SIMP_TAC[ETA_AX] THEN
       REWRITE_TAC[CONTINUOUS_MAP_CONST; TOPSPACE_SUBTOPOLOGY] THEN
