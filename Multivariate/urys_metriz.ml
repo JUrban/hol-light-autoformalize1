@@ -295,7 +295,7 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
             ASM_REWRITE_TAC[] THEN
             REWRITE_TAC[DISJOINT; EXTENSION; IN_INTER; NOT_IN_EMPTY; IN_DIFF] THEN
             ASM SET_TAC[]];
-          (* Extract the function *)
+          (* Extract the function - URYSOHN gives g = 0 on first set, g = 1 on second *)
           MATCH_MP_TAC MONO_EXISTS THEN X_GEN_TAC `g:A->real` THEN
           STRIP_TAC THEN ASM_REWRITE_TAC[]];
         (* Branch 2: Use the existence to get properties of @ *)
@@ -361,7 +361,9 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
         EXPAND_TAC "P" THEN BETA_TAC THEN
         STRIP_TAC THEN
         (* Goal is to show continuity, which is the first conjunct of P *)
-        ASM_REWRITE_TAC[]];
+        (* Note: goal is `continuous_map ... (\x. (@g. ...) x)` but assumption
+           is `continuous_map ... (@g. ...)` - these are equal by eta *)
+        REWRITE_TAC[ETA_AX] THEN ASM_REWRITE_TAC[]];
       (* Invalid case: constant 0 is continuous *)
       ASM_SIMP_TAC[ETA_AX] THEN
       REWRITE_TAC[CONTINUOUS_MAP_CONST; TOPSPACE_SUBTOPOLOGY] THEN
@@ -371,7 +373,7 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     (* Property 3: point separation *)
     MAP_EVERY X_GEN_TAC [`x0:A`; `y0:A`] THEN STRIP_TAC THEN
     (* Strategy: Find basis pair (v, u) with x0 ∈ v, closure(v) ⊆ u, y0 ∉ u
-       Then f_k(x0) = 1 (x0 ∈ closure(v)) and f_k(y0) = 0 (y0 ∉ u) *)
+       Then f_k(x0) = 1 (x0 ∈ v ⊆ closure(v)) and f_k(y0) = 0 (y0 ∈ topspace \ u) *)
     (* Step 1: {y0} is closed (Hausdorff implies T1) *)
     SUBGOAL_THEN `closed_in (top:A topology) {y0:A}` ASSUME_TAC THENL
      [ASM_MESON_TAC[CLOSED_IN_T1_SING; HAUSDORFF_IMP_T1_SPACE]; ALL_TAC] THEN
@@ -463,13 +465,6 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
    are available from the library (ind_types.ml). Use those instead of
    defining custom pairing functions, per CLAUDE.md guidance to avoid
    duplicating library infrastructure. *)
-
-(* Helper: continuous map image in topspace *)
-let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
- (`!top top' (f:A->B).
-        continuous_map (top,top') f
-        ==> IMAGE f (topspace top) SUBSET topspace top'`,
-  SIMP_TAC[CONTINUOUS_MAP]);;
 
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
@@ -661,3 +656,10 @@ let URYSOHN_METRIZATION = prove
     DISCH_TAC THEN
     MP_TAC(SPEC `top:A topology` URYSOHN_METRIZATION_FWD) THEN
     ASM_REWRITE_TAC[] THEN SIMP_TAC[]]);;
+
+(* Helper: continuous map image in topspace *)
+let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
+ (`!top top' (f:A->B).
+        continuous_map (top,top') f
+        ==> IMAGE f (topspace top) SUBSET topspace top'`,
+  SIMP_TAC[CONTINUOUS_MAP]);;
