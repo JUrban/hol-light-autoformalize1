@@ -711,7 +711,61 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
       (* h = g x for some x in topspace top *)
       EXISTS_TAC `x:A` THEN ASM SET_TAC[]];
     (* <== direction: h in union and in image of topspace ==> h in image of u *)
-    CHEAT_TAC]);;
+    (* Assumptions after decomposition:
+       7: w IN u, 8: cylinder def, 9: h IN t, 10: h = g y, 11: y IN topspace top
+       Goal: ∃x. h = g x ∧ x IN u. Witness: y *)
+    DISCH_THEN(CONJUNCTS_THEN2
+      (X_CHOOSE_THEN `t:(num->real)->bool`
+        (CONJUNCTS_THEN2
+          (X_CHOOSE_THEN `w:A` STRIP_ASSUME_TAC)
+          ASSUME_TAC))
+      (X_CHOOSE_THEN `y:A` STRIP_ASSUME_TAC)) THEN
+    EXISTS_TAC `y:A` THEN ASM_REWRITE_TAC[] THEN
+    (* Prove y IN u by contradiction *)
+    ASM_CASES_TAC `(y:A) IN u` THEN ASM_REWRITE_TAC[] THEN
+    (* y ∉ u, so y IN topspace top DIFF u *)
+    SUBGOAL_THEN `(y:A) IN topspace top DIFF u` ASSUME_TAC THENL
+     [ASM SET_TAC[]; ALL_TAC] THEN
+    (* Get n0 with f n0 w = &1 and f n0 z = &0 for z outside u *)
+    SUBGOAL_THEN `?n0. (f:num->A->real) n0 w = &1 /\
+                       (!z. z IN topspace top DIFF u ==> f n0 z = &0)`
+                 (X_CHOOSE_TAC `n0:num`) THENL
+     [FIRST_X_ASSUM(MP_TAC o SPECL [`topspace top DIFF (u:A->bool)`; `w:A`]) THEN
+      ANTS_TAC THENL
+       [CONJ_TAC THENL
+         [MP_TAC(ISPECL [`top:A topology`; `u:A->bool`] OPEN_IN_CLOSED_IN_EQ) THEN
+          ASM_REWRITE_TAC[] THEN MESON_TAC[];
+          CONJ_TAC THENL [ASM SET_TAC[]; ASM SET_TAC[]]];
+        MESON_TAC[]];
+      ALL_TAC] THEN
+    (* By SELECT_AX: f (@n. f n w = &1 ∧ ...) y = &0 since y is outside u *)
+    SUBGOAL_THEN `(f:num->A->real) (@n. f n w = &1 /\
+                   (!z. z IN topspace top DIFF u ==> f n z = &0)) y = &0`
+                 ASSUME_TAC THENL
+     [MP_TAC(ISPEC `\n:num. (f:num->A->real) n w = &1 /\
+                            (!z. z IN topspace top DIFF u ==> f n z = &0)` SELECT_AX) THEN
+      REWRITE_TAC[] THEN
+      DISCH_THEN(MP_TAC o SPEC `n0:num`) THEN
+      ASM_REWRITE_TAC[] THEN
+      DISCH_THEN(CONJUNCTS_THEN2 ASSUME_TAC (MP_TAC o SPEC `y:A`)) THEN
+      ASM_REWRITE_TAC[];
+      ALL_TAC] THEN
+    (* From h IN t and cylinder definition: h (@n...) > &0 *)
+    SUBGOAL_THEN `(h:num->real) (@n. (f:num->A->real) n w = &1 /\
+                   (!z. z IN topspace top DIFF u ==> f n z = &0)) > &0`
+                 ASSUME_TAC THENL
+     [UNDISCH_TAC `(h:num->real) IN t` THEN
+      ASM_REWRITE_TAC[] THEN SIMP_TAC[];
+      ALL_TAC] THEN
+    (* But h = g y = (\n. f n y), so h (@n...) = f (@n...) y = &0 *)
+    SUBGOAL_THEN `(h:num->real) (@n. (f:num->A->real) n w = &1 /\
+                   (!z. z IN topspace top DIFF u ==> f n z = &0)) = &0`
+                 ASSUME_TAC THENL
+     [ASM_REWRITE_TAC[] THEN EXPAND_TAC "g" THEN REWRITE_TAC[] THEN
+      ASM_REWRITE_TAC[];
+      ALL_TAC] THEN
+    (* Contradiction: &0 > &0 *)
+    ASM_REAL_ARITH_TAC]);;
 
 (* Helper: embedding into product of [0,1] *)
 let EMBEDDING_INTO_REAL_PRODUCT = prove
