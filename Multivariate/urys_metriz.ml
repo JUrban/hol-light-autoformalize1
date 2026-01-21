@@ -214,6 +214,15 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      Key: Given x₀ and neighborhood U, regularity gives basis elements B_n, B_m
      with x₀ ∈ B_n, closure(B_n) ⊆ B_m ⊆ U. Then g_{n,m} works. *)
 
+  (* Key step: For valid basis pairs, Urysohn gives separating functions *)
+  (* First show: given x ∈ U open, can find basis pair with x ∈ closure(e n) ⊆ e m ⊆ U *)
+
+  (* Now construct the family using the pairing function NUMPAIR *)
+  (* For k = NUMPAIR(n,m), define f_k using Urysohn if valid, else constant 0 *)
+
+  (* Use Hilbert choice @ to pick Urysohn function for each valid pair *)
+  (* Let G(n,m) = if conditions then @g. Urysohn props else (\x. &0) *)
+
   CHEAT_TAC);;
 
 (* Note: Pairing function NUMPAIR and properties NUMPAIR_INJ, NUMPAIR_DEST
