@@ -279,9 +279,41 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
                    (!z. z IN topspace top DIFF e (NUMSND n) ==> g z = &0)`
           MP_TAC THENL
          [ASM_MESON_TAC[]; ALL_TAC] THEN
-        (* Verify preconditions: need validity information *)
-        (* valid n gives us the 4 properties needed *)
-        CHEAT_TAC;
+        (* Verify preconditions from validity and apply MP *)
+        (* valid n gives: e(NUMFST n) IN b, e(NUMSND n) IN b,
+           closure ⊆ e(NUMSND n), e(NUMFST n) ≠ {} *)
+        (* We need to prove the antecedent and use modus ponens *)
+        MATCH_MP_TAC(TAUT `a /\ (b ==> c) ==> (a ==> b) ==> c`) THEN
+        CONJ_TAC THENL
+         [(* Prove the 3 preconditions *)
+          FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
+          ASM_REWRITE_TAC[] THEN STRIP_TAC THEN
+          REPEAT CONJ_TAC THENL
+           [(* closed_in top (topspace \ e(NUMSND n)) *)
+            MATCH_MP_TAC CLOSED_IN_DIFF THEN
+            REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN ASM_MESON_TAC[];
+            (* (@z. z IN e(NUMFST n)) IN topspace top *)
+            SUBGOAL_THEN `?z:A. z IN e (NUMFST n)` MP_TAC THENL
+             [ASM_MESON_TAC[MEMBER_NOT_EMPTY]; ALL_TAC] THEN
+            DISCH_THEN(MP_TAC o MATCH_MP SELECT_AX) THEN
+            SUBGOAL_THEN `open_in (top:A topology) (e (NUMFST n))` MP_TAC THENL
+             [ASM_MESON_TAC[]; ALL_TAC] THEN
+            REWRITE_TAC[OPEN_IN_SUBSET] THEN ASM SET_TAC[];
+            (* ~((@z. z IN e(NUMFST n)) IN topspace \ e(NUMSND n)) *)
+            REWRITE_TAC[IN_DIFF; DE_MORGAN_THM] THEN DISJ2_TAC THEN
+            SUBGOAL_THEN `?z:A. z IN e (NUMFST n)` MP_TAC THENL
+             [ASM_MESON_TAC[MEMBER_NOT_EMPTY]; ALL_TAC] THEN
+            DISCH_THEN(MP_TAC o MATCH_MP SELECT_AX) THEN
+            MATCH_MP_TAC(SET_RULE `s SUBSET t ==> x IN s ==> x IN t`) THEN
+            MATCH_MP_TAC SUBSET_TRANS THEN
+            EXISTS_TAC `(top:A topology) closure_of e (NUMFST n)` THEN
+            CONJ_TAC THENL
+             [MATCH_MP_TAC CLOSURE_OF_SUBSET THEN
+              SUBGOAL_THEN `open_in (top:A topology) (e (NUMFST n))` MP_TAC THENL
+               [ASM_MESON_TAC[]; REWRITE_TAC[OPEN_IN_SUBSET]];
+              ASM_REWRITE_TAC[]]];
+          (* Now ?g. ... ==> ?g. ... trivially *)
+          SIMP_TAC[]];
         (* Branch 2: Use the existence to get properties of @ *)
         SUBGOAL_THEN `(P:((A->real)->bool)) ((@) P)` MP_TAC THENL
          [ASM_MESON_TAC[SELECT_AX];
@@ -301,7 +333,7 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     GEN_TAC THEN
     ASM_CASES_TAC `(valid:num->bool) n` THENL
      [(* Valid case: chosen function is continuous by SELECT_AX *)
-      CHEAT_TAC;
+      DEBUG_GOAL_TAC;
       (* Invalid case: constant 0 is continuous *)
       ASM_SIMP_TAC[ETA_AX] THEN
       REWRITE_TAC[CONTINUOUS_MAP_CONST; TOPSPACE_SUBTOPOLOGY] THEN
@@ -427,7 +459,18 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
             ASM_REWRITE_TAC[]]]];
       (* Prove injectivity: g injective since functions separate points *)
       (* If g x = g y then !n. f n x = f n y, contradicting assumption 3 unless x=y *)
-      ASM_MESON_TAC[FUN_EQ_THM]];
+      REPEAT GEN_TAC THEN STRIP_TAC THEN
+      (* Assume x IN topspace /\ y IN topspace /\ g x = g y; show x = y *)
+      (* We know g x = g y means !n. f n x = f n y (by FUN_EQ_THM) *)
+      ASM_CASES_TAC `(x:A) = y` THEN ASM_REWRITE_TAC[] THEN
+      (* Case x ≠ y: use assumption 3 to get n where f n x ≠ f n y *)
+      FIRST_X_ASSUM(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
+      ASM_REWRITE_TAC[] THEN
+      DISCH_THEN(X_CHOOSE_TAC `n:num`) THEN
+      (* But g x = g y means g x n = g y n, i.e., f n x = f n y *)
+      FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [FUN_EQ_THM]) THEN
+      DISCH_THEN(MP_TAC o SPEC `n:num`) THEN
+      BETA_TAC THEN ASM_REWRITE_TAC[]];
     (* Prove final property: g x n = f n x where g = \x.\n. f n x *)
     REPEAT STRIP_TAC THEN BETA_TAC THEN REFL_TAC]);;
 
@@ -469,10 +512,25 @@ let URYSOHN_METRIZATION_BWD = prove
   (* Show top is homeomorphic to a subspace of the product, hence metrizable *)
   ABBREV_TAC `prod = product_topology (:num)
                        (\n. subtopology euclideanreal (real_interval[&0,&1]))` THEN
-  ASM_MESON_TAC[EMBEDDING_MAP_IMP_HOMEOMORPHIC_SPACE;
-                HOMEOMORPHIC_METRIZABLE_SPACE;
-                METRIZABLE_SPACE_SUBTOPOLOGY;
-                METRIZABLE_PRODUCT_UNIT_INTERVAL]);;
+  (* Step 1: metrizable_space prod *)
+  SUBGOAL_THEN `metrizable_space prod` ASSUME_TAC THENL
+   [EXPAND_TAC "prod" THEN REWRITE_TAC[METRIZABLE_PRODUCT_UNIT_INTERVAL];
+    ALL_TAC] THEN
+  (* Step 2: embedding_map gives homeomorphic to subtopology *)
+  MP_TAC(ISPECL [`top:A topology`; `prod:(num->real)topology`;
+                 `g:A->num->real`]
+                EMBEDDING_MAP_IMP_HOMEOMORPHIC_SPACE) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_TAC THEN
+  (* Step 3: subtopology of metrizable is metrizable *)
+  SUBGOAL_THEN `metrizable_space (subtopology prod (IMAGE (g:A->num->real) (topspace top)))`
+               ASSUME_TAC THENL
+   [MATCH_MP_TAC METRIZABLE_SPACE_SUBTOPOLOGY THEN ASM_REWRITE_TAC[];
+    ALL_TAC] THEN
+  (* Step 4: homeomorphic to metrizable space is metrizable *)
+  MATCH_MP_TAC HOMEOMORPHIC_METRIZABLE_SPACE THEN
+  EXISTS_TAC `subtopology prod (IMAGE (g:A->num->real) (topspace top))` THEN
+  ASM_REWRITE_TAC[]);;
 
 (* Combined form *)
 let URYSOHN_METRIZATION = prove
@@ -480,7 +538,12 @@ let URYSOHN_METRIZATION = prove
         second_countable top
         ==> (regular_space top /\ hausdorff_space top <=>
              metrizable_space top)`,
-  MESON_TAC[URYSOHN_METRIZATION_FWD; URYSOHN_METRIZATION_BWD]);;
+  GEN_TAC THEN DISCH_TAC THEN EQ_TAC THENL
+   [STRIP_TAC THEN MATCH_MP_TAC URYSOHN_METRIZATION_BWD THEN
+    ASM_REWRITE_TAC[];
+    DISCH_TAC THEN
+    MP_TAC(SPEC `top:A topology` URYSOHN_METRIZATION_FWD) THEN
+    ASM_REWRITE_TAC[] THEN SIMP_TAC[]]);;
 
 (* Helper: continuous map image in topspace *)
 let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
