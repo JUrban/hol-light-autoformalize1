@@ -654,7 +654,7 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
   REWRITE_TAC[EXTENSION; IN_INTER; IN_IMAGE; IN_UNIONS; IN_ELIM_THM] THEN
   X_GEN_TAC `h:num->real` THEN EQ_TAC THENL
    [(* ==> direction: h = g x for some x IN u, show h in union and in image of topspace *)
-    DISCH_THEN(X_CHOOSE_THEN `x:A` STRIP_ASSUME_TAC) THEN
+    DISCH_THEN(X_CHOOSE_THEN `x:A` (CONJUNCTS_THEN2 ASSUME_TAC (ASSUME_TAC o GSYM))) THEN
     (* First establish that x IN topspace top *)
     SUBGOAL_THEN `(x:A) IN topspace top` ASSUME_TAC THENL
      [ASM SET_TAC[]; ALL_TAC] THEN
@@ -662,7 +662,18 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
     SUBGOAL_THEN `?n0. (f:num->A->real) n0 x = &1 /\
                        (!z. z IN topspace top DIFF u ==> f n0 z = &0)`
                  (X_CHOOSE_TAC `n0:num`) THENL
-     [CHEAT_TAC;
+     [(* Use the hypothesis about separating closed sets from points *)
+      FIRST_X_ASSUM(MP_TAC o SPECL [`topspace top DIFF (u:A->bool)`; `x:A`]) THEN
+      ANTS_TAC THENL
+       [(* closed_in top (topspace top DIFF u) /\ x IN topspace top /\ ~(x IN topspace top DIFF u) *)
+        (* closed_in follows from open_in u by OPEN_IN_CLOSED_IN_EQ *)
+        SUBGOAL_THEN `closed_in top (topspace top DIFF (u:A->bool))` ASSUME_TAC THENL
+         [MP_TAC(ISPECL [`top:A topology`; `u:A->bool`] OPEN_IN_CLOSED_IN_EQ) THEN
+          ASM_REWRITE_TAC[] THEN MESON_TAC[];
+          ALL_TAC] THEN
+        ASM_REWRITE_TAC[IN_DIFF];
+        ALL_TAC] THEN
+      MESON_TAC[];
       ALL_TAC] THEN
     CONJ_TAC THENL
      [CHEAT_TAC;
