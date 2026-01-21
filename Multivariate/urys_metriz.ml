@@ -401,10 +401,16 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ASM_REWRITE_TAC[] THEN
     (* Step 7: Show valid(NUMPAIR m n) so we're in the non-zero branch *)
     SUBGOAL_THEN `(valid:num->bool) (NUMPAIR m n)` ASSUME_TAC THENL
-     [FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
+     [(* Use assumption 10: ...closure... <=> valid k *)
+      UNDISCH_TAC `!k:num. (e:num->A->bool) (NUMFST k) IN b /\
+                           e (NUMSND k) IN b /\
+                           top closure_of e (NUMFST k) SUBSET e (NUMSND k) /\
+                           ~(e (NUMFST k) = {})
+                     <=> valid k` THEN
+      DISCH_THEN(fun th -> REWRITE_TAC[GSYM th]) THEN
       REWRITE_TAC[NUMPAIR_DEST] THEN
       ASM_REWRITE_TAC[] THEN
-      CONJ_TAC THENL [ASM SET_TAC[]; ALL_TAC] THEN
+      (* Goal: ~(v = {}). We have x0 IN v, so v ≠ {} *)
       ASM_MESON_TAC[MEMBER_NOT_EMPTY];
       ALL_TAC] THEN
     ASM_SIMP_TAC[] THEN
@@ -568,7 +574,7 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
             ASM_SIMP_TAC[]]]];
       (* Prove injectivity: g injective since functions separate points *)
       (* If g x = g y then !n. f n x = f n y, contradicting assumption 3 unless x=y *)
-      REPEAT GEN_TAC THEN STRIP_TAC THEN
+      DEBUG_GOAL_TAC];
       (* Assume x IN topspace /\ y IN topspace /\ g x = g y; show x = y *)
       (* We know g x = g y means !n. f n x = f n y (by FUN_EQ_THM) *)
       ASM_CASES_TAC `(x:A) = y` THEN ASM_REWRITE_TAC[] THEN
@@ -577,10 +583,9 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
          We need: ?n. ~(f n x = f n y)
          From assumption 2: !x y. x IN topspace /\ y IN topspace /\ ~(x = y) ==> ?n. ~(f n x = f n y) *)
       REWRITE_TAC[FUN_EQ_THM; NOT_FORALL_THM] THEN
-      FIRST_ASSUM(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
-      ASM_SIMP_TAC[]];
+      DEBUG_GOAL_TAC];
     (* Prove final property: g x n = f n x where g = \x.\n. f n x *)
-    REPEAT STRIP_TAC THEN BETA_TAC THEN REFL_TAC]);;
+    DEBUG_GOAL_TAC]);;
 
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
@@ -638,9 +643,7 @@ let URYSOHN_METRIZATION_BWD = prove
   (* Step 4: homeomorphic to metrizable space is metrizable *)
   (* HOMEOMORPHIC_METRIZABLE_SPACE: top homeomorphic top' ==> (metrizable top <=> metrizable top') *)
   (* Use the equivalence in the backward direction: top homeomorphic S /\ metrizable S ==> metrizable top *)
-  FIRST_X_ASSUM(fun th ->
-    MP_TAC(MATCH_MP HOMEOMORPHIC_METRIZABLE_SPACE th)) THEN
-  ASM_REWRITE_TAC[]);;
+  DEBUG_GOAL_TAC);;
 
 (* Combined form *)
 let URYSOHN_METRIZATION = prove
