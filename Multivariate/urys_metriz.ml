@@ -676,7 +676,38 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
       MESON_TAC[];
       ALL_TAC] THEN
     CONJ_TAC THENL
-     [CHEAT_TAC;
+     [(* Show h is in some cylinder in the union *)
+      EXISTS_TAC `{k:num->real | k IN topspace prod /\
+                   k (@n. (f:num->A->real) n x = &1 /\
+                          (!z. z IN topspace top DIFF u ==> f n z = &0)) > &0}` THEN
+      CONJ_TAC THENL
+       [(* Show this cylinder is in the family - witness is x *)
+        EXISTS_TAC `x:A` THEN ASM_REWRITE_TAC[];
+        ALL_TAC] THEN
+      REWRITE_TAC[IN_ELIM_THM] THEN
+      SUBGOAL_THEN `(h:num->real) = (g:A->num->real) x` ASSUME_TAC THENL
+       [ASM_MESON_TAC[]; ALL_TAC] THEN
+      CONJ_TAC THENL
+       [(* h IN topspace prod *)
+        ASM_REWRITE_TAC[] THEN
+        EXPAND_TAC "g" THEN EXPAND_TAC "prod" THEN
+        REWRITE_TAC[TOPSPACE_PRODUCT_TOPOLOGY; cartesian_product; IN_ELIM_THM;
+                    o_THM; IN_UNIV; EXTENSIONAL_UNIV] THEN
+        REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL; INTER_UNIV] THEN
+        REWRITE_TAC[IN_REAL_INTERVAL] THEN GEN_TAC THEN
+        FIRST_X_ASSUM(MP_TAC o SPECL [`i:num`; `x:A`]) THEN
+        ASM_REWRITE_TAC[];
+        ALL_TAC] THEN
+      ASM_REWRITE_TAC[] THEN EXPAND_TAC "g" THEN
+      REWRITE_TAC[real_gt] THEN
+      SUBGOAL_THEN `(f:num->A->real) (@n. f n x = &1 /\
+                     (!z. z IN topspace top DIFF u ==> f n z = &0)) x = &1`
+                   (fun th -> REWRITE_TAC[th] THEN REAL_ARITH_TAC) THEN
+      MP_TAC(ISPEC `\n:num. (f:num->A->real) n x = &1 /\
+                            (!z. z IN topspace top DIFF u ==> f n z = &0)` SELECT_AX) THEN
+      REWRITE_TAC[] THEN
+      DISCH_THEN(MP_TAC o SPEC `n0:num`) THEN
+      ASM_REWRITE_TAC[] THEN MESON_TAC[];
       (* h = g x for some x in topspace top *)
       EXISTS_TAC `x:A` THEN ASM SET_TAC[]];
     (* <== direction: h in union and in image of topspace ==> h in image of u *)
