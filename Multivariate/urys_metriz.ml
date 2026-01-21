@@ -228,6 +228,8 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
   *)
 
   (* Build the witness explicitly *)
+  (* Key change: use closure(e(NUMFST k)) as the "1-set" instead of a single point.
+     This ensures f_k(x) = 1 for ALL x in closure(e(NUMFST k)), not just one point. *)
   EXISTS_TAC
     `\k:num. \x:A.
        if (e:num->A->bool) (NUMFST k) IN b /\
@@ -236,7 +238,7 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
           ~(e (NUMFST k) = {})
        then (@g:A->real.
               continuous_map (top, subtopology euclideanreal (real_interval[&0,&1])) g /\
-              g (@z. z IN e (NUMFST k)) = &1 /\
+              (!z. z IN top closure_of e (NUMFST k) ==> g z = &1) /\
               (!z. z IN topspace top DIFF e (NUMSND k) ==> g z = &0)) x
        else &0` THEN
 
@@ -260,77 +262,45 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      [(* Valid case: use SELECT_AX to extract properties *)
       ASM_SIMP_TAC[] THEN
       (* Abbreviate the predicate for the chosen function *)
+      (* NEW: P uses closure as the "1-set" instead of a single point *)
       ABBREV_TAC `P = \g:A->real.
         continuous_map (top, subtopology euclideanreal (real_interval[&0,&1])) g /\
-        g (@z:A. z IN e (NUMFST n)) = &1 /\
+        (!z. z IN top closure_of e (NUMFST n) ==> g z = &1) /\
         (!z. z IN topspace top DIFF e (NUMSND n) ==> g z = &0)` THEN
-      (* First, show existence of such g using assumption 9 *)
+      (* First, show existence of such g using URYSOHN_LEMMA directly *)
       SUBGOAL_THEN `?g:A->real. P g` ASSUME_TAC THENL
-       [(* Branch 1: Prove the existential *)
+       [(* Branch 1: Prove the existential using URYSOHN_LEMMA *)
         EXPAND_TAC "P" THEN BETA_TAC THEN
-        (* Use the Urysohn assumption - go back up through assumptions *)
-        SUBGOAL_THEN
-          `closed_in top (topspace top DIFF e (NUMSND n)) /\
-           (@z:A. z IN e (NUMFST n)) IN topspace top /\
-           ~((@z. z IN e (NUMFST n)) IN topspace top DIFF e (NUMSND n))
-           ==> ?g. continuous_map
-                     (top,subtopology euclideanreal (real_interval[&0,&1])) g /\
-                   g (@z. z IN e (NUMFST n)) = &1 /\
-                   (!z. z IN topspace top DIFF e (NUMSND n) ==> g z = &0)`
-          MP_TAC THENL
-         [(* This is a direct instantiation of assumption 9 (Urysohn for closed) *)
-          (* Assumption 9: !c x. closed_in c /\ x IN topspace /\ ~(x IN c)
-                           ==> ?g. cont g /\ g x = 1 /\ (!z. z IN c ==> g z = 0) *)
-          (* We instantiate with c = topspace \ e(NUMSND n), x = @z. z IN e(NUMFST n) *)
-          DISCH_TAC THEN
-          FIRST_X_ASSUM(MP_TAC o SPECL
-            [`topspace top DIFF e (NUMSND n):A->bool`;
-             `(@z:A. z IN e (NUMFST n))`]) THEN
-          ASM_REWRITE_TAC[];
-          ALL_TAC] THEN
-        (* Verify preconditions from validity and apply MP *)
-        (* valid n gives: e(NUMFST n) IN b, e(NUMSND n) IN b,
-           closure ⊆ e(NUMSND n), e(NUMFST n) ≠ {} *)
-        (* We need to prove the antecedent and use modus ponens *)
-        MATCH_MP_TAC(TAUT `a /\ (b ==> c) ==> (a ==> b) ==> c`) THEN
-        CONJ_TAC THENL
-         [(* Prove the 3 preconditions *)
-          FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
-          ASM_REWRITE_TAC[] THEN
-          REPEAT CONJ_TAC THENL
-           [(* 1. closed_in top (topspace \ e(NUMSND n)) *)
+        (* Use URYSOHN_LEMMA with:
+           - s = topspace DIFF e(NUMSND n) (closed, gets 0)
+           - t = closure_of e(NUMFST n) (closed, gets 1)
+           - Need: DISJOINT s t, which follows from closure ⊆ e(NUMSND n) *)
+        MP_TAC(ISPECL [`top:A topology`;
+                       `topspace top DIFF e (NUMSND n):A->bool`;
+                       `top closure_of (e:num->A->bool) (NUMFST n)`;
+                       `&0`; `&1`] URYSOHN_LEMMA) THEN
+        REWRITE_TAC[REAL_POS] THEN
+        ANTS_TAC THENL
+         [(* Verify: normal_space, both sets closed, DISJOINT *)
+          ASM_REWRITE_TAC[] THEN REPEAT CONJ_TAC THENL
+           [(* closed_in (topspace DIFF e(NUMSND n)) *)
             MATCH_MP_TAC CLOSED_IN_DIFF THEN
             REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN
-            (* open_in top (e (NUMSND n)) from e(NUMSND n) IN b *)
-            FIRST_ASSUM MATCH_MP_TAC THEN ASM_REWRITE_TAC[];
-            (* 2. (@z. z IN e(NUMFST n)) IN topspace top *)
-            (* From valid n: ~(e(NUMFST n) = {}) and e(NUMFST n) IN b *)
-            (* SELECT_AX: ?z. z IN e(NUMFST n) ==> (@z. z IN ...) IN e(NUMFST n) *)
-            (* Then e(NUMFST n) SUBSET topspace by OPEN_IN_SUBSET *)
-            SUBGOAL_THEN `open_in (top:A topology) (e (NUMFST n))` MP_TAC THENL
-             [ASM_MESON_TAC[]; ALL_TAC] THEN
-            DISCH_THEN(MP_TAC o MATCH_MP OPEN_IN_SUBSET) THEN
-            MP_TAC(ISPEC `\z:A. z IN e (NUMFST n)` SELECT_AX) THEN
-            REWRITE_TAC[MEMBER_NOT_EMPTY] THEN
-            ASM SET_TAC[];
-            (* 3. ~((@z. z IN e(NUMFST n)) IN topspace \ e(NUMSND n)) *)
-            (* (@z. z IN e(NUMFST n)) IN e(NUMFST n) by SELECT_AX *)
-            (* e(NUMFST n) SUBSET closure_of e(NUMFST n) by CLOSURE_OF_SUBSET *)
-            (* closure_of e(NUMFST n) SUBSET e(NUMSND n) from valid n *)
-            (* So @z IN e(NUMSND n), hence ~(@z IN topspace \ e(NUMSND n)) *)
-            REWRITE_TAC[IN_DIFF; DE_MORGAN_THM] THEN DISJ2_TAC THEN
-            MP_TAC(ISPEC `\z:A. z IN e (NUMFST n)` SELECT_AX) THEN
-            REWRITE_TAC[MEMBER_NOT_EMPTY] THEN
-            DISCH_TAC THEN
-            SUBGOAL_THEN `open_in (top:A topology) (e (NUMFST n))` MP_TAC THENL
-             [ASM_MESON_TAC[]; ALL_TAC] THEN
-            DISCH_THEN(MP_TAC o MATCH_MP CLOSURE_OF_SUBSET o MATCH_MP OPEN_IN_SUBSET) THEN
+            ASM_MESON_TAC[];
+            (* closed_in (closure_of e(NUMFST n)) *)
+            REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
+            (* DISJOINT *)
+            (* closure ⊆ e(NUMSND n) from valid n, so closure ∩ (topspace \ e(NUMSND n)) = {} *)
+            FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
+            ASM_REWRITE_TAC[] THEN
+            REWRITE_TAC[DISJOINT; EXTENSION; IN_INTER; NOT_IN_EMPTY; IN_DIFF] THEN
             ASM SET_TAC[]];
-          (* Now ?g. ... ==> ?g. ... trivially *)
-          SIMP_TAC[]];
+          (* Extract the function *)
+          MATCH_MP_TAC MONO_EXISTS THEN X_GEN_TAC `g:A->real` THEN
+          STRIP_TAC THEN ASM_REWRITE_TAC[]];
         (* Branch 2: Use the existence to get properties of @ *)
         SUBGOAL_THEN `(P:((A->real)->bool)) ((@) P)` MP_TAC THENL
-         [(* P ((@) P) follows from ?g. P g via SELECT_AX: !P x. P x ==> P((@) P) *)
+         [(* P ((@) P) follows from ?g. P g via SELECT_AX *)
           FIRST_X_ASSUM(MP_TAC o MATCH_MP
             (MESON[SELECT_AX] `(?g. P g) ==> P ((@) P)`)) THEN
           SIMP_TAC[];
@@ -351,53 +321,37 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      [(* Valid case: chosen function is continuous by SELECT_AX *)
       ASM_SIMP_TAC[] THEN
       (* Abbreviate the predicate for the chosen function *)
+      (* NEW: P uses closure as the "1-set" instead of a single point *)
       ABBREV_TAC `P = \g:A->real.
         continuous_map (top, subtopology euclideanreal (real_interval[&0,&1])) g /\
-        g (@z:A. z IN e (NUMFST n)) = &1 /\
+        (!z. z IN top closure_of e (NUMFST n) ==> g z = &1) /\
         (!z. z IN topspace top DIFF e (NUMSND n) ==> g z = &0)` THEN
-      (* First, show existence of such g using assumption 9 (Urysohn) *)
+      (* First, show existence of such g using URYSOHN_LEMMA *)
       SUBGOAL_THEN `?g:A->real. P g` ASSUME_TAC THENL
-       [(* Branch 1: Prove the existential - same structure as Property 1 *)
+       [(* Branch 1: Prove the existential using URYSOHN_LEMMA *)
         EXPAND_TAC "P" THEN BETA_TAC THEN
-        SUBGOAL_THEN
-          `closed_in top (topspace top DIFF e (NUMSND n)) /\
-           (@z:A. z IN e (NUMFST n)) IN topspace top /\
-           ~((@z. z IN e (NUMFST n)) IN topspace top DIFF e (NUMSND n))
-           ==> ?g. continuous_map
-                     (top,subtopology euclideanreal (real_interval[&0,&1])) g /\
-                   g (@z. z IN e (NUMFST n)) = &1 /\
-                   (!z. z IN topspace top DIFF e (NUMSND n) ==> g z = &0)`
-          MP_TAC THENL
-         [DISCH_TAC THEN
-          FIRST_X_ASSUM(MP_TAC o SPECL
-            [`topspace top DIFF e (NUMSND n):A->bool`;
-             `(@z:A. z IN e (NUMFST n))`]) THEN
-          ASM_REWRITE_TAC[];
-          ALL_TAC] THEN
-        MATCH_MP_TAC(TAUT `a /\ (b ==> c) ==> (a ==> b) ==> c`) THEN
-        CONJ_TAC THENL
-         [(* Prove the 3 preconditions - same as Property 1 *)
-          FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
-          ASM_REWRITE_TAC[] THEN
-          REPEAT CONJ_TAC THENL
-           [MATCH_MP_TAC CLOSED_IN_DIFF THEN
+        MP_TAC(ISPECL [`top:A topology`;
+                       `topspace top DIFF e (NUMSND n):A->bool`;
+                       `top closure_of (e:num->A->bool) (NUMFST n)`;
+                       `&0`; `&1`] URYSOHN_LEMMA) THEN
+        REWRITE_TAC[REAL_POS] THEN
+        ANTS_TAC THENL
+         [(* Verify: normal_space, both sets closed, DISJOINT *)
+          ASM_REWRITE_TAC[] THEN REPEAT CONJ_TAC THENL
+           [(* closed_in (topspace DIFF e(NUMSND n)) *)
+            MATCH_MP_TAC CLOSED_IN_DIFF THEN
             REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN
-            FIRST_ASSUM MATCH_MP_TAC THEN ASM_REWRITE_TAC[];
-            SUBGOAL_THEN `open_in (top:A topology) (e (NUMFST n))` MP_TAC THENL
-             [ASM_MESON_TAC[]; ALL_TAC] THEN
-            DISCH_THEN(MP_TAC o MATCH_MP OPEN_IN_SUBSET) THEN
-            MP_TAC(ISPEC `\z:A. z IN e (NUMFST n)` SELECT_AX) THEN
-            REWRITE_TAC[MEMBER_NOT_EMPTY] THEN
-            ASM SET_TAC[];
-            REWRITE_TAC[IN_DIFF; DE_MORGAN_THM] THEN DISJ2_TAC THEN
-            MP_TAC(ISPEC `\z:A. z IN e (NUMFST n)` SELECT_AX) THEN
-            REWRITE_TAC[MEMBER_NOT_EMPTY] THEN
-            DISCH_TAC THEN
-            SUBGOAL_THEN `open_in (top:A topology) (e (NUMFST n))` MP_TAC THENL
-             [ASM_MESON_TAC[]; ALL_TAC] THEN
-            DISCH_THEN(MP_TAC o MATCH_MP CLOSURE_OF_SUBSET o MATCH_MP OPEN_IN_SUBSET) THEN
+            ASM_MESON_TAC[];
+            (* closed_in (closure_of e(NUMFST n)) *)
+            REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
+            (* DISJOINT *)
+            FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
+            ASM_REWRITE_TAC[] THEN
+            REWRITE_TAC[DISJOINT; EXTENSION; IN_INTER; NOT_IN_EMPTY; IN_DIFF] THEN
             ASM SET_TAC[]];
-          SIMP_TAC[]];
+          (* Extract the function *)
+          MATCH_MP_TAC MONO_EXISTS THEN X_GEN_TAC `g:A->real` THEN
+          STRIP_TAC THEN ASM_REWRITE_TAC[]];
         (* Branch 2: Use the existence to extract properties of @ *)
         SUBGOAL_THEN `(P:((A->real)->bool)) ((@) P)` MP_TAC THENL
          [FIRST_X_ASSUM(MP_TAC o MATCH_MP
@@ -416,8 +370,89 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
 
     (* Property 3: point separation *)
     MAP_EVERY X_GEN_TAC [`x0:A`; `y0:A`] THEN STRIP_TAC THEN
-    (* Use REGULAR_SPACE_BASIS_CLOSURE to find basis pair (m,n) separating x0, y0 *)
-    CHEAT_TAC;
+    (* Strategy: Find basis pair (v, u) with x0 ∈ v, closure(v) ⊆ u, y0 ∉ u
+       Then f_k(x0) = 1 (x0 ∈ closure(v)) and f_k(y0) = 0 (y0 ∉ u) *)
+    (* Step 1: {y0} is closed (Hausdorff implies T1) *)
+    SUBGOAL_THEN `closed_in (top:A topology) {y0:A}` ASSUME_TAC THENL
+     [ASM_MESON_TAC[CLOSED_IN_T1_SING; HAUSDORFF_IMP_T1_SPACE]; ALL_TAC] THEN
+    (* Step 2: topspace DIFF {y0} is open and contains x0 *)
+    SUBGOAL_THEN `open_in (top:A topology) (topspace top DIFF {y0})` ASSUME_TAC THENL
+     [ASM_SIMP_TAC[OPEN_IN_DIFF; OPEN_IN_TOPSPACE]; ALL_TAC] THEN
+    SUBGOAL_THEN `(x0:A) IN topspace top DIFF {y0}` ASSUME_TAC THENL
+     [ASM SET_TAC[]; ALL_TAC] THEN
+    (* Step 3: Find u1 IN b with x0 ∈ u1 ⊆ topspace DIFF {y0} *)
+    (* Use the basis property assumption *)
+    SUBGOAL_THEN `?u1:A->bool. u1 IN b /\ x0 IN u1 /\ u1 SUBSET topspace top DIFF {y0}`
+                 STRIP_ASSUME_TAC THENL
+     [ASM_MESON_TAC[]; ALL_TAC] THEN
+    (* Step 4: Use REGULAR_SPACE_BASIS_CLOSURE to get v IN b with closure(v) ⊆ u1 *)
+    MP_TAC(ISPECL [`top:A topology`; `b:(A->bool)->bool`; `u1:A->bool`; `x0:A`]
+                  REGULAR_SPACE_BASIS_CLOSURE) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `v:A->bool` STRIP_ASSUME_TAC) THEN
+    (* Step 5: Get indices m, n for v, u1 *)
+    SUBGOAL_THEN `?m:num. (e:num->A->bool) m = v` STRIP_ASSUME_TAC THENL
+     [ASM_MESON_TAC[]; ALL_TAC] THEN
+    SUBGOAL_THEN `?n:num. (e:num->A->bool) n = u1` STRIP_ASSUME_TAC THENL
+     [ASM_MESON_TAC[]; ALL_TAC] THEN
+    (* Step 6: Use k = NUMPAIR m n *)
+    EXISTS_TAC `NUMPAIR (m:num) (n:num)` THEN
+    REWRITE_TAC[NUMPAIR_DEST] THEN
+    ASM_REWRITE_TAC[] THEN
+    (* Step 7: Show valid(NUMPAIR m n) so we're in the non-zero branch *)
+    SUBGOAL_THEN `(valid:num->bool) (NUMPAIR m n)` ASSUME_TAC THENL
+     [FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
+      REWRITE_TAC[NUMPAIR_DEST] THEN
+      ASM_REWRITE_TAC[] THEN
+      CONJ_TAC THENL [ASM SET_TAC[]; ALL_TAC] THEN
+      ASM_MESON_TAC[MEMBER_NOT_EMPTY];
+      ALL_TAC] THEN
+    ASM_SIMP_TAC[] THEN
+    (* Step 8: The @g satisfies g = 1 on closure(e m) and g = 0 on topspace DIFF (e n) *)
+    (* So f(x0) = 1 (x0 ∈ e m ⊆ closure(e m)) and f(y0) = 0 (y0 ∈ topspace DIFF (e n)) *)
+    (* The goal uses e m and e n, so we use those in P *)
+    ABBREV_TAC `P = \g:A->real.
+      continuous_map (top, subtopology euclideanreal (real_interval[&0,&1])) g /\
+      (!z. z IN top closure_of (e:num->A->bool) m ==> g z = &1) /\
+      (!z. z IN topspace top DIFF e n ==> g z = &0)` THEN
+    (* Prove ?g. P g (same as in Properties 1 and 2) *)
+    SUBGOAL_THEN `?g:A->real. P g` ASSUME_TAC THENL
+     [EXPAND_TAC "P" THEN BETA_TAC THEN
+      MP_TAC(ISPECL [`top:A topology`;
+                     `topspace top DIFF (e:num->A->bool) n:A->bool`;
+                     `top closure_of (e:num->A->bool) m`;
+                     `&0`; `&1`] URYSOHN_LEMMA) THEN
+      REWRITE_TAC[REAL_POS] THEN
+      ANTS_TAC THENL
+       [ASM_REWRITE_TAC[] THEN REPEAT CONJ_TAC THENL
+         [MATCH_MP_TAC CLOSED_IN_DIFF THEN
+          REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN ASM_MESON_TAC[];
+          REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
+          REWRITE_TAC[DISJOINT; EXTENSION; IN_INTER; NOT_IN_EMPTY; IN_DIFF] THEN
+          ASM SET_TAC[]];
+        MATCH_MP_TAC MONO_EXISTS THEN X_GEN_TAC `g:A->real` THEN
+        STRIP_TAC THEN ASM_REWRITE_TAC[]];
+      ALL_TAC] THEN
+    (* Use SELECT_AX to get P((@) P) *)
+    SUBGOAL_THEN `(P:((A->real)->bool)) ((@) P)` MP_TAC THENL
+     [FIRST_X_ASSUM(MP_TAC o MATCH_MP
+        (MESON[SELECT_AX] `(?g. P g) ==> P ((@) P)`)) THEN
+      SIMP_TAC[];
+      ALL_TAC] THEN
+    EXPAND_TAC "P" THEN BETA_TAC THEN STRIP_TAC THEN
+    (* Now show (@)P x0 ≠ (@)P y0: one is 1, the other is 0 *)
+    SUBGOAL_THEN `((@) P:A->real) x0 = &1` ASSUME_TAC THENL
+     [FIRST_X_ASSUM MATCH_MP_TAC THEN
+      MATCH_MP_TAC(SET_RULE `x IN s /\ s SUBSET t ==> x IN t`) THEN
+      EXISTS_TAC `(e:num->A->bool) m` THEN ASM_REWRITE_TAC[] THEN
+      MATCH_MP_TAC CLOSURE_OF_SUBSET THEN
+      ASM_MESON_TAC[OPEN_IN_SUBSET];
+      ALL_TAC] THEN
+    SUBGOAL_THEN `((@) P:A->real) y0 = &0` ASSUME_TAC THENL
+     [FIRST_X_ASSUM MATCH_MP_TAC THEN
+      ASM SET_TAC[];
+      ALL_TAC] THEN
+    ASM_REWRITE_TAC[] THEN REAL_ARITH_TAC;
 
     (* Property 4: closed set separation *)
     MAP_EVERY X_GEN_TAC [`c0:A->bool`; `x0:A`] THEN STRIP_TAC THEN
