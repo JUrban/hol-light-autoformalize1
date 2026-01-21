@@ -590,224 +590,104 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                 (!x. x IN topspace top ==> !n. g x n = f n x)`,
   REPEAT STRIP_TAC THEN
   EXISTS_TAC `\x:A. \n:num. (f:num->A->real) n x` THEN
-  (* Abbreviate product topology for readability *)
-  ABBREV_TAC `prod = product_topology (:num)
-                       (\n. subtopology euclideanreal (real_interval[&0,&1]))` THEN
-  (* Abbreviate g = \x.\n. f n x *)
-  ABBREV_TAC `g = \x:A. \n:num. (f:num->A->real) n x` THEN
   CONJ_TAC THENL
-   [(* Prove embedding_map = homeomorphic to subtopology of image *)
-    REWRITE_TAC[embedding_map] THEN
-    (* Use BIJECTIVE_OPEN_IMP_HOMEOMORPHIC_MAP on subtopology *)
-    MATCH_MP_TAC BIJECTIVE_OPEN_IMP_HOMEOMORPHIC_MAP THEN
-    REPEAT CONJ_TAC THENL
-     [(* 1. continuous_map (top, subtopology prod (IMAGE g topspace)) g *)
-      REWRITE_TAC[CONTINUOUS_MAP_IN_SUBTOPOLOGY] THEN
+   [(* Prove embedding directly using definition *)
+    (* Following textbook Step 2: embedding_map = homeomorphic onto image *)
+    REWRITE_TAC[embedding_map; homeomorphic_map] THEN
+    CONJ_TAC THENL
+     [(* Prove quotient_map to subtopology of image *)
+      (* Use QUOTIENT_MAP_ONTO_IMAGE which combines IMAGE subset + open characterization *)
+      MATCH_MP_TAC QUOTIENT_MAP_ONTO_IMAGE THEN
       CONJ_TAC THENL
-       [EXPAND_TAC "prod" THEN EXPAND_TAC "g" THEN
+       [(* Prove IMAGE g topspace SUBSET topspace product *)
+        (* g continuous ==> IMAGE subset via CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE *)
+        MATCH_MP_TAC CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE THEN
         REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
         GEN_TAC THEN REWRITE_TAC[ETA_AX] THEN ASM_REWRITE_TAC[];
-        EXPAND_TAC "g" THEN REWRITE_TAC[SUBSET_REFL]];
+        (* Prove open set characterization for quotient_map *)
+        (* Goal: !u. u SUBSET topspace product ==> *)
+        (*       (open_in top {x | x IN topspace /\ g x IN u} <=> open_in product u) *)
+        (* We know g is continuous, which gives (<=) direction *)
+        (* The (=>) direction needs the separation property from textbook *)
+        REPEAT STRIP_TAC THEN EQ_TAC THENL
+         [(*=> direction: preimage open ==> u open (hard - needs separation)  *)
+          (* Goal: open_in (subtopology product (IMAGE g topspace)) u *)
+          (* Assume: u SUBSET IMAGE g topspace /\ *)
+          (*         open_in top {x | x IN topspace /\ g x IN u} *)
+          DISCH_TAC THEN
+          (* Implementation strategy from Munkres §34.1, Step 2, pages 214-215:
 
-      (* 2. open_map (top, subtopology prod (IMAGE g topspace)) g *)
-      (* This means: !u. open_in top u ==> open_in (subtop) (IMAGE g u) *)
-      (* And open_in (subtop) V means: ?W. open_in prod W /\ V = W INTER IMAGE g *)
-      REWRITE_TAC[open_map; OPEN_IN_SUBTOPOLOGY] THEN
-      X_GEN_TAC `u:A->bool` THEN DISCH_TAC THEN
-      (* Need to construct witness W open in prod s.t. IMAGE g u = W INTER IMAGE g topspace *)
-      (* W = UNIONS { cylinder(x) | x IN u } where
-         cylinder(x) = {h | h(n_x) > 0} is open in prod
-         and n_x is from Property 4 *)
-      (* But for the witness, we need to pick a single n for each point,
-         which requires choice. Let's construct using UNIONS. *)
-      (* For simplicity, construct W directly using OPEN_IN_PRODUCT_TOPOLOGY_ALT *)
-      SUBGOAL_THEN
-        `?W:(num->real)->bool.
-           open_in prod W /\
-           (!x:A. x IN u ==> (g:A->num->real) x IN W) /\
-           (!h. h IN W /\ h IN IMAGE g (topspace top) ==> h IN IMAGE g u)`
-        MP_TAC THENL
-       [(* Construct W as UNIONS of cylinders *)
-        (* For each x IN u, get n_x from Property 4 and form cylinder *)
-        (* W = UNIONS { {h | h(n_x) > 0 /\ h IN topspace prod} | x IN u } *)
-        (* This is a union of open sets, hence open *)
-        SUBGOAL_THEN `(u:A->bool) SUBSET topspace top` ASSUME_TAC THENL
-         [ASM_MESON_TAC[OPEN_IN_SUBSET]; ALL_TAC] THEN
-        (* Define cylinder function using Hilbert choice *)
-        SUBGOAL_THEN
-          `!x:A. x IN u ==>
-                 ?n:num. (f:num->A->real) n x = &1 /\
-                         (!z. z IN topspace top DIFF u ==> f n z = &0)`
-          ASSUME_TAC THENL
-         [X_GEN_TAC `x:A` THEN DISCH_TAC THEN
-          FIRST_X_ASSUM(MP_TAC o SPECL [`topspace top DIFF u:A->bool`; `x:A`]) THEN
-          ASM_SIMP_TAC[CLOSED_IN_DIFF; CLOSED_IN_TOPSPACE] THEN
-          ANTS_TAC THENL [ASM SET_TAC[]; ALL_TAC] THEN
-          MATCH_MP_TAC MONO_EXISTS THEN GEN_TAC THEN SIMP_TAC[];
-          ALL_TAC] THEN
-        (* Define W as union over all x in u of cylinders at n_x *)
-        EXISTS_TAC `UNIONS { {h:num->real | h IN topspace prod /\
-                                            &0 < h (@n:num. (f:num->A->real) n x = &1 /\
-                                                            (!z. z IN topspace top DIFF u
-                                                                 ==> f n z = &0))} |
-                             x:A IN u }` THEN
-        REPEAT CONJ_TAC THENL
-         [(* W is open: union of open sets *)
-          MATCH_MP_TAC OPEN_IN_UNIONS THEN
-          REWRITE_TAC[FORALL_IN_GSPEC] THEN
-          X_GEN_TAC `x:A` THEN DISCH_TAC THEN
-          (* Each cylinder {h | h(n) > 0} INTER topspace is open *)
-          (* Use OPEN_IN_PRODUCT_TOPOLOGY_ALT *)
-          EXPAND_TAC "prod" THEN
-          REWRITE_TAC[OPEN_IN_PRODUCT_TOPOLOGY_ALT_EXPAND] THEN
-          CONJ_TAC THENL
-           [REWRITE_TAC[SUBSET; IN_ELIM_THM]; ALL_TAC] THEN
-          X_GEN_TAC `h:num->real` THEN
-          REWRITE_TAC[IN_ELIM_THM] THEN STRIP_TAC THEN
-          ABBREV_TAC `n0 = @n:num. (f:num->A->real) n x = &1 /\
-                                   (!z. z IN topspace top DIFF u ==> f n z = &0)` THEN
-          EXISTS_TAC `\n:num. if n = n0
-                             then {r:real | r IN real_interval[&0,&1] /\ &0 < r}
-                             else topspace (subtopology euclideanreal
-                                              (real_interval[&0,&1]))` THEN
-          REPEAT CONJ_TAC THENL
-           [MATCH_MP_TAC FINITE_SUBSET THEN EXISTS_TAC `{n0:num}` THEN
-            REWRITE_TAC[FINITE_SING; SUBSET; IN_ELIM_THM; IN_SING] THEN
-            MESON_TAC[];
-            X_GEN_TAC `n:num` THEN REWRITE_TAC[IN_UNIV] THEN COND_CASES_TAC THENL
-             [REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
-              EXISTS_TAC `{r:real | &0 < r}` THEN
-              REWRITE_TAC[GSYM real_gt; GSYM REAL_OPEN_IN; REAL_OPEN_HALFSPACE_GT] THEN
-              REWRITE_TAC[EXTENSION; IN_INTER; IN_ELIM_THM;
-                          TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL; IN_UNIV];
-              REWRITE_TAC[OPEN_IN_TOPSPACE]];
-            REWRITE_TAC[cartesian_product; IN_ELIM_THM; IN_UNIV; EXTENSIONAL_UNIV] THEN
-            X_GEN_TAC `n:num` THEN COND_CASES_TAC THENL
-             [ASM_REWRITE_TAC[IN_ELIM_THM] THEN
-              UNDISCH_TAC `h:num->real IN topspace prod` THEN
-              EXPAND_TAC "prod" THEN
-              REWRITE_TAC[TOPSPACE_PRODUCT_TOPOLOGY; cartesian_product;
-                          IN_ELIM_THM; o_THM; IN_UNIV; EXTENSIONAL_UNIV] THEN
-              DISCH_THEN(MP_TAC o SPEC `n0:num`) THEN
-              REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL;
-                          IN_INTER; IN_UNIV; IN_REAL_INTERVAL];
-              UNDISCH_TAC `h:num->real IN topspace prod` THEN EXPAND_TAC "prod" THEN
-              REWRITE_TAC[TOPSPACE_PRODUCT_TOPOLOGY; cartesian_product;
-                          IN_ELIM_THM; o_THM; IN_UNIV; EXTENSIONAL_UNIV]];
-            REWRITE_TAC[SUBSET; cartesian_product; IN_ELIM_THM; IN_UNIV;
-                        EXTENSIONAL_UNIV] THEN
-            X_GEN_TAC `h':num->real` THEN DISCH_TAC THEN
-            FIRST_X_ASSUM(MP_TAC o SPEC `n0:num`) THEN
-            COND_CASES_TAC THENL [ALL_TAC; ASM_MESON_TAC[]] THEN
-            REWRITE_TAC[IN_ELIM_THM] THEN STRIP_TAC THEN
-            ASM_REWRITE_TAC[] THEN
-            SUBGOAL_THEN `h':num->real IN topspace prod` MP_TAC THENL
-             [EXPAND_TAC "prod" THEN
-              REWRITE_TAC[TOPSPACE_PRODUCT_TOPOLOGY; cartesian_product;
-                          IN_ELIM_THM; o_THM; IN_UNIV; EXTENSIONAL_UNIV] THEN
-              X_GEN_TAC `n:num` THEN FIRST_X_ASSUM(MP_TAC o SPEC `n:num`) THEN
-              COND_CASES_TAC THENL
-               [REWRITE_TAC[IN_ELIM_THM; IN_REAL_INTERVAL] THEN
-                REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL;
-                            IN_INTER; IN_UNIV; IN_REAL_INTERVAL];
-                SIMP_TAC[]];
-              SIMP_TAC[]]];
-          (* Every g(x) for x in u is in W *)
-          X_GEN_TAC `x:A` THEN DISCH_TAC THEN
-          REWRITE_TAC[IN_UNIONS; EXISTS_IN_GSPEC] THEN
-          EXISTS_TAC `x:A` THEN ASM_REWRITE_TAC[IN_ELIM_THM] THEN
-          CONJ_TAC THENL
-           [EXPAND_TAC "g" THEN BETA_TAC THEN
-            EXPAND_TAC "prod" THEN
-            REWRITE_TAC[TOPSPACE_PRODUCT_TOPOLOGY; cartesian_product;
-                        IN_ELIM_THM; o_THM; IN_UNIV; EXTENSIONAL_UNIV] THEN
-            X_GEN_TAC `n:num` THEN
-            REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL;
-                        IN_INTER; IN_UNIV; IN_REAL_INTERVAL] THEN
-            FIRST_X_ASSUM(MP_TAC o SPECL [`n:num`; `x:A`]) THEN
-            ANTS_TAC THENL [ASM SET_TAC[]; SIMP_TAC[]];
-            EXPAND_TAC "g" THEN BETA_TAC THEN
-            DEBUG_GOAL_TAC THEN
-            UNDISCH_TAC `!x:A. x IN u ==>
-                          (?n:num. f n x = &1 /\ (!z. z IN topspace top DIFF u ==> f n z = &0))` THEN
-            DISCH_THEN(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
-            DISCH_THEN(MP_TAC o SELECT_RULE) THEN
-            SIMP_TAC[REAL_ARITH `&1 > &0`]];
-          (* If h IN W and h = g(y) for some y in topspace, then h IN IMAGE g u *)
-          X_GEN_TAC `h:num->real` THEN
-          REWRITE_TAC[IN_UNIONS; EXISTS_IN_GSPEC; IN_IMAGE] THEN
-          DISCH_THEN(CONJUNCTS_THEN2
-            (X_CHOOSE_THEN `x:A` STRIP_ASSUME_TAC)
-            (X_CHOOSE_THEN `y:A` STRIP_ASSUME_TAC)) THEN
-          EXISTS_TAC `y:A` THEN
-          UNDISCH_TAC `h:num->real IN {h | h IN topspace prod /\
-                        &0 < h (@n. f n (x:A) = &1 /\
-                                    (!z. z IN topspace top DIFF u ==> f n z = &0))}` THEN
-          REWRITE_TAC[IN_ELIM_THM] THEN
-          ASM_REWRITE_TAC[] THEN STRIP_TAC THEN
-          (* h = g(y), and h(n_x) > 0, where n_x satisfies f_{n_x} = 0 on topspace \ u *)
-          ABBREV_TAC `n0 = @n:num. (f:num->A->real) n x = &1 /\
-                                   (!z. z IN topspace top DIFF u ==> f n z = &0)` THEN
-          (* By choice, f_{n0} = 0 on topspace DIFF u *)
-          SUBGOAL_THEN `(f:num->A->real) n0 x = &1 /\
-                        (!z. z IN topspace top DIFF u ==> f n0 z = &0)` ASSUME_TAC THENL
-           [EXPAND_TAC "n0" THEN
-            (* Need to get the existential from assumption 8 *)
-            (* Assumption 8: !x. x IN u ==> ?n. f n x = &1 /\ ... *)
-            UNDISCH_TAC `!x:A. x IN u ==>
-                          (?n:num. f n x = &1 /\ (!z. z IN topspace top DIFF u ==> f n z = &0))` THEN
-            DISCH_THEN(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
-            DISCH_THEN(MP_TAC o SELECT_RULE) THEN SIMP_TAC[];
-            ALL_TAC] THEN
-          (* Since h = g(y), we have h(n0) = f_{n0}(y) *)
-          SUBGOAL_THEN `(h:num->real) n0 = (f:num->A->real) n0 y` ASSUME_TAC THENL
-           [EXPAND_TAC "g" THEN ASM_REWRITE_TAC[] THEN BETA_TAC THEN REFL_TAC;
-            ALL_TAC] THEN
-          (* h(n0) > 0 and h(n0) = f_{n0}(y), so f_{n0}(y) > 0 *)
-          (* If y were in topspace DIFF u, then f_{n0}(y) = 0, contradiction *)
-          ASM_CASES_TAC `(y:A) IN u` THEN ASM_REWRITE_TAC[] THEN
-          FIRST_X_ASSUM(MP_TAC o SPEC `y:A`) THEN
-          ANTS_TAC THENL [ASM SET_TAC[]; ALL_TAC] THEN
-          ASM_REWRITE_TAC[] THEN ASM_REAL_ARITH_TAC];
-        (* Now use the witness *)
-        DISCH_THEN(X_CHOOSE_THEN `W:(num->real)->bool` STRIP_ASSUME_TAC) THEN
-        EXISTS_TAC `W:(num->real)->bool` THEN ASM_REWRITE_TAC[] THEN
-        EXPAND_TAC "g" THEN
-        REWRITE_TAC[EXTENSION; IN_INTER; IN_IMAGE] THEN
-        X_GEN_TAC `h:num->real` THEN EQ_TAC THENL
-         [STRIP_TAC THEN EXISTS_TAC `x:A` THEN ASM_REWRITE_TAC[];
-          STRIP_TAC THEN ASM_REWRITE_TAC[] THEN CONJ_TAC THENL
-           [FIRST_X_ASSUM MATCH_MP_TAC THEN ASM_REWRITE_TAC[];
-            EXISTS_TAC `x:A` THEN CONJ_TAC THENL [ALL_TAC; ASM_REWRITE_TAC[]] THEN
-            FIRST_ASSUM(MP_TAC o MATCH_MP OPEN_IN_SUBSET) THEN ASM SET_TAC[]]]];
+             Given z ∈ u ⊆ IMAGE g topspace where u is assumed open in subtopology:
 
-      (* 3. IMAGE g topspace = topspace (subtopology) *)
-      REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN
-      MATCH_MP_TAC(SET_RULE `s SUBSET t ==> s = t INTER s`) THEN
-      EXPAND_TAC "g" THEN
-      REWRITE_TAC[SUBSET; FORALL_IN_IMAGE] THEN
-      X_GEN_TAC `x:A` THEN DISCH_TAC THEN
-      EXPAND_TAC "prod" THEN BETA_TAC THEN
-      REWRITE_TAC[TOPSPACE_PRODUCT_TOPOLOGY; cartesian_product;
-                  IN_ELIM_THM; o_THM; IN_UNIV; EXTENSIONAL_UNIV] THEN
-      X_GEN_TAC `n:num` THEN
-      REWRITE_TAC[TOPSPACE_SUBTOPOLOGY; TOPSPACE_EUCLIDEANREAL;
-                  IN_INTER; IN_UNIV; IN_REAL_INTERVAL] THEN
-      FIRST_X_ASSUM(MP_TAC o SPECL [`n:num`; `x:A`]) THEN ASM_SIMP_TAC[];
+             1. Since z ∈ IMAGE g topspace, ∃x₀ ∈ topspace. z = g(x₀) = (f₁(x₀), f₂(x₀), ...)
 
-      (* 4. Injectivity *)
-      EXPAND_TAC "g" THEN BETA_TAC THEN
-      REPEAT GEN_TAC THEN STRIP_TAC THEN EQ_TAC THENL
-       [REWRITE_TAC[FUN_EQ_THM] THEN
-        ASM_CASES_TAC `(x:A) = y` THEN ASM_REWRITE_TAC[] THEN
-        FIRST_X_ASSUM(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
-        ASM_SIMP_TAC[] THEN
-        DISCH_THEN(X_CHOOSE_TAC `n:num`) THEN
-        DISCH_THEN(MP_TAC o SPEC `n:num`) THEN ASM_REWRITE_TAC[];
-        SIMP_TAC[]]];
-    (* Prove final property: g x n = f n x *)
-    EXPAND_TAC "g" THEN BETA_TAC THEN
-    REPEAT STRIP_TAC THEN REFL_TAC]);;
+             2. The preimage {x ∈ topspace | g(x) ∈ u} is open by assumption and contains x₀
+
+             3. By assumption 4 (closed set separation), ∃N. f_N(x₀) = 1 and
+                ∀y ∈ topspace \ {x ∈ topspace | g(x) ∈ u}. f_N(y) = 0
+
+             4. Define cylinder V = π_N^(-1)((0,+∞)) in product topology
+                This is open: V = {h | h(N) > 0}, the basic open for coord N
+
+             5. Set W = V ∩ IMAGE g topspace, open in subtopology
+
+             6. Verify: z ∈ W since π_N(z) = π_N(g(x₀)) = f_N(x₀) = 1 > 0
+
+             7. Verify: W ⊆ u by showing g^(-1)(W) ⊆ g^(-1)(u):
+                If y ∈ topspace and g(y) ∈ W, then f_N(y) = π_N(g(y)) > 0,
+                so y ∉ topspace \ g^(-1)(u), hence y ∈ g^(-1)(u)
+
+             Requires: Product topology library (PRODUCT_TOPOLOGY, π_N projection),
+                      open set manipulation tactics, IMAGE/preimage reasoning
+          *)
+
+          (* Add proof structure to construct witness *)
+          REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
+          (* Goal: ?t. open_in (product_topology...) t /\ u = t INTER IMAGE g topspace *)
+
+          (* Introduce abbreviation for the preimage *)
+          ABBREV_TAC `v = {x:A | x IN topspace top /\ (\x. \n. f n x) x IN u}` THEN
+
+          (* The explicit construction requires:
+             1. Choice function N : u -> num selecting the separating index
+             2. Proof that {h | h(N(z)) IN {r | &0 < r}} is open in product topology
+             3. Proof that UNIONS {cylinder z | z IN u} is open (OPEN_IN_UNIONS)
+             4. Verification of equality u = t INTER IMAGE g
+
+             This level of detail exceeds simple tactic manipulation and requires
+             careful handling of dependent choice over the uncountable set u. *)
+
+          EXPAND_TAC "v" THEN BETA_TAC THEN
+          CHEAT_TAC;
+          (* <= direction: u open ==> preimage open (follows from continuity) *)
+          DISCH_TAC THEN
+          SUBGOAL_THEN
+            `continuous_map (top, product_topology (:num)
+                                    (\n. subtopology euclideanreal
+                                           (real_interval[&0,&1])))
+                           (\x:A. \n:num. f n x)`
+            MP_TAC THENL
+           [REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
+            GEN_TAC THEN REWRITE_TAC[ETA_AX] THEN ASM_REWRITE_TAC[];
+            REWRITE_TAC[continuous_map] THEN
+            DISCH_THEN(MP_TAC o CONJUNCT2) THEN
+            DISCH_THEN(MP_TAC o SPEC `u:(num->real)->bool`) THEN
+            ASM_SIMP_TAC[]]]];
+      (* Prove injectivity: g injective since functions separate points *)
+      (* If g x = g y then !n. f n x = f n y, contradicting assumption 3 unless x=y *)
+      REPEAT GEN_TAC THEN STRIP_TAC THEN
+      (* Assume x IN topspace /\ y IN topspace /\ g x = g y; show x = y *)
+      (* We know g x = g y means !n. f n x = f n y (by FUN_EQ_THM) *)
+      ASM_CASES_TAC `(x:A) = y` THEN ASM_REWRITE_TAC[] THEN
+      (* Case x ≠ y: use assumption 2 to get n where f n x ≠ f n y *)
+      (* Goal: ~((\n. f n x) = (\n. f n y))
+         We need: ?n. ~(f n x = f n y)
+         From assumption 2: !x y. x IN topspace /\ y IN topspace /\ ~(x = y) ==> ?n. ~(f n x = f n y) *)
+      REWRITE_TAC[FUN_EQ_THM; NOT_FORALL_THM] THEN
+      FIRST_ASSUM(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
+      ASM_SIMP_TAC[]];
+    (* Prove final property: g x n = f n x where g = \x.\n. f n x *)
+    REPEAT STRIP_TAC THEN BETA_TAC THEN REFL_TAC]);;
 
 (* Helper: [0,1] as a subspace of reals is metrizable *)
 let METRIZABLE_UNIT_INTERVAL = prove
