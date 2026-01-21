@@ -2,14 +2,19 @@
 
 (* This is a debugging tactic DEBUG_GOAL_TAC - do not remove *)
 let debug_goal_string (asl,w) =
-  let buf = Buffer.create 1024 in
+  let buf = Buffer.create 16384 in
   let fmt = Format.formatter_of_buffer buf in
+  Format.pp_set_max_boxes fmt 200;
+  Format.pp_set_margin fmt 200;
   pp_print_goal fmt (asl,w);  (* if available *)
   Format.pp_print_flush fmt ();
   Buffer.contents buf;;
 
 let DEBUG_GOAL_TAC : tactic =
-  fun (asl,w as g) -> failwith ("GOAL:\n" ^ debug_goal_string g);;
+  fun (asl,w as g) ->
+  let s = debug_goal_string g in
+  print_string ("DEBUG_GOAL:\n" ^ s ^ "\n");
+  failwith "DEBUG_GOAL_TAC";;
 
 (* Urysohn Metrization Theorem:
    A topological space is metrizable if and only if it is
@@ -181,58 +186,39 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
                      g x = &1 /\ (!z. z IN c ==> g z = &0)`
     ASSUME_TAC THENL
    [REPEAT STRIP_TAC THEN
-    (* Use Urysohn with singleton {x} and closed set c *)
-    MP_TAC(ISPECL [`top:A topology`; `{x:A}`; `c:A->bool`]
+    (* Use Urysohn with c as first set (gets 0) and {x} as second (gets 1) *)
+    MP_TAC(ISPECL [`top:A topology`; `c:A->bool`; `{x:A}`]
                   NORMAL_SPACE_URYSOHN_FUNCTION) THEN
     ASM_REWRITE_TAC[] THEN
     ANTS_TAC THENL
-     [CONJ_TAC THENL
-       [(* {x} is closed: Hausdorff implies T1, T1 gives closed singletons *)
-        ASM_SIMP_TAC[CLOSED_IN_T1_SING; HAUSDORFF_IMP_T1_SPACE];
-        (* {x} and c are disjoint since x ∉ c *)
-        ASM_SIMP_TAC[DISJOINT; EXTENSION; IN_INTER; NOT_IN_EMPTY; IN_SING]];
+     [(* Need: closed_in top c /\ closed_in top {x} /\ DISJOINT c {x} *)
+      (* closed_in top c is already assumed, so will be solved by ASM_REWRITE_TAC *)
+      ASM_SIMP_TAC[CLOSED_IN_T1_SING; HAUSDORFF_IMP_T1_SPACE; DISJOINT_SING];
       (* Extract the function from Urysohn *)
       MATCH_MP_TAC MONO_EXISTS THEN X_GEN_TAC `g:A->real` THEN
       STRIP_TAC THEN ASM_REWRITE_TAC[] THEN
-      CONJ_TAC THENL
-       [FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN SIMP_TAC[IN_SING];
-        ASM_SIMP_TAC[]]];
+      (* g x = &1 follows from assumption 14 with x' = x *)
+      FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN
+      SIMP_TAC[IN_SING]];
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (* Munkres §34.1, Step 1, page 214-215:
-     For each pair (n,m) where closure(B_n) ⊆ B_m, use Urysohn lemma to get
-     g_{n,m}: X → [0,1] with g_{n,m}(closure(B_n)) = {1}, g_{n,m}(X-B_m) = {0}.
-     Since indexed by subset of N×N, this collection is countable.
-     Reindex as {f_k} using pairing function (NUMPAIR available in library).
+  (* Munkres §34.1, Step 1:
+     For each pair (n,m) where closure(e n) ⊆ e m, use Urysohn lemma.
+     The witness function uses Hilbert choice @ applied to the existential
+     from assumption 9 (Urysohn for closed sets). *)
 
-     To verify the four required properties:
-     - Property 1-2: Each g_{n,m} maps to [0,1] and is continuous (from Urysohn)
-     - Property 3: Point separation follows from regularity (can find basis pair)
-     - Property 4: Closed set separation follows from regularity (can find basis pair)
+  (* The construction requires extracting a SKOLEM function from the
+     existential in assumption 9. The witness will be:
+     f k = Urysohn function for (topspace \ e(NUMSND k), some point in e(NUMFST k))
+           when (e(NUMFST k) IN b /\ e(NUMSND k) IN b /\ closure(NUMFST k) ⊆ e(NUMSND k))
+           else constant 0 function
 
-     Key: Given x₀ and neighborhood U, regularity gives basis elements B_n, B_m
-     with x₀ ∈ B_n, closure(B_n) ⊆ B_m ⊆ U. Then g_{n,m} works. *)
+     Properties 1-2 (range, continuity): From Urysohn or constant 0
+     Property 3 (point separation): Use REGULAR_SPACE_BASIS_CLOSURE to find pairs
+     Property 4 (closed set separation): Same
 
-  (* Key step: For valid basis pairs, Urysohn gives separating functions *)
-
-  (* Construction: For each pair (n,m), define f(NUMPAIR n m) using Urysohn
-     when e n, e m are valid basis elements with closure containment.
-     Otherwise use constant function mapping to 0. *)
-
-  (* Define the family using Hilbert choice @ *)
-  (* g n m = @h. if conditions(n,m) then Urysohn_props(h) else h = (\x. &0) *)
-
-  (* The witness construction requires careful handling of type variables.
-     The current goal is existentially quantified for f:num->A->real.
-     We need the witness to reference the free variables e, b, top. *)
-
-  (* For now, use CHEAT_TAC - the proof sketch is:
-     1. EXISTS_TAC with the conditional Urysohn construction
-     2. Prove range [0,1] using Urysohn properties or constant 0
-     3. Prove continuity using Urysohn or constant function
-     4. Prove point separation using regularity + basis pairs
-     5. Prove closed set separation using regularity + basis pairs *)
+     This requires careful SKOLEM manipulation. For now use CHEAT_TAC. *)
 
   CHEAT_TAC);;
 
