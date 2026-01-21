@@ -843,10 +843,3 @@ let URYSOHN_METRIZATION = prove
         ==> (regular_space top /\ hausdorff_space top <=>
              metrizable_space top)`,
   MESON_TAC[URYSOHN_METRIZATION_FWD; URYSOHN_METRIZATION_BWD]);;
-
-(* Helper: continuous map image in topspace *)
-let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
- (`!top top' (f:A->B).
-        continuous_map (top,top') f
-        ==> IMAGE f (topspace top) SUBSET topspace top'`,
-  SIMP_TAC[CONTINUOUS_MAP]);;
