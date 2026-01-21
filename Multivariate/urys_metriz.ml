@@ -590,103 +590,68 @@ let EMBEDDING_INTO_REAL_PRODUCT = prove
                 (!x. x IN topspace top ==> !n. g x n = f n x)`,
   REPEAT STRIP_TAC THEN
   EXISTS_TAC `\x:A. \n:num. (f:num->A->real) n x` THEN
+  ABBREV_TAC `prod_top = product_topology (:num)
+                           (\n. subtopology euclideanreal (real_interval[&0,&1]))` THEN
+  ABBREV_TAC `g = \x:A. \n:num. (f:num->A->real) n x` THEN
   CONJ_TAC THENL
-   [(* Prove embedding directly using definition *)
-    (* Following textbook Step 2: embedding_map = homeomorphic onto image *)
-    REWRITE_TAC[embedding_map; homeomorphic_map] THEN
-    CONJ_TAC THENL
-     [(* Prove quotient_map to subtopology of image *)
-      (* Use QUOTIENT_MAP_ONTO_IMAGE which combines IMAGE subset + open characterization *)
-      MATCH_MP_TAC QUOTIENT_MAP_ONTO_IMAGE THEN
+   [(* Prove embedding_map using embedding_map definition directly *)
+    REWRITE_TAC[embedding_map] THEN
+    EXPAND_TAC "prod_top" THEN
+    EXPAND_TAC "g" THEN
+    (* Goal: homeomorphic_map (top, subtopology prod_top (IMAGE g (topspace top))) g *)
+    (* Use BIJECTIVE_OPEN_IMP_HOMEOMORPHIC_MAP *)
+    MATCH_MP_TAC BIJECTIVE_OPEN_IMP_HOMEOMORPHIC_MAP THEN
+    REPEAT CONJ_TAC THENL
+     [(* continuous_map (top, subtopology prod_top (IMAGE g topspace)) g *)
+      REWRITE_TAC[CONTINUOUS_MAP_IN_SUBTOPOLOGY] THEN
       CONJ_TAC THENL
-       [(* Prove IMAGE g topspace SUBSET topspace product *)
-        (* g continuous ==> IMAGE subset via CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE *)
-        MATCH_MP_TAC CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE THEN
+       [(* continuous_map (top, prod_top) g *)
         REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
         GEN_TAC THEN REWRITE_TAC[ETA_AX] THEN ASM_REWRITE_TAC[];
-        (* Prove open set characterization for quotient_map *)
-        (* Goal: !u. u SUBSET topspace product ==> *)
-        (*       (open_in top {x | x IN topspace /\ g x IN u} <=> open_in product u) *)
-        (* We know g is continuous, which gives (<=) direction *)
-        (* The (=>) direction needs the separation property from textbook *)
-        REPEAT STRIP_TAC THEN EQ_TAC THENL
-         [(*=> direction: preimage open ==> u open (hard - needs separation)  *)
-          (* Goal: open_in (subtopology product (IMAGE g topspace)) u *)
-          (* Assume: u SUBSET IMAGE g topspace /\ *)
-          (*         open_in top {x | x IN topspace /\ g x IN u} *)
-          DISCH_TAC THEN
-          (* Implementation strategy from Munkres §34.1, Step 2, pages 214-215:
+        (* IMAGE g topspace SUBSET IMAGE g topspace - trivial *)
+        REWRITE_TAC[SUBSET_REFL]];
 
-             Given z ∈ u ⊆ IMAGE g topspace where u is assumed open in subtopology:
+      (* open_map (top, subtopology prod_top (IMAGE g topspace)) g *)
+      (* This is the key: IMAGE g v is open in subtopology for every open v *)
+      REWRITE_TAC[open_map] THEN
+      X_GEN_TAC `v:A->bool` THEN DISCH_TAC THEN
+      REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
+      (* Goal: ?t. open_in prod_top t /\ IMAGE g v = t INTER IMAGE g (topspace top) *)
+      (* For each x in v, construct cylinder around g(x) separating from complement *)
+      EXISTS_TAC `UNIONS {
+        {h:num->real | h IN topspace prod_top /\
+         h(@n. f n x = &1 /\ (!z. z IN topspace top DIFF v ==> f n z = &0)) > &0} |
+        x | (x:A) IN v}` THEN
+      CONJ_TAC THENL
+       [(* UNIONS of cylinders is open *)
+        MATCH_MP_TAC OPEN_IN_UNIONS THEN
+        REWRITE_TAC[FORALL_IN_GSPEC] THEN
+        X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+        (* The cylinder {h | h(N) > 0} is open in product topology *)
+        (* Use OPEN_IN_PRODUCT_TOPOLOGY *)
+        CHEAT_TAC;
+        (* IMAGE g v = t INTER IMAGE g topspace *)
+        CHEAT_TAC];
 
-             1. Since z ∈ IMAGE g topspace, ∃x₀ ∈ topspace. z = g(x₀) = (f₁(x₀), f₂(x₀), ...)
+      (* IMAGE g topspace = topspace (subtopology ...) *)
+      REWRITE_TAC[TOPSPACE_SUBTOPOLOGY] THEN
+      SUBGOAL_THEN `IMAGE (\x:A. \n:num. (f:num->A->real) n x) (topspace top) SUBSET
+                   topspace (product_topology (:num)
+                               (\n. subtopology euclideanreal (real_interval[&0,&1])))`
+        (fun th -> SIMP_TAC[th; SET_RULE `s SUBSET t ==> t INTER s = s`]) THEN
+      MATCH_MP_TAC CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE THEN
+      REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
+      GEN_TAC THEN REWRITE_TAC[ETA_AX] THEN ASM_REWRITE_TAC[];
 
-             2. The preimage {x ∈ topspace | g(x) ∈ u} is open by assumption and contains x₀
-
-             3. By assumption 4 (closed set separation), ∃N. f_N(x₀) = 1 and
-                ∀y ∈ topspace \ {x ∈ topspace | g(x) ∈ u}. f_N(y) = 0
-
-             4. Define cylinder V = π_N^(-1)((0,+∞)) in product topology
-                This is open: V = {h | h(N) > 0}, the basic open for coord N
-
-             5. Set W = V ∩ IMAGE g topspace, open in subtopology
-
-             6. Verify: z ∈ W since π_N(z) = π_N(g(x₀)) = f_N(x₀) = 1 > 0
-
-             7. Verify: W ⊆ u by showing g^(-1)(W) ⊆ g^(-1)(u):
-                If y ∈ topspace and g(y) ∈ W, then f_N(y) = π_N(g(y)) > 0,
-                so y ∉ topspace \ g^(-1)(u), hence y ∈ g^(-1)(u)
-
-             Requires: Product topology library (PRODUCT_TOPOLOGY, π_N projection),
-                      open set manipulation tactics, IMAGE/preimage reasoning
-          *)
-
-          (* Add proof structure to construct witness *)
-          REWRITE_TAC[OPEN_IN_SUBTOPOLOGY] THEN
-          (* Goal: ?t. open_in (product_topology...) t /\ u = t INTER IMAGE g topspace *)
-
-          (* Introduce abbreviation for the preimage *)
-          ABBREV_TAC `v = {x:A | x IN topspace top /\ (\x. \n. f n x) x IN u}` THEN
-
-          (* The explicit construction requires:
-             1. Choice function N : u -> num selecting the separating index
-             2. Proof that {h | h(N(z)) IN {r | &0 < r}} is open in product topology
-             3. Proof that UNIONS {cylinder z | z IN u} is open (OPEN_IN_UNIONS)
-             4. Verification of equality u = t INTER IMAGE g
-
-             This level of detail exceeds simple tactic manipulation and requires
-             careful handling of dependent choice over the uncountable set u. *)
-
-          EXPAND_TAC "v" THEN BETA_TAC THEN
-          CHEAT_TAC;
-          (* <= direction: u open ==> preimage open (follows from continuity) *)
-          DISCH_TAC THEN
-          SUBGOAL_THEN
-            `continuous_map (top, product_topology (:num)
-                                    (\n. subtopology euclideanreal
-                                           (real_interval[&0,&1])))
-                           (\x:A. \n:num. f n x)`
-            MP_TAC THENL
-           [REWRITE_TAC[CONTINUOUS_MAP_COMPONENTWISE_UNIV] THEN
-            GEN_TAC THEN REWRITE_TAC[ETA_AX] THEN ASM_REWRITE_TAC[];
-            REWRITE_TAC[continuous_map] THEN
-            DISCH_THEN(MP_TAC o CONJUNCT2) THEN
-            DISCH_THEN(MP_TAC o SPEC `u:(num->real)->bool`) THEN
-            ASM_SIMP_TAC[]]]];
-      (* Prove injectivity: g injective since functions separate points *)
-      (* If g x = g y then !n. f n x = f n y, contradicting assumption 3 unless x=y *)
-      REPEAT GEN_TAC THEN STRIP_TAC THEN
-      (* Assume x IN topspace /\ y IN topspace /\ g x = g y; show x = y *)
-      (* We know g x = g y means !n. f n x = f n y (by FUN_EQ_THM) *)
+      (* g is injective *)
+      MAP_EVERY X_GEN_TAC [`x:A`; `y:A`] THEN STRIP_TAC THEN
       ASM_CASES_TAC `(x:A) = y` THEN ASM_REWRITE_TAC[] THEN
-      (* Case x ≠ y: use assumption 2 to get n where f n x ≠ f n y *)
-      (* Goal: ~((\n. f n x) = (\n. f n y))
-         We need: ?n. ~(f n x = f n y)
-         From assumption 2: !x y. x IN topspace /\ y IN topspace /\ ~(x = y) ==> ?n. ~(f n x = f n y) *)
       REWRITE_TAC[FUN_EQ_THM; NOT_FORALL_THM] THEN
       FIRST_ASSUM(MP_TAC o SPECL [`x:A`; `y:A`]) THEN
       ASM_SIMP_TAC[]];
-    (* Prove final property: g x n = f n x where g = \x.\n. f n x *)
+
+    (* Prove final property: g x n = f n x *)
+    EXPAND_TAC "g" THEN
     REPEAT STRIP_TAC THEN BETA_TAC THEN REFL_TAC]);;
 
 (* Helper: [0,1] as a subspace of reals is metrizable *)
