@@ -467,8 +467,104 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
 
     (* Property 4: closed set separation *)
     MAP_EVERY X_GEN_TAC [`c0:A->bool`; `x0:A`] THEN STRIP_TAC THEN
-    (* Use REGULAR_SPACE_BASIS_CLOSURE with complement of c0 *)
-    CHEAT_TAC]);;
+    (* topspace DIFF c0 is open (complement of closed) *)
+    SUBGOAL_THEN `open_in (top:A topology) (topspace top DIFF c0)` ASSUME_TAC THENL
+     [ASM_SIMP_TAC[OPEN_IN_DIFF; OPEN_IN_TOPSPACE]; ALL_TAC] THEN
+    (* x0 is in topspace DIFF c0 *)
+    SUBGOAL_THEN `(x0:A) IN topspace top DIFF c0` ASSUME_TAC THENL
+     [ASM SET_TAC[]; ALL_TAC] THEN
+    (* Use basis to find u1 containing x0 in complement of c0 *)
+    SUBGOAL_THEN `?u1:A->bool. u1 IN b /\ x0 IN u1 /\ u1 SUBSET topspace top DIFF c0`
+                 STRIP_ASSUME_TAC THENL
+     [ASM_MESON_TAC[]; ALL_TAC] THEN
+    (* Use REGULAR_SPACE_BASIS_CLOSURE to find v with closure SUBSET u1 *)
+    MP_TAC(ISPECL [`top:A topology`; `b:(A->bool)->bool`; `u1:A->bool`; `x0:A`]
+                  REGULAR_SPACE_BASIS_CLOSURE) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `v:A->bool` STRIP_ASSUME_TAC) THEN
+    (* Find indices m, n for v, u1 *)
+    SUBGOAL_THEN `?m:num. (e:num->A->bool) m = v` STRIP_ASSUME_TAC THENL
+     [ASM_MESON_TAC[]; ALL_TAC] THEN
+    SUBGOAL_THEN `?n:num. (e:num->A->bool) n = u1` STRIP_ASSUME_TAC THENL
+     [ASM_MESON_TAC[]; ALL_TAC] THEN
+    (* Witness is NUMPAIR m n *)
+    EXISTS_TAC `NUMPAIR (m:num) (n:num)` THEN
+    REWRITE_TAC[NUMPAIR_DEST] THEN
+    ASM_REWRITE_TAC[] THEN
+    (* Establish valid condition holds *)
+    SUBGOAL_THEN `(v:A->bool) IN b /\ (u1:A->bool) IN b /\
+                  (top:A topology) closure_of v SUBSET u1 /\ ~(v = {})`
+                 ASSUME_TAC THENL
+     [ASM_REWRITE_TAC[] THEN ASM SET_TAC[];
+      ALL_TAC] THEN
+    ASM_REWRITE_TAC[] THEN
+    (* Case split on valid *)
+    ASM_CASES_TAC `valid (NUMPAIR (m:num) (n:num)):bool` THENL
+     [(* valid case *)
+      ASM_REWRITE_TAC[] THEN
+      (* Abbreviate the predicate *)
+      ABBREV_TAC `P = \g:A->real.
+                        continuous_map (top, subtopology euclideanreal (real_interval[&0,&1])) g /\
+                        (!z. z IN top closure_of v ==> g z = &1) /\
+                        (!z. z IN topspace top DIFF u1 ==> g z = &0)` THEN
+      (* Prove existence using URYSOHN_LEMMA *)
+      SUBGOAL_THEN `?g:A->real. P g` ASSUME_TAC THENL
+       [EXPAND_TAC "P" THEN BETA_TAC THEN
+        MP_TAC(ISPECL [`top:A topology`; `topspace top DIFF (u1:A->bool)`;
+                       `top closure_of (v:A->bool)`; `&0`; `&1`] URYSOHN_LEMMA) THEN
+        REWRITE_TAC[REAL_POS] THEN
+        ANTS_TAC THENL
+         [CONJ_TAC THENL [ASM_REWRITE_TAC[]; ALL_TAC] THEN
+          CONJ_TAC THENL
+           [MATCH_MP_TAC CLOSED_IN_DIFF THEN
+            REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN ASM_MESON_TAC[];
+            ALL_TAC] THEN
+          CONJ_TAC THENL [REWRITE_TAC[CLOSED_IN_CLOSURE_OF]; ALL_TAC] THEN
+          REWRITE_TAC[DISJOINT; EXTENSION; IN_INTER; NOT_IN_EMPTY; IN_DIFF] THEN
+          ASM SET_TAC[];
+          DISCH_THEN(X_CHOOSE_THEN `g:A->real` STRIP_ASSUME_TAC) THEN
+          EXISTS_TAC `g:A->real` THEN ASM_REWRITE_TAC[]];
+        ALL_TAC] THEN
+      (* Use P((@) P) via SELECT_AX *)
+      SUBGOAL_THEN `(P:((A->real)->bool)) ((@) P)` MP_TAC THENL
+       [FIRST_X_ASSUM(MP_TAC o MATCH_MP
+         (MESON[SELECT_AX] `(?g. P g) ==> P ((@) P)`)) THEN
+        SIMP_TAC[];
+        ALL_TAC] THEN
+      EXPAND_TAC "P" THEN BETA_TAC THEN STRIP_TAC THEN
+      (* x0 IN v ⊆ closure(v) ⟹ (@g...) x0 = 1 *)
+      SUBGOAL_THEN `(x0:A) IN top closure_of v` ASSUME_TAC THENL
+       [SUBGOAL_THEN `(v:A->bool) SUBSET top closure_of v` MP_TAC THENL
+         [MATCH_MP_TAC CLOSURE_OF_SUBSET THEN ASM_MESON_TAC[OPEN_IN_SUBSET];
+          ASM SET_TAC[]];
+        ALL_TAC] THEN
+      (* c0 ⊆ topspace DIFF u1 since u1 ⊆ topspace DIFF c0 *)
+      SUBGOAL_THEN `(c0:A->bool) SUBSET topspace top DIFF u1` ASSUME_TAC THENL
+       [MP_TAC(ISPECL [`top:A topology`; `c0:A->bool`] CLOSED_IN_SUBSET) THEN
+        ASM_REWRITE_TAC[] THEN ASM SET_TAC[];
+        ALL_TAC] THEN
+      (* Prove f(NUMPAIR m n) x0 = 1 and f(NUMPAIR m n) z = 0 for z in c0 *)
+      CONJ_TAC THENL
+       [(* x0 gives 1 *)
+        SUBGOAL_THEN `((@g:A->real. continuous_map (top,subtopology euclideanreal (real_interval [&0,&1])) g /\
+                      (!z. z IN top closure_of v ==> g z = &1) /\
+                      (!z. z IN topspace top DIFF u1 ==> g z = &0)) x0 = &1)`
+                     (fun th -> REWRITE_TAC[th]) THEN
+        ASM_MESON_TAC[];
+        (* z in c0 gives 0 *)
+        X_GEN_TAC `z:A` THEN DISCH_TAC THEN
+        SUBGOAL_THEN `(z:A) IN topspace top DIFF u1` ASSUME_TAC THENL
+         [ASM SET_TAC[]; ALL_TAC] THEN
+        SUBGOAL_THEN `((@g:A->real. continuous_map (top,subtopology euclideanreal (real_interval [&0,&1])) g /\
+                      (!z. z IN top closure_of v ==> g z = &1) /\
+                      (!z. z IN topspace top DIFF u1 ==> g z = &0)) z = &0)`
+                     (fun th -> REWRITE_TAC[th]) THEN
+        ASM_MESON_TAC[]];
+      (* ~valid case: contradiction *)
+      FIRST_X_ASSUM(MP_TAC o SPEC `NUMPAIR (m:num) (n:num)`) THEN
+      REWRITE_TAC[NUMPAIR_DEST] THEN
+      ASM_REWRITE_TAC[] THEN
+      DISCH_TAC THEN ASM_MESON_TAC[]]]);;
 
 (* Note: Pairing function NUMPAIR and properties NUMPAIR_INJ, NUMPAIR_DEST
    are available from the library (ind_types.ml). Use those instead of
