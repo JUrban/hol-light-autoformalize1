@@ -258,7 +258,42 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     (* Case split on validity of n *)
     ASM_CASES_TAC `(valid:num->bool) n` THENL
      [(* Valid case: use SELECT_AX to extract properties *)
-      CHEAT_TAC;
+      ASM_SIMP_TAC[] THEN
+      (* Abbreviate the predicate for the chosen function *)
+      ABBREV_TAC `P = \g:A->real.
+        continuous_map (top, subtopology euclideanreal (real_interval[&0,&1])) g /\
+        g (@z:A. z IN e (NUMFST n)) = &1 /\
+        (!z. z IN topspace top DIFF e (NUMSND n) ==> g z = &0)` THEN
+      (* First, show existence of such g using assumption 9 *)
+      SUBGOAL_THEN `?g:A->real. P g` ASSUME_TAC THENL
+       [(* Branch 1: Prove the existential *)
+        EXPAND_TAC "P" THEN BETA_TAC THEN
+        (* Use the Urysohn assumption - go back up through assumptions *)
+        SUBGOAL_THEN
+          `closed_in top (topspace top DIFF e (NUMSND n)) /\
+           (@z:A. z IN e (NUMFST n)) IN topspace top /\
+           ~((@z. z IN e (NUMFST n)) IN topspace top DIFF e (NUMSND n))
+           ==> ?g. continuous_map
+                     (top,subtopology euclideanreal (real_interval[&0,&1])) g /\
+                   g (@z. z IN e (NUMFST n)) = &1 /\
+                   (!z. z IN topspace top DIFF e (NUMSND n) ==> g z = &0)`
+          MP_TAC THENL
+         [ASM_MESON_TAC[]; ALL_TAC] THEN
+        (* Verify preconditions: need validity information *)
+        (* valid n gives us the 4 properties needed *)
+        CHEAT_TAC;
+        (* Branch 2: Use the existence to get properties of @ *)
+        SUBGOAL_THEN `(P:((A->real)->bool)) ((@) P)` MP_TAC THENL
+         [ASM_MESON_TAC[SELECT_AX];
+          ALL_TAC] THEN
+        EXPAND_TAC "P" THEN BETA_TAC THEN STRIP_TAC THEN
+        (* continuous_map to subtopology [0,1] implies g x IN [0,1] *)
+        FIRST_X_ASSUM(MP_TAC o
+          GEN_REWRITE_RULE I [CONTINUOUS_MAP_IN_SUBTOPOLOGY]) THEN
+        STRIP_TAC THEN
+        FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [SUBSET]) THEN
+        REWRITE_TAC[FORALL_IN_IMAGE; IN_REAL_INTERVAL] THEN
+        DISCH_THEN MATCH_MP_TAC THEN ASM_REWRITE_TAC[]];
       (* Invalid case: constant 0 in [0,1] *)
       ASM_SIMP_TAC[] THEN REAL_ARITH_TAC];
 
