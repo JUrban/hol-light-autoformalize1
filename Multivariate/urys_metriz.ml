@@ -215,13 +215,24 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      with x₀ ∈ B_n, closure(B_n) ⊆ B_m ⊆ U. Then g_{n,m} works. *)
 
   (* Key step: For valid basis pairs, Urysohn gives separating functions *)
-  (* First show: given x ∈ U open, can find basis pair with x ∈ closure(e n) ⊆ e m ⊆ U *)
 
-  (* Now construct the family using the pairing function NUMPAIR *)
-  (* For k = NUMPAIR(n,m), define f_k using Urysohn if valid, else constant 0 *)
+  (* Construction: For each pair (n,m), define f(NUMPAIR n m) using Urysohn
+     when e n, e m are valid basis elements with closure containment.
+     Otherwise use constant function mapping to 0. *)
 
-  (* Use Hilbert choice @ to pick Urysohn function for each valid pair *)
-  (* Let G(n,m) = if conditions then @g. Urysohn props else (\x. &0) *)
+  (* Define the family using Hilbert choice @ *)
+  (* g n m = @h. if conditions(n,m) then Urysohn_props(h) else h = (\x. &0) *)
+
+  (* The witness construction requires careful handling of type variables.
+     The current goal is existentially quantified for f:num->A->real.
+     We need the witness to reference the free variables e, b, top. *)
+
+  (* For now, use CHEAT_TAC - the proof sketch is:
+     1. EXISTS_TAC with the conditional Urysohn construction
+     2. Prove range [0,1] using Urysohn properties or constant 0
+     3. Prove continuity using Urysohn or constant function
+     4. Prove point separation using regularity + basis pairs
+     5. Prove closed set separation using regularity + basis pairs *)
 
   CHEAT_TAC);;
 
