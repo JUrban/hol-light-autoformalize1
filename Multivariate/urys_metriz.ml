@@ -208,17 +208,53 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      The witness function uses Hilbert choice @ applied to the existential
      from assumption 9 (Urysohn for closed sets). *)
 
-  (* The construction requires extracting a SKOLEM function from the
-     existential in assumption 9. The witness will be:
-     f k = Urysohn function for (topspace \ e(NUMSND k), some point in e(NUMFST k))
-           when (e(NUMFST k) IN b /\ e(NUMSND k) IN b /\ closure(NUMFST k) ⊆ e(NUMSND k))
-           else constant 0 function
+  (* Construct the witness using Hilbert choice @ on the existential assumptions.
+     The idea: define f k = @g. properties_for_k(g) where properties_for_k are
+     the appropriate Urysohn properties when k encodes a valid basis pair,
+     or trivially true (g = const 0) when k is invalid.
 
-     Properties 1-2 (range, continuity): From Urysohn or constant 0
-     Property 3 (point separation): Use REGULAR_SPACE_BASIS_CLOSURE to find pairs
-     Property 4 (closed set separation): Same
+     Use the fact that for valid pairs (n,m) with closure(e n) ⊆ e m:
+     - topspace \ e m is closed (complement of open)
+     - any point in e n is in e m (by subset), hence not in topspace \ e m
+     - by assumption 9, there exists a separating function
 
-     This requires careful SKOLEM manipulation. For now use CHEAT_TAC. *)
+     For invalid k, use constant 0 which trivially has range [0,1] and is continuous.
+
+     The witness: for k:num, let n = NUMFST k, m = NUMSND k, define
+     f k = @g. (e n IN b /\ e m IN b /\ closure(e n) ⊆ e m /\ e n ≠ {}) ==>
+               (properties g) /\
+               (~(e n IN b /\ e m IN b /\ closure(e n) ⊆ e m /\ e n ≠ {}) ==>
+                g = \x. &0)
+  *)
+
+  (* Build the witness explicitly *)
+  EXISTS_TAC
+    `\k:num. \x:A.
+       if (e:num->A->bool) (NUMFST k) IN b /\
+          e (NUMSND k) IN b /\
+          (top closure_of e (NUMFST k)) SUBSET e (NUMSND k) /\
+          ~(e (NUMFST k) = {})
+       then (@g:A->real.
+              continuous_map (top, subtopology euclideanreal (real_interval[&0,&1])) g /\
+              g (@z. z IN e (NUMFST k)) = &1 /\
+              (!z. z IN topspace top DIFF e (NUMSND k) ==> g z = &0)) x
+       else &0` THEN
+
+  (* Now prove the four required properties *)
+  (* Beta-reduce the witness function *)
+  BETA_TAC THEN
+
+  (* The proof requires:
+     1. For valid k: show the @ chosen function satisfies range/continuity via SELECT_AX
+        (exists such g from assumption 9 applied to appropriate closed sets)
+     2. For invalid k: show constant 0 satisfies range/continuity (trivial)
+     3. Point separation: use REGULAR_SPACE_BASIS_CLOSURE to find valid k = NUMPAIR n m
+     4. Closed set separation: similar
+
+     Key lemmas needed:
+     - SELECT_AX: !P x. P x ==> P((@) P)
+     - NUMFST (NUMPAIR n m) = n, NUMSND (NUMPAIR n m) = m (from ind_types.ml)
+     - CLOSED_IN_DIFF for complement of open set being closed *)
 
   CHEAT_TAC);;
 
