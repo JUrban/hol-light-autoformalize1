@@ -655,8 +655,18 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
   X_GEN_TAC `h:num->real` THEN EQ_TAC THENL
    [(* ==> direction: h = g x for some x IN u, show h in union and in image of topspace *)
     DISCH_THEN(X_CHOOSE_THEN `x:A` STRIP_ASSUME_TAC) THEN
+    (* First establish that x IN topspace top *)
+    SUBGOAL_THEN `(x:A) IN topspace top` ASSUME_TAC THENL
+     [ASM SET_TAC[]; ALL_TAC] THEN
+    (* Get a separating function *)
+    SUBGOAL_THEN `?n0. (f:num->A->real) n0 x = &1 /\
+                       (!z. z IN topspace top DIFF u ==> f n0 z = &0)`
+                 (X_CHOOSE_TAC `n0:num`) THENL
+     [CHEAT_TAC;
+      ALL_TAC] THEN
     CONJ_TAC THENL
      [CHEAT_TAC;
+      (* h = g x for some x in topspace top *)
       EXISTS_TAC `x:A` THEN ASM SET_TAC[]];
     CHEAT_TAC]);;
 
