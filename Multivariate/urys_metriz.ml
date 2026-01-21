@@ -679,6 +679,7 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
      [CHEAT_TAC;
       (* h = g x for some x in topspace top *)
       EXISTS_TAC `x:A` THEN ASM SET_TAC[]];
+    (* <== direction: h in union and in image of topspace ==> h in image of u *)
     CHEAT_TAC]);;
 
 (* Helper: embedding into product of [0,1] *)
