@@ -899,10 +899,3 @@ let URYSOHN_METRIZATION = prove
     DISCH_TAC THEN
     MP_TAC(SPEC `top:A topology` URYSOHN_METRIZATION_FWD) THEN
     ASM_REWRITE_TAC[] THEN SIMP_TAC[]]);;
-
-(* Helper: continuous map image in topspace *)
-let CONTINUOUS_MAP_IMAGE_SUBSET_TOPSPACE = prove
- (`!top top' (f:A->B).
-        continuous_map (top,top') f
-        ==> IMAGE f (topspace top) SUBSET topspace top'`,
-  SIMP_TAC[CONTINUOUS_MAP]);;
