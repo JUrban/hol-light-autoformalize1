@@ -203,8 +203,8 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
     ALL_TAC] THEN
 
   (* CONSTRUCTION OF COUNTABLE SEPARATING FAMILY *)
-  (* Munkres §34.1, Step 1:
-     For each pair (n,m) where closure(e n) ⊆ e m, use Urysohn lemma.
+  (* Munkres S34.1, Step 1:
+     For each pair (n,m) where closure(e n) SUBSET e m, use Urysohn lemma.
      The witness function uses Hilbert choice @ applied to the existential
      from assumption 9 (Urysohn for closed sets). *)
 
@@ -213,7 +213,7 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      the appropriate Urysohn properties when k encodes a valid basis pair,
      or trivially true (g = const 0) when k is invalid.
 
-     Use the fact that for valid pairs (n,m) with closure(e n) ⊆ e m:
+     Use the fact that for valid pairs (n,m) with closure(e n) SUBSET e m:
      - topspace \ e m is closed (complement of open)
      - any point in e n is in e m (by subset), hence not in topspace \ e m
      - by assumption 9, there exists a separating function
@@ -221,9 +221,9 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
      For invalid k, use constant 0 which trivially has range [0,1] and is continuous.
 
      The witness: for k:num, let n = NUMFST k, m = NUMSND k, define
-     f k = @g. (e n IN b /\ e m IN b /\ closure(e n) ⊆ e m /\ e n ≠ {}) ==>
+     f k = @g. (e n IN b /\ e m IN b /\ closure(e n) SUBSET e m /\ e n /= {}) ==>
                (properties g) /\
-               (~(e n IN b /\ e m IN b /\ closure(e n) ⊆ e m /\ e n ≠ {}) ==>
+               (~(e n IN b /\ e m IN b /\ closure(e n) SUBSET e m /\ e n /= {}) ==>
                 g = \x. &0)
   *)
 
@@ -274,7 +274,7 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
         (* Use URYSOHN_LEMMA with:
            - s = topspace DIFF e(NUMSND n) (closed, gets 0)
            - t = closure_of e(NUMFST n) (closed, gets 1)
-           - Need: DISJOINT s t, which follows from closure ⊆ e(NUMSND n) *)
+           - Need: DISJOINT s t, which follows from closure SUBSET e(NUMSND n) *)
         MP_TAC(ISPECL [`top:A topology`;
                        `topspace top DIFF e (NUMSND n):A->bool`;
                        `top closure_of (e:num->A->bool) (NUMFST n)`;
@@ -290,7 +290,7 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
             (* closed_in (closure_of e(NUMFST n)) *)
             REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
             (* DISJOINT *)
-            (* closure ⊆ e(NUMSND n) from valid n, so closure ∩ (topspace \ e(NUMSND n)) = {} *)
+            (* closure SUBSET e(NUMSND n) from valid n, so closure INTER (topspace \ e(NUMSND n)) = {} *)
             FIRST_X_ASSUM(fun th -> REWRITE_TAC[GSYM th]) THEN
             ASM_REWRITE_TAC[] THEN
             REWRITE_TAC[DISJOINT; EXTENSION; IN_INTER; NOT_IN_EMPTY; IN_DIFF] THEN
@@ -433,8 +433,8 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
         ALL_TAC] THEN
       EXPAND_TAC "P" THEN BETA_TAC THEN STRIP_TAC THEN
       (* Now (@g...) gives &1 on closure v, &0 on topspace DIFF u1 *)
-      (* x0 IN v ⊆ closure(v) ⟹ (@g...) x0 = 1 *)
-      (* y0 ∉ u1 (since u1 ⊆ topspace DIFF {y0}) ⟹ (@g...) y0 = 0 *)
+      (* x0 IN v SUBSET closure(v) ==> (@g...) x0 = 1 *)
+      (* y0 ~IN u1 (since u1 SUBSET topspace DIFF {y0}) ==> (@g...) y0 = 0 *)
       SUBGOAL_THEN `(x0:A) IN top closure_of v` ASSUME_TAC THENL
        [(* x0 IN v and v SUBSET closure(v) *)
         SUBGOAL_THEN `(v:A->bool) SUBSET top closure_of v` MP_TAC THENL
@@ -532,13 +532,13 @@ let REGULAR_SECOND_COUNTABLE_SEPARATING_FUNCTIONS = prove
         SIMP_TAC[];
         ALL_TAC] THEN
       EXPAND_TAC "P" THEN BETA_TAC THEN STRIP_TAC THEN
-      (* x0 IN v ⊆ closure(v) ⟹ (@g...) x0 = 1 *)
+      (* x0 IN v SUBSET closure(v) ==> (@g...) x0 = 1 *)
       SUBGOAL_THEN `(x0:A) IN top closure_of v` ASSUME_TAC THENL
        [SUBGOAL_THEN `(v:A->bool) SUBSET top closure_of v` MP_TAC THENL
          [MATCH_MP_TAC CLOSURE_OF_SUBSET THEN ASM_MESON_TAC[OPEN_IN_SUBSET];
           ASM SET_TAC[]];
         ALL_TAC] THEN
-      (* c0 ⊆ topspace DIFF u1 since u1 ⊆ topspace DIFF c0 *)
+      (* c0 SUBSET topspace DIFF u1 since u1 SUBSET topspace DIFF c0 *)
       SUBGOAL_THEN `(c0:A->bool) SUBSET topspace top DIFF u1` ASSUME_TAC THENL
        [MP_TAC(ISPECL [`top:A topology`; `c0:A->bool`] CLOSED_IN_SUBSET) THEN
         ASM_REWRITE_TAC[] THEN ASM SET_TAC[];
@@ -713,7 +713,7 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
     (* <== direction: h in union and in image of topspace ==> h in image of u *)
     (* Assumptions after decomposition:
        7: w IN u, 8: cylinder def, 9: h IN t, 10: h = g y, 11: y IN topspace top
-       Goal: ∃x. h = g x ∧ x IN u. Witness: y *)
+       Goal: ?x. h = g x /\ x IN u. Witness: y *)
     DISCH_THEN(CONJUNCTS_THEN2
       (X_CHOOSE_THEN `t:(num->real)->bool`
         (CONJUNCTS_THEN2
@@ -723,7 +723,7 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
     EXISTS_TAC `y:A` THEN ASM_REWRITE_TAC[] THEN
     (* Prove y IN u by contradiction *)
     ASM_CASES_TAC `(y:A) IN u` THEN ASM_REWRITE_TAC[] THEN
-    (* y ∉ u, so y IN topspace top DIFF u *)
+    (* y ~IN u, so y IN topspace top DIFF u *)
     SUBGOAL_THEN `(y:A) IN topspace top DIFF u` ASSUME_TAC THENL
      [ASM SET_TAC[]; ALL_TAC] THEN
     (* Get n0 with f n0 w = &1 and f n0 z = &0 for z outside u *)
@@ -738,7 +738,7 @@ let OPEN_MAP_INTO_PRODUCT_IMAGE = prove
           CONJ_TAC THENL [ASM SET_TAC[]; ASM SET_TAC[]]];
         MESON_TAC[]];
       ALL_TAC] THEN
-    (* By SELECT_AX: f (@n. f n w = &1 ∧ ...) y = &0 since y is outside u *)
+    (* By SELECT_AX: f (@n. f n w = &1 /\ ...) y = &0 since y is outside u *)
     SUBGOAL_THEN `(f:num->A->real) (@n. f n w = &1 /\
                    (!z. z IN topspace top DIFF u ==> f n z = &0)) y = &0`
                  ASSUME_TAC THENL
