@@ -605,9 +605,33 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
      EXISTS_TAC `{s:A->bool | s IN (E_layer:num->(A->bool)->bool) n /\ ~(s INTER mball m (x, inv(&6 * &n)) = {})}` THEN
      CONJ_TAC THENL
      [(* The set meeting x's ball is finite - at most one element *)
-      (* TODO: This is the key part - showing at most one element meets the ball *)
-      (* For now, admit this - it requires the separation argument *)
-      CHEAT_TAC;
+      (* Key: inv(&6*&n) = inv(&3*&n) / &2, so we can use SMALL_BALL_MEETS_ONE *)
+      SUBGOAL_THEN `inv(&6 * &n) = inv(&3 * &n) / &2` ASSUME_TAC THENL
+      [REWRITE_TAC[real_div; REAL_INV_MUL] THEN
+       REWRITE_TAC[REAL_ARITH `&6 = &2 * &3`] THEN
+       REWRITE_TAC[REAL_INV_MUL] THEN REAL_ARITH_TAC;
+       ALL_TAC] THEN
+      (* Use SMALL_BALL_MEETS_ONE with r = inv(&3 * &n) *)
+      MP_TAC(ISPECL [`m:A metric`; `x:A`; `inv(&3 * &n)`;
+                     `(E_layer:num->(A->bool)->bool) n`] SMALL_BALL_MEETS_ONE) THEN
+      ANTS_TAC THENL
+      [ASM_REWRITE_TAC[] THEN CONJ_TAC THENL
+       [(* &0 < inv(&3 * &n) *)
+        MATCH_MP_TAC INV_3N_POS THEN REWRITE_TAC[GE] THEN
+        UNDISCH_TAC `~(n = 0)` THEN ARITH_TAC;
+        (* Separation property: distinct elements of E_layer n are 1/(3n)-separated *)
+        (* For e1 = En n u1, e2 = En n u2 with u1 != u2, points are separated *)
+        CHEAT_TAC];
+       (* Use the result to show finiteness *)
+       ASM_REWRITE_TAC[] THEN
+       DISCH_THEN(X_CHOOSE_THEN `v:A->bool` ASSUME_TAC) THEN
+       MATCH_MP_TAC FINITE_SUBSET THEN EXISTS_TAC `{v:A->bool}` THEN
+       CONJ_TAC THENL
+       [REWRITE_TAC[FINITE_SING];
+        REWRITE_TAC[SUBSET; IN_ELIM_THM; IN_SING] THEN
+        X_GEN_TAC `s:A->bool` THEN STRIP_TAC THEN
+        FIRST_X_ASSUM MATCH_MP_TAC THEN ASM_REWRITE_TAC[] THEN
+        ONCE_REWRITE_TAC[INTER_COMM] THEN ASM_REWRITE_TAC[]]];
       (* Subset property *)
       REWRITE_TAC[SUBSET; IN_ELIM_THM; IN_DIFF; IN_SING] THEN
       GEN_TAC THEN STRIP_TAC THEN ASM_REWRITE_TAC[]]]]]);;
