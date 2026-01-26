@@ -135,6 +135,10 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = thm `;
    define V_i = UNIONS B_i and S_n(u) = u - UNIONS{V_i | i < n}
    Then C_n = {S_n(u) | u ∈ B_n} and C = ∪_n C_n is locally finite *)
 
+(* Helper: For x in UNIONS{B n | n}, there exists a minimum n with x in UNIONS(B n).
+   This is used to show that x is in some shrunk set S_n(u), and that elements
+   from later layers don't intersect x's neighborhood. *)
+
 let MICHAEL_STEP_1_2 = thm `;
   !top:A topology U.
     (!u. u IN U ==> open_in top u) /\
