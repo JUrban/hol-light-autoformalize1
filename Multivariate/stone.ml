@@ -238,6 +238,11 @@ let INV_3N_POS = prove
   REWRITE_TAC[REAL_ARITH `&0 < &3`] THEN
   ASM_SIMP_TAC[REAL_OF_NUM_LT; ARITH_RULE `n >= 1 ==> 0 < n`]);;
 
+(* Helper: The two set comprehension notations are equivalent *)
+let GSPEC_EQUIV = prove
+ (`!f:A->B P. {f x | x | P x} = {f x | P x}`,
+  REWRITE_TAC[EXTENSION; IN_ELIM_THM] THEN MESON_TAC[]);;
+
 (* Helper: For a well-ordered set, there exists a minimal element containing a point *)
 (* Note: Using 'a' instead of 'x' to avoid variable capture with WOSET_WELL *)
 let WOSET_MINIMAL_CONTAINING = prove
@@ -294,9 +299,34 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
   ABBREV_TAC `E_layer = \(n:num). {(En:num->(A->bool)->A->bool) n u | u IN U}` THEN
   (* V = UNIONS{E_layer n | n >= 1} but removing empty sets *)
   EXISTS_TAC `UNIONS {E_layer n | n >= 1} DIFF {{}}:(A->bool)->bool` THEN
-  (* The proof splits into four parts - all with CHEAT_TAC for now *)
+  (* The proof splits into four parts *)
   REPEAT CONJ_TAC THENL
-  [(* Property 1: V is open *)
+  [(* Property 1: V is open
+     Every element v in V is some En n u which is UNIONS of mballs, hence open *)
+   REWRITE_TAC[IN_DIFF; IN_SING; IN_UNIONS; IN_ELIM_THM] THEN
+   X_GEN_TAC `v:A->bool` THEN STRIP_TAC THEN
+   (* After STRIP_TAC we have: n >= 1, t = E_layer n, v IN t, ~(v = {}) *)
+   (* Derive: exists u0. u0 IN U /\ v = En n u0 from v IN t and t = E_layer n *)
+   SUBGOAL_THEN `?u0. u0 IN U /\ v = (En:num->(A->bool)->A->bool) n u0`
+     STRIP_ASSUME_TAC THENL
+   [(* Have: t = E_layer n (assumption), v IN t (assumption) *)
+    UNDISCH_TAC `v:A->bool IN t` THEN
+    FIRST_X_ASSUM(SUBST1_TAC) THEN  (* t = E_layer n, substitute in goal *)
+    EXPAND_TAC "E_layer" THEN
+    REWRITE_TAC[IN_ELIM_THM];
+    ALL_TAC] THEN
+   (* Now we have u0 IN U and v = En n u0 *)
+   ASM_REWRITE_TAC[] THEN
+   EXPAND_TAC "En" THEN REWRITE_TAC[] THEN
+   (* Goal: open_in top (UNIONS {mball m (x, inv(&3*&n)) | x IN Tn n u0}) *)
+   (* Use mtopology m = top to substitute top -> mtopology m *)
+   UNDISCH_TAC `mtopology m:A topology = top` THEN
+   DISCH_THEN(SUBST1_TAC o SYM) THEN
+   (* Now goal is: open_in (mtopology m) (UNIONS {...}) *)
+   (* En n u0 = UNIONS {mball m (x,r) | x IN Tn n u0} is open
+      because it is a union of open balls. The inv(&3*&n) > 0 follows from
+      n >= 1, and NEIGHBORHOOD_OPEN gives openness.
+      CHEAT: Set comprehension notation mismatch needs resolution *)
    CHEAT_TAC;
    (* Property 2: V covers topspace *)
    CHEAT_TAC;
