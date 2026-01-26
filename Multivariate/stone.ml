@@ -639,24 +639,21 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
          EXPAND_TAC "E_layer" THEN REWRITE_TAC[IN_ELIM_THM] THEN
          DISCH_THEN(X_CHOOSE_THEN `u2:A->bool` (CONJUNCTS_THEN2 ASSUME_TAC SUBST_ALL_TAC)) THEN
          (* Now have u1, u2 IN U, En n u1 != En n u2, y1 IN En n u1, y2 IN En n u2 *)
-         (* Extract z1, z2 from En definitions and apply EN_SEPARATION *)
-         (* Step 1: Extract z1 from y1 IN En n u1 = UNIONS {mball m (x, 1/3n) | x IN Tn n u1} *)
-         UNDISCH_TAC `y1:A IN (En:num->(A->bool)->(A->bool)) n u1` THEN
-         EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-         REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN STRIP_TAC THEN
-         (* Step 2: Extract z2 from y2 IN En n u2 *)
-         UNDISCH_TAC `y2:A IN (En:num->(A->bool)->(A->bool)) n u2` THEN
-         EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-         REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN STRIP_TAC THEN
-         (* Step 3: u1 != u2 (otherwise En n u1 = En n u2, contradiction) *)
+         (* Step 1: u1 != u2 (otherwise En n u1 = En n u2, contradiction) *)
          SUBGOAL_THEN `~(u1:A->bool = u2)` ASSUME_TAC THENL
          [DISCH_TAC THEN UNDISCH_TAC `~((En:num->(A->bool)->(A->bool)) n u1 = En n u2)` THEN
           ASM_REWRITE_TAC[];
           ALL_TAC] THEN
-         (* Now have: x' IN Tn n' u1, y1 IN mball(x', 1/3n')
-                     x'' IN Tn n'' u2, y2 IN mball(x'', 1/3n'')
-            Note: n' and n'' from GSPEC should equal n (the outer context)
-            Remaining: woset trichotomy, SHRINK_SEPARATION, EN_SEPARATION *)
+         (* The full proof needs:
+            1. Extract z1 IN Tn n u1 with y1 IN mball(z1, 1/3n)
+            2. Extract z2 IN Tn n u2 with y2 IN mball(z2, 1/3n)
+            3. Use woset trichotomy: ord u1 u2 \/ ord u2 u1 \/ u1 = u2
+            4. WLOG assume ord u1 u2 (or symmetric case)
+            5. z2 IN Tn n u2 means z2 NOT IN u1 (since z2 IN Sn n u2 DIFF ord-earlier)
+            6. z1 IN Tn n u1 SUBSET Sn n u1 means mball(z1, 1/n) SUBSET u1
+            7. SHRINK_SEPARATION: mdist(z1, z2) >= 1/n
+            8. EN_SEPARATION: &3 * 1/3n = 1/n <= mdist(z1, z2) implies 1/3n <= mdist(y1, y2)
+            GSPEC issue: extraction introduces fresh n' variables instead of using outer n *)
          CHEAT_TAC];
         ASM_REWRITE_TAC[] THEN
         DISCH_THEN(X_CHOOSE_THEN `v:A->bool` ASSUME_TAC) THEN
