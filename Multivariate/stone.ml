@@ -35,7 +35,7 @@ let countably_locally_finite_in = new_definition
 
 let LOCALLY_FINITE_IN_EMPTY = thm `;
   !top:A topology. locally_finite_in top {}
-  by FINITE_EMPTY, UNIONS_0, EMPTY_SUBSET, FINITE_IMP_LOCALLY_FINITE_IN, CHEAT_TAC`;;
+  by SIMP_TAC[FINITE_IMP_LOCALLY_FINITE_IN; FINITE_EMPTY; UNIONS_0; EMPTY_SUBSET]`;;
 
 let LOCALLY_FINITE_IMP_COUNTABLY_LOCALLY_FINITE = thm `;
   !top:A topology U. locally_finite_in top U
