@@ -1157,17 +1157,31 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
    DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
    STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
-   (* Property 4: V is locally finite
-      Key insight: V(c) = E(c) INTER f(c). We have:
-      - c SUBSET E(c) since c SUBSET topspace and for all d disjoint from c, c is not in d
-      - c SUBSET f(c) by assumption
-      - So c SUBSET V(c)
-      For the finiteness: if V(c) INTER w != {}, then closure_of(c) INTER w != {} because:
-      - V(c) INTER w != {} means some point y is in V(c) and w
-      - y IN E(c) means y is not in any closure disjoint from c
-      - Using x IN c INTER w (from local finiteness of C), we get closure_of(c) INTER w != {}
-      Then {V(c) | V(c) INTER w != {}} has cardinality <= |{d IN D | d INTER w != {}}| *)
-   CHEAT_TAC]);;
+   (* Property 4: V is locally finite *)
+   REWRITE_TAC[locally_finite_in] THEN CONJ_TAC THENL
+   [(* Part 1: UNIONS V SUBSET topspace - V(c) SUBSET topspace for all c *)
+    REWRITE_TAC[UNIONS_SUBSET; FORALL_IN_GSPEC] THEN
+    X_GEN_TAC `c:A->bool` THEN DISCH_TAC THEN
+    REWRITE_TAC[SUBSET; IN_INTER; IN_DIFF] THEN
+    GEN_TAC THEN STRIP_TAC THEN ASM_REWRITE_TAC[];
+    (* Part 2: For each x, find open w with finitely many V(c) meeting w *)
+    X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+    (* Use local finiteness of C to get neighborhood *)
+    UNDISCH_TAC `locally_finite_in top (C:(A->bool)->bool)` THEN
+    REWRITE_TAC[locally_finite_in] THEN STRIP_TAC THEN
+    FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
+    EXISTS_TAC `w:A->bool` THEN ASM_REWRITE_TAC[] THEN
+    (* Goal: FINITE {V(c) | c IN C, V(c) INTER w != {}} *)
+    (* Rewrite as image of finite set *)
+    ONCE_REWRITE_TAC[SET_RULE
+      `{y | y IN {g x | P x} /\ Q y} = IMAGE g {x | P x /\ Q(g x)}`] THEN
+    MATCH_MP_TAC FINITE_IMAGE THEN
+    (* Goal: FINITE {c IN C | V(c) INTER w != {}} *)
+    (* Key insight: c SUBSET V(c), so if c INTER w != {} then V(c) INTER w != {} *)
+    (* But we need the converse. Show this by proving V(c) SUBSET closure_of c *)
+    (* For now, use CHEAT_TAC - this is the core difficulty *)
+    CHEAT_TAC]]);;  (* TODO: prove FINITE {c IN C | V(c) INTER w != {}} *)
 
 (* Michael's Lemma: For regular spaces, countably locally finite open covering
    has a locally finite open refinement.
