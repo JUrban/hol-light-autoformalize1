@@ -141,20 +141,35 @@ let SHRINK_SUBSET = prove
      u DIFF UNIONS {UNIONS (B i) | i < n} SUBSET u`,
   SET_TAC[]);;
 
-(* Helper: The two set comprehension forms are equal *)
-let GSPEC_EQ_LEMMA = prove
- (`!D:A->bool (B:(A->bool)->bool).
-     {(\u. u DIFF D) s | s IN B} = {u DIFF D | u IN B}`,
-  REWRITE_TAC[EXTENSION; IN_ELIM_THM] THEN MESON_TAC[]);;
+(* IMAGE version of LOCALLY_FINITE_IN_REFINEMENT *)
+let LOCALLY_FINITE_IN_IMAGE = prove
+ (`!top (u:(A->bool)->bool) (f:(A->bool)->(A->bool)).
+     locally_finite_in top u /\ (!s. s IN u ==> f s SUBSET s)
+     ==> locally_finite_in top (IMAGE f u)`,
+  REPEAT GEN_TAC THEN REWRITE_TAC[locally_finite_in] THEN
+  REWRITE_TAC[FORALL_IN_IMAGE] THEN STRIP_TAC THEN
+  CONJ_TAC THENL [ASM SET_TAC[]; ALL_TAC] THEN
+  X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+  FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
+  MATCH_MP_TAC MONO_EXISTS THEN GEN_TAC THEN
+  REPEAT(MATCH_MP_TAC MONO_AND THEN REWRITE_TAC[]) THEN
+  DISCH_TAC THEN ONCE_REWRITE_TAC[SET_RULE
+    `{y | y IN IMAGE f u /\ Q y} = IMAGE f {x | x IN u /\ Q(f x)}`] THEN
+  MATCH_MP_TAC FINITE_IMAGE THEN
+  FIRST_X_ASSUM(MATCH_MP_TAC o MATCH_MP (ONCE_REWRITE_RULE[IMP_CONJ]
+        FINITE_SUBSET)) THEN
+  ASM SET_TAC[]);;
 
 (* Helper: Each layer C_n = {shrink n u | u IN B n} is locally finite
-   Uses: shrink n u SUBSET u, so apply LOCALLY_FINITE_IN_REFINEMENT *)
+   Uses IMAGE form due to HOL Light GSPEC parsing issues with free variables *)
 let SHRINK_LAYER_LOCALLY_FINITE = prove
  (`!top:A topology (B:num->(A->bool)->bool) n.
     locally_finite_in top (B n)
     ==> locally_finite_in top
-          {u DIFF UNIONS {UNIONS (B i) | i < n} | u IN B n}`,
-  CHEAT_TAC);;
+          (IMAGE (\u. u DIFF UNIONS {UNIONS (B i) | i < n}) (B n))`,
+  REPEAT GEN_TAC THEN DISCH_TAC THEN
+  MATCH_MP_TAC LOCALLY_FINITE_IN_IMAGE THEN
+  ASM_REWRITE_TAC[] THEN GEN_TAC THEN DISCH_TAC THEN SET_TAC[]);;
 
 (* Helper: minimal n exists by well-ordering principle
    Uses num_WOP: !P. (?n. P n) <=> (?n. P(n) /\ !m. m < n ==> ~P(m)) *)
@@ -162,7 +177,12 @@ let MINIMAL_LAYER_EXISTS = prove
  (`!(B:num->(A->bool)->bool) x.
      x IN UNIONS (UNIONS {B n | n IN (:num)})
      ==> ?N. x IN UNIONS (B N) /\ !m. m < N ==> ~(x IN UNIONS (B m))`,
-  CHEAT_TAC);;
+  REPEAT GEN_TAC THEN DISCH_TAC THEN
+  SUBGOAL_THEN `?n:num. x IN UNIONS ((B:num->(A->bool)->bool) n)` MP_TAC THENL
+  [FIRST_X_ASSUM(MP_TAC) THEN
+   REWRITE_TAC[IN_UNIONS; IN_ELIM_THM; IN_UNIV] THEN MESON_TAC[];
+   ALL_TAC] THEN
+  REWRITE_TAC[GSYM num_WOP]);;
 
 (* Helper: For x in UNIONS{B n | n}, there exists a minimum n with x in UNIONS(B n).
    This is used to show that x is in some shrunk set S_n(u), and that elements
