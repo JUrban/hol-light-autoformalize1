@@ -148,9 +148,7 @@ let GSPEC_EQ_LEMMA = prove
   REWRITE_TAC[EXTENSION; IN_ELIM_THM] THEN MESON_TAC[]);;
 
 (* Helper: Each layer C_n = {shrink n u | u IN B n} is locally finite
-   Uses: shrink n u SUBSET u, so apply LOCALLY_FINITE_IN_REFINEMENT
-   Conceptually: just need to show {f s | s IN B n} = {u DIFF D | u IN B n}
-   where f = \u. u DIFF D, which is trivial *)
+   Uses: shrink n u SUBSET u, so apply LOCALLY_FINITE_IN_REFINEMENT *)
 let SHRINK_LAYER_LOCALLY_FINITE = prove
  (`!top:A topology (B:num->(A->bool)->bool) n.
     locally_finite_in top (B n)
