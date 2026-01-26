@@ -764,8 +764,67 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
            ALL_TAC] THEN
           DISCH_THEN(MP_TAC o SPECL [`y1:A`; `y2:A`]) THEN
           ASM_REWRITE_TAC[];
-          (* Case: properly ord u2 u1 - symmetric argument *)
-          CHEAT_TAC]];
+          (* Case: properly ord u2 u1 - symmetric: z1 NOT IN u2 *)
+          (* Step 1: z1 NOT IN u2 *)
+          SUBGOAL_THEN `~(z1:A IN u2)` ASSUME_TAC THENL
+          [(* z1 IN Tn n u1 = Sn n u1 DIFF UNIONS{v | ord v u1 /\ ~(v = u1)} *)
+           (* Since properly ord u2 u1, we have ord u2 u1 /\ ~(u2 = u1) *)
+           (* So u2 is in the UNIONS, meaning z1 NOT IN u2 *)
+           CHEAT_TAC;
+           ALL_TAC] THEN
+          (* Step 2: mball(z2, inv(&n)) SUBSET u2 *)
+          SUBGOAL_THEN `mball m (z2:A, inv(&n)) SUBSET u2` ASSUME_TAC THENL
+          [UNDISCH_TAC `z2:A IN (Tn:num->(A->bool)->A->bool) n u2` THEN
+           EXPAND_TAC "Tn" THEN EXPAND_TAC "Sn" THEN
+           CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+           REWRITE_TAC[IN_DIFF; IN_ELIM_THM] THEN
+           STRIP_TAC THEN ASM_REWRITE_TAC[];
+           ALL_TAC] THEN
+          (* Step 3: z1 and z2 are in mspace m - already proved above *)
+          SUBGOAL_THEN `z1:A IN mspace m /\ z2 IN mspace m` STRIP_ASSUME_TAC THENL
+          [CONJ_TAC THENL
+           [UNDISCH_TAC `z1:A IN (Tn:num->(A->bool)->A->bool) n u1` THEN
+            EXPAND_TAC "Tn" THEN EXPAND_TAC "Sn" THEN
+            CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+            REWRITE_TAC[IN_DIFF; IN_ELIM_THM] THEN MESON_TAC[];
+            UNDISCH_TAC `z2:A IN (Tn:num->(A->bool)->A->bool) n u2` THEN
+            EXPAND_TAC "Tn" THEN EXPAND_TAC "Sn" THEN
+            CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+            REWRITE_TAC[IN_DIFF; IN_ELIM_THM] THEN MESON_TAC[]];
+           ALL_TAC] THEN
+          (* Step 4: Use SHRINK_SEPARATION for inv(&n) <= mdist(z2, z1) = mdist(z1, z2) *)
+          SUBGOAL_THEN `inv(&n) <= mdist m (z2:A, z1)` ASSUME_TAC THENL
+          [MATCH_MP_TAC SHRINK_SEPARATION THEN
+           EXISTS_TAC `u2:A->bool` THEN
+           ASM_REWRITE_TAC[] THEN
+           MATCH_MP_TAC REAL_LT_INV THEN
+           REWRITE_TAC[REAL_OF_NUM_LT] THEN
+           UNDISCH_TAC `n >= 1` THEN ARITH_TAC;
+           ALL_TAC] THEN
+          (* Step 5: Use EN_SEPARATION with z2, z1 *)
+          SUBGOAL_THEN `&3 * inv(&3 * &n) <= mdist m (z2:A, z1)` ASSUME_TAC THENL
+          [MATCH_MP_TAC REAL_LE_TRANS THEN EXISTS_TAC `inv(&n)` THEN
+           ASM_REWRITE_TAC[] THEN
+           SUBGOAL_THEN `~(&3 = &0) /\ ~(&n = &0)` STRIP_ASSUME_TAC THENL
+           [REWRITE_TAC[REAL_OF_NUM_EQ] THEN
+            CONJ_TAC THENL [ARITH_TAC; UNDISCH_TAC `n >= 1` THEN ARITH_TAC];
+            ALL_TAC] THEN
+           ASM_SIMP_TAC[REAL_INV_MUL] THEN
+           REWRITE_TAC[REAL_MUL_ASSOC] THEN
+           ASM_SIMP_TAC[REAL_MUL_RINV] THEN
+           REWRITE_TAC[REAL_MUL_LID; REAL_LE_REFL];
+           ALL_TAC] THEN
+          (* Apply EN_SEPARATION with z2 and z1 as centers *)
+          MP_TAC(ISPECL [`m:A metric`; `inv(&3 * &n)`; `z2:A`; `z1:A`] EN_SEPARATION) THEN
+          ANTS_TAC THENL
+          [ASM_REWRITE_TAC[] THEN
+           MATCH_MP_TAC INV_3N_POS THEN ASM_REWRITE_TAC[GE];
+           ALL_TAC] THEN
+          DISCH_THEN(MP_TAC o SPECL [`y2:A`; `y1:A`]) THEN
+          ASM_REWRITE_TAC[] THEN
+          (* mdist(y2, y1) = mdist(y1, y2) by metric symmetry *)
+          MATCH_MP_TAC(REAL_ARITH `x = y ==> r <= x ==> r <= y`) THEN
+          MATCH_MP_TAC MDIST_SYM THEN ASM_MESON_TAC[MBALL_SUBSET_MSPACE; SUBSET]]];
         ASM_REWRITE_TAC[] THEN
         DISCH_THEN(X_CHOOSE_THEN `v:A->bool` ASSUME_TAC) THEN
         MATCH_MP_TAC FINITE_SUBSET THEN EXISTS_TAC `{v:A->bool}` THEN
