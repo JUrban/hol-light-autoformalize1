@@ -686,9 +686,10 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
          DISCH_THEN(MP_TAC o SPECL [`u1:A->bool`; `u2:A->bool`]) THEN
          ANTS_TAC THENL
          [(* Need: fld ord u1 /\ fld ord u2. Since fld ord = U, this is u1 IN U /\ u2 IN U *)
-          (* Goal is U u1 /\ U u2; need to use: (s x) <=> x IN s *)
-          (* TODO: Figure out the right rewrite to convert U u1 to u1 IN U *)
-          CHEAT_TAC;
+          (* Goal is U u1 /\ U u2; Use IN definition: U x <=> x IN U *)
+          CONJ_TAC THENL
+          [UNDISCH_TAC `u1:A->bool IN U` THEN REWRITE_TAC[IN];
+           UNDISCH_TAC `u2:A->bool IN U` THEN REWRITE_TAC[IN]];
           ALL_TAC] THEN
          (* Now have: u1 = u2 \/ properly ord u1 u2 \/ properly ord u2 u1 *)
          DISCH_THEN(DISJ_CASES_THEN2 ASSUME_TAC
