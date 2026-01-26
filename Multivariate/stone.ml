@@ -596,8 +596,60 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
   (* Define V = {E(c) INTER f(c) | c IN C} where E(c) = topspace - disjoint closures *)
   EXISTS_TAC `{((topspace top DIFF UNIONS {d:A->bool | d IN D /\ d INTER c = {}})
                 INTER (f:(A->bool)->(A->bool)) c) | c IN C}` THEN
-  (* All four properties need proof - use CHEAT for now *)
-  CHEAT_TAC);;
+  (* Prove the four properties one by one *)
+  REPEAT CONJ_TAC THENL
+  [(* Property 1: V is open *)
+   REWRITE_TAC[FORALL_IN_GSPEC] THEN X_GEN_TAC `c:A->bool` THEN DISCH_TAC THEN
+   (* Goal: open_in top ((topspace DIFF UNIONS{...}) INTER f c) *)
+   MATCH_MP_TAC OPEN_IN_INTER THEN CONJ_TAC THENL
+   [(* topspace DIFF UNIONS{d | d IN D /\ d INTER c = {}} is open *)
+    MATCH_MP_TAC OPEN_IN_DIFF THEN REWRITE_TAC[OPEN_IN_TOPSPACE] THEN
+    (* UNIONS{d | d IN D /\ d INTER c = {}} is closed *)
+    MATCH_MP_TAC CLOSED_IN_LOCALLY_FINITE_UNIONS THEN CONJ_TAC THENL
+    [REWRITE_TAC[IN_ELIM_THM] THEN REPEAT STRIP_TAC THEN
+     FIRST_X_ASSUM MATCH_MP_TAC THEN ASM_REWRITE_TAC[];
+     MATCH_MP_TAC LOCALLY_FINITE_IN_SUBSET THEN
+     EXISTS_TAC `D:(A->bool)->bool` THEN ASM_REWRITE_TAC[] THEN SET_TAC[]];
+    (* f(c) is open *)
+    UNDISCH_TAC `!u:A->bool. u IN U ==> open_in top u` THEN
+    DISCH_THEN MATCH_MP_TAC THEN
+    UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
+    DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN SIMP_TAC[]];
+   (* Property 2: V covers topspace *)
+   REWRITE_TAC[SUBSET; IN_UNIONS; IN_ELIM_THM] THEN
+   X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+   (* x is in some c in C since C covers topspace *)
+   UNDISCH_TAC `topspace top SUBSET UNIONS (C:(A->bool)->bool)` THEN
+   REWRITE_TAC[SUBSET] THEN DISCH_THEN(MP_TAC o SPEC `x:A`) THEN
+   ASM_REWRITE_TAC[IN_UNIONS] THEN
+   DISCH_THEN(X_CHOOSE_THEN `c:A->bool` STRIP_ASSUME_TAC) THEN
+   (* Witness: V(c) = (topspace DIFF ...) INTER f(c) *)
+   EXISTS_TAC `(topspace top DIFF UNIONS {d:A->bool | d IN D /\ d INTER c = {}})
+               INTER (f:(A->bool)->(A->bool)) c` THEN
+   CONJ_TAC THENL
+   [EXISTS_TAC `c:A->bool` THEN ASM_REWRITE_TAC[];
+    (* x IN V(c) = E(c) INTER f(c) *)
+    REWRITE_TAC[IN_INTER; IN_DIFF; IN_UNIONS; IN_ELIM_THM] THEN
+    REPEAT CONJ_TAC THENL
+    [(* x IN topspace *)
+     ASM_REWRITE_TAC[];
+     (* x not in any d with d INTER c = {} *)
+     REWRITE_TAC[NOT_EXISTS_THM] THEN X_GEN_TAC `d:A->bool` THEN
+     STRIP_TAC THEN
+     (* x IN c and d INTER c = {} contradicts x IN d *)
+     ASM SET_TAC[];
+     (* x IN f(c) since x IN c and c SUBSET f(c) *)
+     UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
+     DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
+     STRIP_TAC THEN ASM SET_TAC[]]];
+   (* Property 3: V refines U *)
+   REWRITE_TAC[FORALL_IN_GSPEC] THEN X_GEN_TAC `c:A->bool` THEN DISCH_TAC THEN
+   EXISTS_TAC `(f:(A->bool)->(A->bool)) c` THEN
+   UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
+   DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
+   STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
+   (* Property 4: V is locally finite - this is the hard part *)
+   CHEAT_TAC]);;
 
 let MICHAEL_LEMMA = thm `;
   !top:A topology U.
