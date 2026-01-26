@@ -102,27 +102,61 @@ let COMPACT_IMP_PARACOMPACT = thm `;
   qed by main, paracompact_space`;;
 
 (* ------------------------------------------------------------------------- *)
+(* Helper lemmas for Lemma 39.2 construction                                 *)
+(* These lemmas are used for the metric ball constructions in the proof.     *)
+(* ------------------------------------------------------------------------- *)
+
+(* Two points in different sets are separated by at least r if:
+   x's r-ball is contained in u and y is not in u *)
+let SHRINK_SEPARATION = prove
+ (`!m:A metric x y u r.
+    x IN mspace m /\ y IN mspace m /\ &0 < r /\
+    mball m (x, r) SUBSET u /\ ~(y IN u)
+    ==> r <= mdist m (x,y)`,
+  REPEAT GEN_TAC THEN STRIP_TAC THEN
+  REWRITE_TAC[GSYM REAL_NOT_LT] THEN DISCH_TAC THEN
+  UNDISCH_TAC `~(y:A IN u)` THEN REWRITE_TAC[] THEN
+  FIRST_X_ASSUM(MATCH_MP_TAC o GEN_REWRITE_RULE I [SUBSET]) THEN
+  ASM_SIMP_TAC[IN_MBALL]);;
+
+(* Disjoint balls when separated by enough distance *)
+let DISJOINT_EN_SEPARATION = prove
+ (`!m:A metric x y r.
+    r + r <= mdist m (x,y)
+    ==> DISJOINT (mball m (x,r)) (mball m (y,r))`,
+  REPEAT STRIP_TAC THEN MATCH_MP_TAC DISJOINT_MBALL THEN ASM_REWRITE_TAC[]);;
+
+(* The neighborhood of a set is open *)
+let NEIGHBORHOOD_OPEN = prove
+ (`!m:A metric s r.
+    &0 < r ==> open_in (mtopology m) (UNIONS {mball m (x,r) | x IN s})`,
+  REPEAT STRIP_TAC THEN MATCH_MP_TAC OPEN_IN_UNIONS THEN
+  REWRITE_TAC[FORALL_IN_GSPEC] THEN GEN_TAC THEN DISCH_TAC THEN
+  REWRITE_TAC[OPEN_IN_MBALL]);;
+
+(* ------------------------------------------------------------------------- *)
 (* Lemma 39.2: Every open covering of a metrizable space has a countably     *)
 (* locally finite open refinement that covers the space.                     *)
 (* ------------------------------------------------------------------------- *)
 
-let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = thm `;
-  !top:A topology U.
+(* For the full proof, we need:
+   1. Well-order the covering U
+   2. For each n, define S_n(u) = {x | mball(x, 1/n) SUBSET u}
+   3. Define T_n(u) = S_n(u) - UNIONS{v | v < u in well-order}
+   4. Define E_n(u) = 1/(3n)-neighborhood of T_n(u)
+   5. E_n = {E_n(u) | u IN U} is locally finite (elements pairwise disjoint)
+   6. E = UNIONS{E_n | n > 0} covers topspace and is countably locally finite *)
+let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
+ (`!top:A topology U.
     metrizable_space top /\
     (!u. u IN U ==> open_in top u) /\
     topspace top SUBSET UNIONS U
     ==> ?V. (!v. v IN V ==> open_in top v) /\
             topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
-            countably_locally_finite_in top V
-  proof
-    let top be A topology;
-    let U be (A->bool)->bool;
-    assume metrizable_space top [1];
-    assume (!u. u IN U ==> open_in top u) [2];
-    assume topspace top SUBSET UNIONS U [3];
-    consider m such that top = mtopology m [4] by 1, metrizable_space;
-  qed by 1, 2, 3, 4, CHEAT_TAC`;;
+            countably_locally_finite_in top V`,
+  (* TODO: Implement the full Lemma 39.2 construction *)
+  CHEAT_TAC);;
 
 (* ------------------------------------------------------------------------- *)
 (* Lemma 41.3 (Michael's Lemma): For a regular space, countably locally      *)
@@ -651,8 +685,8 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    (* Property 4: V is locally finite - this is the hard part *)
    CHEAT_TAC]);;
 
-let MICHAEL_LEMMA = thm `;
-  !top:A topology U.
+let MICHAEL_LEMMA = prove
+ (`!top:A topology U.
     regular_space top /\
     (!u. u IN U ==> open_in top u) /\
     topspace top SUBSET UNIONS U /\
@@ -660,57 +694,44 @@ let MICHAEL_LEMMA = thm `;
     ==> ?V. (!v. v IN V ==> open_in top v) /\
             topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
-            locally_finite_in top V
-  proof
-    let top be A topology;
-    let U be (A->bool)->bool;
-    assume regular_space top [1];
-    assume (!u. u IN U ==> open_in top u) [2];
-    assume topspace top SUBSET UNIONS U [3];
-    assume countably_locally_finite_in top U [4];
-    consider C such that
-      topspace top SUBSET UNIONS C /\
-      (!c. c IN C ==> ?u. u IN U /\ c SUBSET u) /\
-      locally_finite_in top C [5]
-      by 2, 3, 4, MICHAEL_STEP_1_2;
-  qed by 1, 2, 5, LOCALLY_FINITE_OPEN_REFINEMENT`;;
+            locally_finite_in top V`,
+  REPEAT STRIP_TAC THEN
+  (* Step 1: Apply MICHAEL_STEP_1_2 to get locally finite refinement C *)
+  MP_TAC(ISPECL [`top:A topology`; `U:(A->bool)->bool`] MICHAEL_STEP_1_2) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_THEN `C:(A->bool)->bool` STRIP_ASSUME_TAC) THEN
+  (* Step 2: Apply LOCALLY_FINITE_OPEN_REFINEMENT to get locally finite open V *)
+  MP_TAC(ISPECL [`top:A topology`; `U:(A->bool)->bool`; `C:(A->bool)->bool`]
+    LOCALLY_FINITE_OPEN_REFINEMENT) THEN
+  ASM_REWRITE_TAC[]);;
 
 (* ------------------------------------------------------------------------- *)
 (* THEOREM 41.4: Every metrizable space is paracompact                       *)
 (* ------------------------------------------------------------------------- *)
 
-let METRIZABLE_IMP_PARACOMPACT = thm `;
-  !top:A topology. metrizable_space top ==> paracompact_space top
-  proof
-    let top be A topology;
-    assume metrizable_space top [1];
-    regular_space top [2] by 1, METRIZABLE_IMP_REGULAR_SPACE;
-    now
-      let U be (A->bool)->bool;
-      assume (!u. u IN U ==> open_in top u) /\ topspace top SUBSET UNIONS U [3];
-      consider W such that
-        (!w. w IN W ==> open_in top w) /\
-        topspace top SUBSET UNIONS W /\
-        (!w. w IN W ==> ?u. u IN U /\ w SUBSET u) /\
-        countably_locally_finite_in top W [4]
-        by 1, 3, METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT;
-      consider V such that
-        (!v. v IN V ==> open_in top v) /\
-        topspace top SUBSET UNIONS V /\
-        (!v. v IN V ==> ?w. w IN W /\ v SUBSET w) /\
-        locally_finite_in top V [5]
-        by 2, 4, MICHAEL_LEMMA;
-      !v. v IN V ==> ?u. u IN U /\ v SUBSET u [6]
-      proof
-        let v be A->bool;
-        assume v IN V [vV];
-        consider w such that w IN W /\ v SUBSET w [vw] by vV, 5;
-        consider u such that u IN U /\ w SUBSET u [wu] by vw, 4;
-      qed by vw, wu, SUBSET_TRANS;
-      thus ?V. (!v. v IN V ==> open_in top v) /\
-               topspace top SUBSET UNIONS V /\
-               (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
-               locally_finite_in top V
-        by 5, 6;
-    end;
-  qed by -, paracompact_space`;;
+let METRIZABLE_IMP_PARACOMPACT = prove
+ (`!top:A topology. metrizable_space top ==> paracompact_space top`,
+  GEN_TAC THEN DISCH_TAC THEN REWRITE_TAC[paracompact_space] THEN
+  X_GEN_TAC `U:(A->bool)->bool` THEN STRIP_TAC THEN
+  (* Step 1: Metrizable implies regular *)
+  SUBGOAL_THEN `regular_space (top:A topology)` ASSUME_TAC THENL
+  [ASM_MESON_TAC[METRIZABLE_IMP_REGULAR_SPACE]; ALL_TAC] THEN
+  (* Step 2: Get countably locally finite refinement W *)
+  MP_TAC(ISPECL [`top:A topology`; `U:(A->bool)->bool`]
+    METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_THEN `W:(A->bool)->bool` STRIP_ASSUME_TAC) THEN
+  (* Step 3: Apply Michael's lemma to get locally finite open V *)
+  MP_TAC(ISPECL [`top:A topology`; `W:(A->bool)->bool`] MICHAEL_LEMMA) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_THEN `V:(A->bool)->bool` STRIP_ASSUME_TAC) THEN
+  (* Step 4: V refines U (via transitivity: V refines W refines U) *)
+  EXISTS_TAC `V:(A->bool)->bool` THEN ASM_REWRITE_TAC[] THEN
+  X_GEN_TAC `v:A->bool` THEN DISCH_TAC THEN
+  SUBGOAL_THEN `?w:A->bool. w IN W /\ v SUBSET w` MP_TAC THENL
+  [ASM_MESON_TAC[]; ALL_TAC] THEN
+  DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
+  SUBGOAL_THEN `?u:A->bool. u IN U /\ w SUBSET u` MP_TAC THENL
+  [ASM_MESON_TAC[]; ALL_TAC] THEN
+  DISCH_THEN(X_CHOOSE_THEN `u:A->bool` STRIP_ASSUME_TAC) THEN
+  EXISTS_TAC `u:A->bool` THEN ASM_MESON_TAC[SUBSET_TRANS]);;
