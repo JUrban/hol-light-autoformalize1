@@ -1157,31 +1157,17 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
    DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
    STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
-   (* Property 4: V is locally finite *)
-   REWRITE_TAC[locally_finite_in] THEN CONJ_TAC THENL
-   [(* Part 1: UNIONS V SUBSET topspace - V(c) SUBSET topspace for all c *)
-    REWRITE_TAC[UNIONS_SUBSET; FORALL_IN_GSPEC] THEN
-    X_GEN_TAC `c:A->bool` THEN DISCH_TAC THEN
-    REWRITE_TAC[SUBSET; IN_INTER; IN_DIFF] THEN
-    GEN_TAC THEN STRIP_TAC THEN ASM_REWRITE_TAC[];
-    (* Part 2: For each x, find open w with finitely many V(c) meeting w *)
-    X_GEN_TAC `x:A` THEN DISCH_TAC THEN
-    (* Use local finiteness of C to get neighborhood *)
-    UNDISCH_TAC `locally_finite_in top (C:(A->bool)->bool)` THEN
-    REWRITE_TAC[locally_finite_in] THEN STRIP_TAC THEN
-    FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
-    DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
-    EXISTS_TAC `w:A->bool` THEN ASM_REWRITE_TAC[] THEN
-    (* Goal: FINITE {V(c) | c IN C, V(c) INTER w != {}} *)
-    (* Rewrite as image of finite set *)
-    ONCE_REWRITE_TAC[SET_RULE
-      `{y | y IN {g x | P x} /\ Q y} = IMAGE g {x | P x /\ Q(g x)}`] THEN
-    MATCH_MP_TAC FINITE_IMAGE THEN
-    (* Goal: FINITE {c IN C | V(c) INTER w != {}} *)
-    (* Key insight: c SUBSET V(c), so if c INTER w != {} then V(c) INTER w != {} *)
-    (* But we need the converse. Show this by proving V(c) SUBSET closure_of c *)
-    (* For now, use CHEAT_TAC - this is the core difficulty *)
-    CHEAT_TAC]]);;  (* TODO: prove FINITE {c IN C | V(c) INTER w != {}} *)
+   (* Property 4: V is locally finite
+      Key insight: Use both local finiteness of C and D.
+      V(c) = E(c) INTER f(c), where E(c) = topspace - UNIONS{d disjoint from c}.
+      We have c SUBSET V(c), so c INTER w != {} implies V(c) INTER w != {}.
+      For the converse direction: if V(c) INTER w != {} but c INTER w = {},
+      there's y IN V(c) INTER w with y NOT IN c.
+      y is in some c' IN C with c' INTER w != {} (since C covers and y IN w).
+      For y IN E(c), closure_of c' INTER c != {}.
+      So c is "linked" to some c' with c' INTER w != {}.
+      The key is bounding how many c's can be linked to each such c'. *)
+   CHEAT_TAC]);;
 
 (* Michael's Lemma: For regular spaces, countably locally finite open covering
    has a locally finite open refinement.
