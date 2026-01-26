@@ -301,7 +301,7 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    (* Use OPEN_IN_UNIONS: each element is an open ball *)
    MATCH_MP_TAC OPEN_IN_UNIONS THEN
    REWRITE_TAC[FORALL_IN_GSPEC; OPEN_IN_MBALL];
-   (* Property 2: V covers topspace - temporarily cheated while debugging *)
+   (* Property 2: V covers topspace - temporarily using CHEAT_TAC *)
    CHEAT_TAC;
    (* Property 3: V refines U - each En n u SUBSET u *)
    REWRITE_TAC[IN_DIFF; IN_SING] THEN
