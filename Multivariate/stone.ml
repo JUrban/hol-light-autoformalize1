@@ -600,6 +600,19 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
        [ASM_REWRITE_TAC[] THEN CONJ_TAC THENL
         [MATCH_MP_TAC INV_3N_POS THEN ASM_REWRITE_TAC[GE];
          (* Separation property: elements of E_layer n are 1/(3n)-separated *)
+         REPEAT GEN_TAC THEN STRIP_TAC THEN REPEAT GEN_TAC THEN STRIP_TAC THEN
+         (* Now have e1, e2 IN E_layer n, e1 != e2, y1 IN e1, y2 IN e2 *)
+         (* Extract u1, u2 such that e1 = En n u1, e2 = En n u2 *)
+         UNDISCH_TAC `e1:A->bool IN (E_layer:num->(A->bool)->bool) n` THEN
+         EXPAND_TAC "E_layer" THEN REWRITE_TAC[IN_ELIM_THM] THEN
+         DISCH_THEN(X_CHOOSE_THEN `u1:A->bool` (CONJUNCTS_THEN2 ASSUME_TAC SUBST_ALL_TAC)) THEN
+         UNDISCH_TAC `e2:A->bool IN (E_layer:num->(A->bool)->bool) n` THEN
+         EXPAND_TAC "E_layer" THEN REWRITE_TAC[IN_ELIM_THM] THEN
+         DISCH_THEN(X_CHOOSE_THEN `u2:A->bool` (CONJUNCTS_THEN2 ASSUME_TAC SUBST_ALL_TAC)) THEN
+         (* Now have u1, u2 IN U, En n u1 != En n u2, y1 IN En n u1, y2 IN En n u2 *)
+         (* The full proof: extract z1, z2 from En via Tn, use woset ordering
+            between u1, u2, apply SHRINK_SEPARATION for distance bound on centers,
+            then EN_SEPARATION for distance bound on y1, y2 *)
          CHEAT_TAC];
         ASM_REWRITE_TAC[] THEN
         DISCH_THEN(X_CHOOSE_THEN `v:A->bool` ASSUME_TAC) THEN
