@@ -684,10 +684,8 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
          DISCH_THEN(MP_TAC o SPECL [`u1:A->bool`; `u2:A->bool`]) THEN
          ANTS_TAC THENL
          [(* Need: fld ord u1 /\ fld ord u2. Since fld ord = U, this is u1 IN U /\ u2 IN U *)
-          (* Use WOSET_FLDEQ: woset l ==> (fld l x <=> l x x) *)
-          (* So fld ord u1 <=> ord u1 u1, which follows from woset reflexivity on fld *)
-          (* Since the fld ord = U assumption is not accessible here, use CHEAT_TAC *)
-          (* TODO: Fix by passing fld ord = U explicitly through the proof *)
+          (* The fld ord = U assumption exists but UNDISCH_TAC matching fails *)
+          (* TODO: Debug why UNDISCH_TAC fails to match fld ord = U *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Now have: u1 = u2 \/ properly ord u1 u2 \/ properly ord u2 u1 *)
