@@ -686,20 +686,15 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
          SUBGOAL_THEN `?z1:A. z1 IN (Tn:num->(A->bool)->A->bool) n u1 /\
                               y1 IN mball m (z1, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
          [(* y1 IN UNIONS{mball(x,r)|x IN Tn n u1} ==> ?z1. z1 IN Tn n u1 /\ y1 IN mball *)
-          (* Convert GSPEC to IMAGE form via SIMPLE_IMAGE, then use UNIONS_IMAGE *)
-          UNDISCH_TAC `y1:A IN (En:num->(A->bool)->A->bool) n u1` THEN
-          EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-          REWRITE_TAC[SIMPLE_IMAGE; UNIONS_IMAGE; IN_ELIM_THM] THEN
-          (* Debug: see the goal form *)
-          PRINT_GOAL_TAC THEN CHEAT_TAC;
+          (* GSPEC variable capture issue: HOL Light quantifies n as well as x in the GSPEC *)
+          (* This is a syntactic issue - the set IS well-defined with fixed outer n *)
+          (* TODO: Prove using term-level manipulation or redefine En with IMAGE form *)
+          CHEAT_TAC;
           ALL_TAC] THEN
          (* Step 3: Extract z2 IN Tn n u2 with y2 IN mball(z2, inv(&3*&n)) *)
          SUBGOAL_THEN `?z2:A. z2 IN (Tn:num->(A->bool)->A->bool) n u2 /\
                               y2 IN mball m (z2, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* Same approach for z2 - use SIMPLE_IMAGE and UNIONS_IMAGE *)
-          UNDISCH_TAC `y2:A IN (En:num->(A->bool)->A->bool) n u2` THEN
-          EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-          REWRITE_TAC[SIMPLE_IMAGE; UNIONS_IMAGE; IN_ELIM_THM] THEN
+         [(* Same GSPEC issue as z1 *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Now have z1, z2. Use woset trichotomy and SHRINK_SEPARATION *)
