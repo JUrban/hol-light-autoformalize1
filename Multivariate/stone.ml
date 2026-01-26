@@ -245,6 +245,12 @@ let LOCALLY_FINITE_IN_FINITE_UNIONS = prove
 
 
 
+(* Helper: u IN B N implies u SUBSET UNIONS(B N) *)
+let IN_LAYER_SUBSET_UNIONS = prove
+ (`!(B:num->(A->bool)->bool) N u. u IN B N ==> u SUBSET UNIONS (B N)`,
+  REPEAT GEN_TAC THEN DISCH_TAC THEN
+  REWRITE_TAC[SUBSET; IN_UNIONS] THEN ASM_MESON_TAC[]);;
+
 (* Helper: shrunk sets from later layers don't intersect earlier layer unions *)
 let SHRINK_DISJOINT_EARLIER = prove
  (`!(B:num->(A->bool)->bool) n m u.
@@ -258,6 +264,20 @@ let SHRINK_DISJOINT_EARLIER = prove
   CONJ_TAC THENL
   [EXISTS_TAC `n:num` THEN ASM_REWRITE_TAC[];
    REWRITE_TAC[IN_UNIONS] THEN ASM_MESON_TAC[]]);;
+
+(* Helper: shrunk sets from layer m > N don't intersect any set u in B N *)
+let SHRINK_LATER_DISJOINT_SET = prove
+ (`!(B:num->(A->bool)->bool) N u m v.
+     u IN B N /\ N < m /\ v IN B m
+     ==> (v DIFF UNIONS {UNIONS (B i) | i < m}) INTER u = {}`,
+  REPEAT GEN_TAC THEN STRIP_TAC THEN
+  MP_TAC(ISPECL [`B:num->(A->bool)->bool`; `N:num`; `m:num`; `v:A->bool`]
+    SHRINK_DISJOINT_EARLIER) THEN
+  ASM_REWRITE_TAC[] THEN DISCH_TAC THEN
+  MP_TAC(ISPECL [`B:num->(A->bool)->bool`; `N:num`; `u:A->bool`]
+    IN_LAYER_SUBSET_UNIONS) THEN
+  ASM_REWRITE_TAC[] THEN
+  ASM SET_TAC[]);;
 
 (* Helper: the shrunk collection covers the topspace *)
 let SHRINK_COVERS_HELPER = prove
@@ -311,7 +331,19 @@ let MICHAEL_STEP_1_2 = prove
    [EXISTS_TAC `n:num` THEN REWRITE_TAC[IN_UNIV]; ALL_TAC] THEN
    REWRITE_TAC[IN_IMAGE] THEN EXISTS_TAC `u:A->bool` THEN ASM_REWRITE_TAC[];
    (* Refinement: each v refines some u in U *)
-   CHEAT_TAC;
+   REWRITE_TAC[FORALL_IN_UNIONS; FORALL_IN_GSPEC; IN_UNIV; FORALL_IN_IMAGE] THEN
+   X_GEN_TAC `t:(A->bool)->bool` THEN X_GEN_TAC `v:A->bool` THEN
+   REWRITE_TAC[IN_ELIM_THM] THEN
+   DISCH_THEN(CONJUNCTS_THEN2 (X_CHOOSE_TAC `n:num`) MP_TAC) THEN
+   ASM_REWRITE_TAC[IN_IMAGE] THEN
+   DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
+   EXISTS_TAC `w:A->bool` THEN
+   CONJ_TAC THENL
+   [FIRST_X_ASSUM(SUBST1_TAC o SYM) THEN
+    REWRITE_TAC[IN_UNIONS; IN_ELIM_THM; IN_UNIV] THEN
+    EXISTS_TAC `(B:num->(A->bool)->bool) n` THEN
+    ASM_REWRITE_TAC[] THEN EXISTS_TAC `n:num` THEN REWRITE_TAC[];
+    ASM_REWRITE_TAC[] THEN SET_TAC[]];
    (* Local finiteness *)
    CHEAT_TAC])
 
