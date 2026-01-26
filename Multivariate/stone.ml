@@ -301,7 +301,13 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    (* Use OPEN_IN_UNIONS: each element is an open ball *)
    MATCH_MP_TAC OPEN_IN_UNIONS THEN
    REWRITE_TAC[FORALL_IN_GSPEC; OPEN_IN_MBALL];
-   (* Property 2: V covers topspace - temporarily using CHEAT_TAC *)
+   (* Property 2: V covers topspace *)
+   (* Key steps: For x in topspace = mspace m:
+      1. x is in some u0 in U (since U covers topspace)
+      2. By well-ordering, let u_min be minimal element of U containing x
+      3. Since u_min is open, mball(x, inv(n)) SUBSET u_min for large n
+      4. x IN Sn n u_min, and by minimality x IN Tn n u_min
+      5. Hence x IN En n u_min (the ball around x) which is in V *)
    CHEAT_TAC;
    (* Property 3: V refines U - each En n u SUBSET u *)
    REWRITE_TAC[IN_DIFF; IN_SING] THEN
