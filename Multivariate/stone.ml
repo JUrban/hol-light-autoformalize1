@@ -684,14 +684,28 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Now have z1, z2. Use woset trichotomy and SHRINK_SEPARATION *)
-         (* The proof uses:
-            1. WOSET_TOTAL_LT: u1 = u2 \/ properly ord u1 u2 \/ properly ord u2 u1
-            2. Since u1 != u2, either ord u1 u2 or ord u2 u1 properly
-            3. WLOG ord u1 u2: z2 IN Tn n u2 means z2 NOT IN u1
-            4. z1 IN Tn n u1 means mball(z1, 1/n) SUBSET u1
-            5. SHRINK_SEPARATION: inv(&n) <= mdist(z1, z2)
-            6. EN_SEPARATION: inv(&3*&n) <= mdist(y1, y2) *)
-         CHEAT_TAC];
+         (* Step 1: Use woset trichotomy to get ord u1 u2 or ord u2 u1 *)
+         MP_TAC(ISPEC `ord:(A->bool)->(A->bool)->bool` WOSET_TOTAL_LT) THEN
+         ASM_REWRITE_TAC[] THEN
+         DISCH_THEN(MP_TAC o SPECL [`u1:A->bool`; `u2:A->bool`]) THEN
+         ANTS_TAC THENL
+         [(* Need: fld ord u1 /\ fld ord u2. Since fld ord = U, this is u1 IN U /\ u2 IN U *)
+          (* fld ord u1 means (fld ord) u1 which is u1 IN fld ord *)
+          (* The assumption fld ord = U seems to be consumed somewhere earlier - CHEAT_TAC for now *)
+          CHEAT_TAC;
+          ALL_TAC] THEN
+         (* Now have: u1 = u2 \/ properly ord u1 u2 \/ properly ord u2 u1 *)
+         DISCH_THEN(DISJ_CASES_THEN2 ASSUME_TAC
+           (DISJ_CASES_THEN ASSUME_TAC)) THENL
+         [(* Case u1 = u2 - contradiction with ~(u1 = u2) *)
+          ASM_MESON_TAC[];
+          (* Case: properly ord u1 u2 - z2 IN Tn n u2 means z2 NOT IN u1 *)
+          (* z1 IN Tn n u1 SUBSET Sn n u1 means mball(z1,1/n) SUBSET u1 *)
+          (* SHRINK_SEPARATION gives inv(&n) <= mdist(z1,z2) *)
+          (* EN_SEPARATION gives inv(&3*&n) <= mdist(y1,y2) *)
+          CHEAT_TAC;
+          (* Case: properly ord u2 u1 - symmetric argument *)
+          CHEAT_TAC]];
         ASM_REWRITE_TAC[] THEN
         DISCH_THEN(X_CHOOSE_THEN `v:A->bool` ASSUME_TAC) THEN
         MATCH_MP_TAC FINITE_SUBSET THEN EXISTS_TAC `{v:A->bool}` THEN
