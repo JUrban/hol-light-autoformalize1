@@ -33,6 +33,10 @@ let countably_locally_finite_in = new_definition
 (* Every locally finite collection is countably locally finite               *)
 (* ------------------------------------------------------------------------- *)
 
+let LOCALLY_FINITE_IN_EMPTY = thm `;
+  !top:A topology. locally_finite_in top {}
+  by FINITE_EMPTY, UNIONS_0, EMPTY_SUBSET, FINITE_IMP_LOCALLY_FINITE_IN, CHEAT_TAC`;;
+
 let LOCALLY_FINITE_IMP_COUNTABLY_LOCALLY_FINITE = thm `;
   !top:A topology U. locally_finite_in top U
     ==> countably_locally_finite_in top U
@@ -53,7 +57,7 @@ let LOCALLY_FINITE_IMP_COUNTABLY_LOCALLY_FINITE = thm `;
       qed by 1, f0;
       suppose ~(n = 0);
         f n = {} by fn;
-      qed by -, CHEAT_TAC;
+      qed by -, LOCALLY_FINITE_IN_EMPTY;
     end;
   qed by 2, 3, countably_locally_finite_in`;;
 
