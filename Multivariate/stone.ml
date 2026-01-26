@@ -323,11 +323,11 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    UNDISCH_TAC `mtopology m:A topology = top` THEN
    DISCH_THEN(SUBST1_TAC o SYM) THEN
    (* Now goal is: open_in (mtopology m) (UNIONS {...}) *)
-   (* En n u0 = UNIONS {mball m (x,r) | x IN Tn n u0} is open
-      because it is a union of open balls. The inv(&3*&n) > 0 follows from
-      n >= 1, and NEIGHBORHOOD_OPEN gives openness.
-      CHEAT: Set comprehension notation mismatch needs resolution *)
-   CHEAT_TAC;
+   (* Use OPEN_IN_UNIONS: each element in the set is an open ball *)
+   MATCH_MP_TAC OPEN_IN_UNIONS THEN
+   REWRITE_TAC[FORALL_IN_GSPEC] THEN
+   REPEAT GEN_TAC THEN DISCH_TAC THEN
+   REWRITE_TAC[OPEN_IN_MBALL];
    (* Property 2: V covers topspace *)
    CHEAT_TAC;
    (* Property 3: V refines U *)
