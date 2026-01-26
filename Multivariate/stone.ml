@@ -545,8 +545,23 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
                        then (E_layer:num->(A->bool)->bool) n DIFF {{}}
                        else {}` THEN
    CONJ_TAC THENL
-   [(* Part 1: V = UNIONS{f n | n} - set equality *)
-    CHEAT_TAC;
+   [(* Part 1: V = UNIONS{f n | n} - set equality
+       LHS = {En n u | n >= 1, u IN U} DIFF {{}} = {En n u | n >= 1, u IN U, En n u != {}}
+       RHS = UNIONS{f n | n} where f n = if n >= 1 then E_layer n DIFF {{}} else {}
+           = {} ∪ (E_layer 1 DIFF {{}}) ∪ (E_layer 2 DIFF {{}}) ∪ ...
+           = {En n u | n >= 1, u IN U, En n u != {}} *)
+    REWRITE_TAC[EXTENSION] THEN X_GEN_TAC `e:A->bool` THEN EQ_TAC THENL
+    [(* LHS ==> RHS *)
+     REWRITE_TAC[IN_UNIONS; IN_DIFF; IN_ELIM_THM; IN_SING] THEN
+     STRIP_TAC THEN
+     (* e IN t where t = E_layer n' for some n' >= 1, and e != {} *)
+     (* Witness: use the layer containing e *)
+     CHEAT_TAC;
+     (* RHS ==> LHS *)
+     REWRITE_TAC[IN_UNIONS; IN_DIFF; IN_ELIM_THM; IN_SING] THEN
+     STRIP_TAC THEN
+     (* e IN f n' for some n', need e IN UNIONS{E_layer n | n >= 1} and e != {} *)
+     CHEAT_TAC];
     (* Part 2: !n. locally_finite_in top (f n) *)
     X_GEN_TAC `n:num` THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
     ASM_CASES_TAC `n >= 1` THENL
