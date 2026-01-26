@@ -135,34 +135,56 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = thm `;
    define V_i = UNIONS B_i and S_n(u) = u - UNIONS{V_i | i < n}
    Then C_n = {S_n(u) | u ∈ B_n} and C = ∪_n C_n is locally finite *)
 
+(* Helper: shrink n u SUBSET u for any n and u *)
+let SHRINK_SUBSET = prove
+ (`!(B:num->(A->bool)->bool) n u.
+     u DIFF UNIONS {UNIONS (B i) | i < n} SUBSET u`,
+  SET_TAC[]);;
+
+(* Helper: The two set comprehension forms are equal *)
+let GSPEC_EQ_LEMMA = prove
+ (`!D:A->bool (B:(A->bool)->bool).
+     {(\u. u DIFF D) s | s IN B} = {u DIFF D | u IN B}`,
+  REWRITE_TAC[EXTENSION; IN_ELIM_THM] THEN MESON_TAC[]);;
+
+(* Helper: Each layer C_n = {shrink n u | u IN B n} is locally finite
+   Uses: shrink n u SUBSET u, so apply LOCALLY_FINITE_IN_REFINEMENT
+   Conceptually: just need to show {f s | s IN B n} = {u DIFF D | u IN B n}
+   where f = \u. u DIFF D, which is trivial *)
+let SHRINK_LAYER_LOCALLY_FINITE = prove
+ (`!top:A topology (B:num->(A->bool)->bool) n.
+    locally_finite_in top (B n)
+    ==> locally_finite_in top
+          {u DIFF UNIONS {UNIONS (B i) | i < n} | u IN B n}`,
+  CHEAT_TAC);;
+
+(* Helper: minimal n exists by well-ordering principle
+   Uses num_WOP: !P. (?n. P n) <=> (?n. P(n) /\ !m. m < n ==> ~P(m)) *)
+let MINIMAL_LAYER_EXISTS = prove
+ (`!(B:num->(A->bool)->bool) x.
+     x IN UNIONS (UNIONS {B n | n IN (:num)})
+     ==> ?N. x IN UNIONS (B N) /\ !m. m < N ==> ~(x IN UNIONS (B m))`,
+  CHEAT_TAC);;
+
 (* Helper: For x in UNIONS{B n | n}, there exists a minimum n with x in UNIONS(B n).
    This is used to show that x is in some shrunk set S_n(u), and that elements
    from later layers don't intersect x's neighborhood. *)
 
-let MICHAEL_STEP_1_2 = thm `;
-  !top:A topology U.
+(* MICHAEL_STEP_1_2: countably locally finite => locally finite
+   Construction: V_layer n = UNIONS(B n), shrink n u = u DIFF (earlier layers)
+   The union C of all {shrink n u | u in B n} is locally finite because:
+   - Each layer C_n refines B_n, so is locally finite by LOCALLY_FINITE_IN_REFINEMENT
+   - For x in some u in B_N, elements of C_m (m > N) don't intersect u
+   - So we only need to consider finitely many layers around x *)
+let MICHAEL_STEP_1_2 = prove
+ (`!top:A topology U.
     (!u. u IN U ==> open_in top u) /\
     topspace top SUBSET UNIONS U /\
     countably_locally_finite_in top U
     ==> ?V. topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
-            locally_finite_in top V
-  proof
-    let top be A topology;
-    let U be (A->bool)->bool;
-    assume (!u. u IN U ==> open_in top u) [1];
-    assume topspace top SUBSET UNIONS U [2];
-    assume countably_locally_finite_in top U [3];
-    consider B such that
-      U = UNIONS {B n | n IN (:num)} /\
-      !n. locally_finite_in top (B n) [4]
-      by 3, countably_locally_finite_in;
-    // Construction: V_layer n = UNIONS(B n), shrink n u = u DIFF (earlier layers)
-    // The union C of all {shrink n u | u in B n} is locally finite because:
-    // - Each layer C_n refines B_n, so is locally finite by LOCALLY_FINITE_IN_REFINEMENT
-    // - For x in some u in B_N, elements of C_m (m > N) don't intersect u
-    // - So we only need to consider finitely many layers around x
-  qed by 1, 2, 3, 4, CHEAT_TAC`;;
+            locally_finite_in top V`,
+  CHEAT_TAC);;
 
 (* Proof sketch for MICHAEL_STEP_1_2:
    Define V_layer n = UNIONS (B n) - the nth layer union
