@@ -1477,16 +1477,33 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
    STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
    (* Property 4: V is locally finite
-      Key insight: Use both local finiteness of C and D.
-      V(c) = E(c) INTER f(c), where E(c) = topspace - UNIONS{d disjoint from c}.
-      We have c SUBSET V(c), so c INTER w != {} implies V(c) INTER w != {}.
-      For the converse direction: if V(c) INTER w != {} but c INTER w = {},
-      there's y IN V(c) INTER w with y NOT IN c.
-      y is in some c' IN C with c' INTER w != {} (since C covers and y IN w).
-      For y IN E(c), closure_of c' INTER c != {}.
-      So c is "linked" to some c' with c' INTER w != {}.
-      The key is bounding how many c's can be linked to each such c'. *)
-   CHEAT_TAC]);;
+      The key argument from topology.tex (Lemma 41.3, (3) => (4)):
+      1. For x in topspace, get W from local finiteness of D (closures)
+      2. D covers topspace (since C covers and c SUBSET closure c)
+      3. W is covered by finitely many d's from D, say D_W = {d | d INTER W != {}}
+      4. For V(c) INTER W != {}, pick y in V(c) INTER W
+      5. y is in some d_i in D_W (since D covers W and y in W)
+      6. y IN V(c) = E(c) INTER f(c) means y not in any d with d INTER c = {}
+      7. So d_i INTER c != {}
+      8. Hence c is in {c | d_i INTER c != {}} for some d_i in D_W
+      9. Need: for each d = closure c', {c | d INTER c != {}} is finite
+         This follows from FINITE_CLOSURES_AT_POINT: for z in d INTER c,
+         z IN c implies c IN {c | z IN closure c}, which is finite. *)
+   REWRITE_TAC[locally_finite_in; FORALL_IN_GSPEC] THEN CONJ_TAC THENL
+   [(* Each V(c) SUBSET topspace - easy since V(c) = (topspace DIFF ...) INTER f(c) *)
+    X_GEN_TAC `c:A->bool` THEN DISCH_TAC THEN SET_TAC[];
+    (* For each x, find W with FINITE{V(c) | V(c) INTER W != {}} *)
+    X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+    (* Use local finiteness of D at x *)
+    UNDISCH_TAC `locally_finite_in top (D:(A->bool)->bool)` THEN
+    REWRITE_TAC[locally_finite_in] THEN STRIP_TAC THEN
+    FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
+    EXISTS_TAC `w:A->bool` THEN ASM_REWRITE_TAC[] THEN
+    (* Need: FINITE{V(c) | c IN C /\ V(c) INTER w != {}}
+       where V(c) = (topspace DIFF UNIONS{d | d IN D /\ d INTER c = {}}) INTER f(c) *)
+    (* This follows from the linking argument - needs custom proof *)
+    CHEAT_TAC]]);;
 
 (* Michael's Lemma: For regular spaces, countably locally finite open covering
    has a locally finite open refinement.
