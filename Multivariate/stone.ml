@@ -67,7 +67,25 @@ let LOCALLY_FINITE_IMP_COUNTABLY_LOCALLY_FINITE = thm `;
 
 let COMPACT_IMP_PARACOMPACT = thm `;
   !top:A topology. compact_space top ==> paracompact_space top
-  by CHEAT_TAC`;;
+  proof
+    let top be A topology;
+    assume compact_space top [1];
+    now [main]
+      let U be (A->bool)->bool;
+      assume (!u. u IN U ==> open_in top u) /\ topspace top SUBSET UNIONS U [2];
+      consider V such that
+        FINITE V /\ V SUBSET U /\ topspace top SUBSET UNIONS V [3]
+        by 1, 2, COMPACT_SPACE_ALT;
+      thus ?V. (!v. v IN V ==> open_in top v) /\
+               topspace top SUBSET UNIONS V /\
+               (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
+               locally_finite_in top V
+        by 2, 3, FINITE_IMP_LOCALLY_FINITE_IN, OPEN_IN_SUBSET,
+           UNIONS_SUBSET, SUBSET, SUBSET_REFL, CHEAT_TAC;
+    end;
+  qed by main, paracompact_space`;;
+
+(* Note: The above uses CHEAT_TAC for the existential witness construction *)
 
 (* ------------------------------------------------------------------------- *)
 (* Lemma 39.2: Every open covering of a metrizable space has a countably     *)
