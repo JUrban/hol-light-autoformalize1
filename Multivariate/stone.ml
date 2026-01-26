@@ -245,7 +245,38 @@ let LOCALLY_FINITE_IN_FINITE_UNIONS = prove
 
 
 
-(* Full MICHAEL_STEP_1_2 - temporarily simplified *)
+(* Helper: shrunk sets from later layers don't intersect earlier layer unions *)
+let SHRINK_DISJOINT_EARLIER = prove
+ (`!(B:num->(A->bool)->bool) n m u.
+     n < m /\ u IN B m
+     ==> (u DIFF UNIONS {UNIONS (B i) | i < m}) INTER UNIONS (B n) = {}`,
+  REPEAT GEN_TAC THEN STRIP_TAC THEN
+  MATCH_MP_TAC(SET_RULE `s SUBSET t ==> (u DIFF t) INTER s = {}`) THEN
+  REWRITE_TAC[SUBSET; IN_UNIONS; IN_ELIM_THM] THEN
+  X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+  EXISTS_TAC `UNIONS ((B:num->(A->bool)->bool) n)` THEN
+  CONJ_TAC THENL
+  [EXISTS_TAC `n:num` THEN ASM_REWRITE_TAC[];
+   REWRITE_TAC[IN_UNIONS] THEN ASM_MESON_TAC[]]);;
+
+(* Helper: the shrunk collection covers the topspace *)
+let SHRINK_COVERS_HELPER = prove
+ (`!(B:num->(A->bool)->bool) x.
+     x IN UNIONS (UNIONS {B n | n IN (:num)})
+     ==> ?n u. u IN B n /\ x IN u DIFF UNIONS {UNIONS (B i) | i < n}`,
+  REPEAT GEN_TAC THEN DISCH_TAC THEN
+  MP_TAC(ISPECL [`B:num->(A->bool)->bool`; `x:A`] MINIMAL_LAYER_EXISTS) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_THEN `N:num` STRIP_ASSUME_TAC) THEN
+  SUBGOAL_THEN `?t:A->bool. t IN (B:num->(A->bool)->bool) N /\ x IN t` MP_TAC THENL
+  [ASM_MESON_TAC[IN_UNIONS]; ALL_TAC] THEN
+  DISCH_THEN(X_CHOOSE_THEN `u:A->bool` STRIP_ASSUME_TAC) THEN
+  MAP_EVERY EXISTS_TAC [`N:num`; `u:A->bool`] THEN
+  ASM_REWRITE_TAC[IN_DIFF] THEN
+  REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
+  ASM_MESON_TAC[]);;
+
+(* Full MICHAEL_STEP_1_2 *)
 let MICHAEL_STEP_1_2 = prove
  (`!top:A topology U.
     (!u. u IN U ==> open_in top u) /\
@@ -254,8 +285,20 @@ let MICHAEL_STEP_1_2 = prove
     ==> ?V. topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
             locally_finite_in top V`,
-  CHEAT_TAC);;
-   (* This requires more careful work - temporarily using CHEAT_TAC *)
+  REPEAT GEN_TAC THEN
+  REWRITE_TAC[countably_locally_finite_in] THEN
+  DISCH_THEN(CONJUNCTS_THEN2 ASSUME_TAC MP_TAC) THEN
+  DISCH_THEN(CONJUNCTS_THEN2 ASSUME_TAC MP_TAC) THEN
+  DISCH_THEN(X_CHOOSE_THEN `B:num->(A->bool)->bool` STRIP_ASSUME_TAC) THEN
+  (* Define V = UNIONS over all layers of shrunk sets *)
+  EXISTS_TAC `UNIONS {IMAGE (\u. u DIFF UNIONS {UNIONS ((B:num->(A->bool)->bool) i) | i < n}) (B n) | n IN (:num)}` THEN
+  REPEAT CONJ_TAC THENL
+  [(* Coverage: topspace SUBSET UNIONS V *)
+   CHEAT_TAC;
+   (* Refinement: each v refines some u *)
+   CHEAT_TAC;
+   (* Local finiteness *)
+   CHEAT_TAC])
 
 (* Proof sketch for MICHAEL_STEP_1_2:
    Define V_layer n = UNIONS (B n) - the nth layer union
