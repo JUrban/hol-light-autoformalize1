@@ -359,7 +359,8 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
       - T_n elements are at least 1/n apart (by construction using well-ordering)
       - E_n elements are at least 1/3n apart (triangle inequality)
       - So any 1/6n-ball meets at most one E_n(u)
-      Hence V = UNIONS{E_layer n | n >= 1} is countably locally finite. *)
+      Hence V = UNIONS{E_layer n | n >= 1} is countably locally finite.
+      The detailed proof is complex - using CHEAT_TAC for now. *)
    CHEAT_TAC]);;
 
 (* ------------------------------------------------------------------------- *)
