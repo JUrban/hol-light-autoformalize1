@@ -639,9 +639,24 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
          EXPAND_TAC "E_layer" THEN REWRITE_TAC[IN_ELIM_THM] THEN
          DISCH_THEN(X_CHOOSE_THEN `u2:A->bool` (CONJUNCTS_THEN2 ASSUME_TAC SUBST_ALL_TAC)) THEN
          (* Now have u1, u2 IN U, En n u1 != En n u2, y1 IN En n u1, y2 IN En n u2 *)
-         (* The full proof: extract z1, z2 from En via Tn, use woset ordering
-            between u1, u2, apply SHRINK_SEPARATION for distance bound on centers,
-            then EN_SEPARATION for distance bound on y1, y2 *)
+         (* Extract z1, z2 from En definitions and apply EN_SEPARATION *)
+         (* Step 1: Extract z1 from y1 IN En n u1 = UNIONS {mball m (x, 1/3n) | x IN Tn n u1} *)
+         UNDISCH_TAC `y1:A IN (En:num->(A->bool)->(A->bool)) n u1` THEN
+         EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+         REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN STRIP_TAC THEN
+         (* Step 2: Extract z2 from y2 IN En n u2 *)
+         UNDISCH_TAC `y2:A IN (En:num->(A->bool)->(A->bool)) n u2` THEN
+         EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+         REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN STRIP_TAC THEN
+         (* Step 3: u1 != u2 (otherwise En n u1 = En n u2, contradiction) *)
+         SUBGOAL_THEN `~(u1:A->bool = u2)` ASSUME_TAC THENL
+         [DISCH_TAC THEN UNDISCH_TAC `~((En:num->(A->bool)->(A->bool)) n u1 = En n u2)` THEN
+          ASM_REWRITE_TAC[];
+          ALL_TAC] THEN
+         (* Now have: x' IN Tn n' u1, y1 IN mball(x', 1/3n')
+                     x'' IN Tn n'' u2, y2 IN mball(x'', 1/3n'')
+            Note: n' and n'' from GSPEC should equal n (the outer context)
+            Remaining: woset trichotomy, SHRINK_SEPARATION, EN_SEPARATION *)
          CHEAT_TAC];
         ASM_REWRITE_TAC[] THEN
         DISCH_THEN(X_CHOOSE_THEN `v:A->bool` ASSUME_TAC) THEN
