@@ -36,7 +36,26 @@ let countably_locally_finite_in = new_definition
 let LOCALLY_FINITE_IMP_COUNTABLY_LOCALLY_FINITE = thm `;
   !top:A topology U. locally_finite_in top U
     ==> countably_locally_finite_in top U
-  by CHEAT_TAC`;;
+  proof
+    let top be A topology;
+    let U be (A->bool)->bool;
+    assume locally_finite_in top U [1];
+    set f = \n:num. if n = 0 then U else {}:(A->bool)->bool;
+    f 0 = U [f0];
+    !n. ~(n = 0) ==> f n = {} [fn] by CHEAT_TAC;
+    U = UNIONS {f n | n IN (:num)} [2] by f0, fn, CHEAT_TAC;
+    !n. locally_finite_in top (f n) [3]
+    proof
+      let n be num;
+      n = 0 \/ ~(n = 0);
+      cases by -;
+      suppose n = 0;
+      qed by 1, f0;
+      suppose ~(n = 0);
+        f n = {} by fn;
+      qed by -, CHEAT_TAC;
+    end;
+  qed by 2, 3, countably_locally_finite_in`;;
 
 (* ------------------------------------------------------------------------- *)
 (* Compact implies paracompact                                               *)
