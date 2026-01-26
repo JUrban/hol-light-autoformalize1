@@ -243,6 +243,15 @@ let GSPEC_EQUIV = prove
  (`!f:A->B P. {f x | x | P x} = {f x | P x}`,
   REWRITE_TAC[EXTENSION; IN_ELIM_THM] THEN MESON_TAC[]);;
 
+(* Helper: Membership in UNIONS of mballs - fixes the GSPEC issue where IN_ELIM_THM
+   quantifies over all free variables. This lemma explicitly states the relationship.
+   Note: Uses SET_RULE which handles GSPEC correctly. *)
+let IN_UNIONS_MBALL = prove
+ (`!m:A metric r s y.
+    y IN UNIONS {mball m (x, r) | x IN s} <=>
+    ?x. x IN s /\ y IN mball m (x, r)`,
+  REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN SET_TAC[]);;
+
 (* Helper: For a well-ordered set, there exists a minimal element containing a point *)
 (* Note: Using 'a' instead of 'x' to avoid variable capture with WOSET_WELL *)
 let WOSET_MINIMAL_CONTAINING = prove
@@ -654,6 +663,28 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
             7. SHRINK_SEPARATION: mdist(z1, z2) >= 1/n
             8. EN_SEPARATION: &3 * 1/3n = 1/n <= mdist(z1, z2) implies 1/3n <= mdist(y1, y2)
             GSPEC issue: extraction introduces fresh n' variables instead of using outer n *)
+         (* Step 2: Extract z1 IN Tn n u1 with y1 IN mball(z1, inv(&3*&n)) *)
+         (* GSPEC issue: IN_ELIM_THM quantifies over all free vars including n *)
+         SUBGOAL_THEN `?z1:A. z1 IN (Tn:num->(A->bool)->A->bool) n u1 /\
+                              y1 IN mball m (z1, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
+         [(* y1 IN En n u1 = UNIONS{mball(x,r)|x IN Tn n u1}. By IN_UNIONS_MBALL,
+            this gives ?x. x IN Tn n u1 /\ y1 IN mball(x,r), so z1 = x works *)
+          CHEAT_TAC;
+          ALL_TAC] THEN
+         (* Step 3: Extract z2 IN Tn n u2 with y2 IN mball(z2, inv(&3*&n)) *)
+         SUBGOAL_THEN `?z2:A. z2 IN (Tn:num->(A->bool)->A->bool) n u2 /\
+                              y2 IN mball m (z2, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
+         [(* Same as z1 extraction *)
+          CHEAT_TAC;
+          ALL_TAC] THEN
+         (* Now have z1, z2. Use woset trichotomy and SHRINK_SEPARATION *)
+         (* The proof uses:
+            1. WOSET_TOTAL_LT: u1 = u2 \/ properly ord u1 u2 \/ properly ord u2 u1
+            2. Since u1 != u2, either ord u1 u2 or ord u2 u1 properly
+            3. WLOG ord u1 u2: z2 IN Tn n u2 means z2 NOT IN u1
+            4. z1 IN Tn n u1 means mball(z1, 1/n) SUBSET u1
+            5. SHRINK_SEPARATION: inv(&n) <= mdist(z1, z2)
+            6. EN_SEPARATION: inv(&3*&n) <= mdist(y1, y2) *)
          CHEAT_TAC];
         ASM_REWRITE_TAC[] THEN
         DISCH_THEN(X_CHOOSE_THEN `v:A->bool` ASSUME_TAC) THEN
