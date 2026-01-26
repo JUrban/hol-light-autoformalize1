@@ -307,10 +307,11 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
       Taking the minimum u (in well-ordering) with x IN S_n(u), we get x IN T_n(u).
       Then x IN E_n(u) (x is in its own 1/3n-neighborhood). *)
    CHEAT_TAC;
-   (* Property 3: V refines U
-      Each E_n(u) SUBSET u because:
-      - x IN T_n(u) ==> x IN S_n(u) ==> mball(x, 1/n) SUBSET u
-      - mball(x, 1/3n) SUBSET mball(x, 1/n) SUBSET u *)
+   (* Property 3: V refines U - each En n u SUBSET u
+      For v IN V, we have v = En n0 u for some n0 >= 1, u IN U.
+      En n0 u = UNIONS{mball(y, 1/3n0) | y IN Tn n0 u}.
+      For y IN Tn n0 u, y IN Sn n0 u, so mball(y, 1/n0) SUBSET u.
+      Since inv(3*n0) <= inv(n0), we get mball(y, 1/3n0) SUBSET mball(y, 1/n0) SUBSET u. *)
    CHEAT_TAC;
    (* Property 4: V is countably locally finite
       E_layer n = {E_n(u) | u IN U} is locally finite because:
