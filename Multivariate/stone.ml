@@ -157,6 +157,11 @@ let MICHAEL_STEP_1_2 = thm `;
       U = UNIONS {B n | n IN (:num)} /\
       !n. locally_finite_in top (B n) [4]
       by 3, countably_locally_finite_in;
+    // Construction: V_layer n = UNIONS(B n), shrink n u = u DIFF (earlier layers)
+    // The union C of all {shrink n u | u in B n} is locally finite because:
+    // - Each layer C_n refines B_n, so is locally finite by LOCALLY_FINITE_IN_REFINEMENT
+    // - For x in some u in B_N, elements of C_m (m > N) don't intersect u
+    // - So we only need to consider finitely many layers around x
   qed by 1, 2, 3, 4, CHEAT_TAC`;;
 
 (* Proof sketch for MICHAEL_STEP_1_2:
