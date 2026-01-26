@@ -464,7 +464,17 @@ let MICHAEL_STEP_1_2 = prove
     (* m > N, so s INTER u0 = {} by SHRINK_LATER_DISJOINT_SET *)
     SUBGOAL_THEN `N < m:num` ASSUME_TAC THENL [ASM_ARITH_TAC; ALL_TAC] THEN
     SUBGOAL_THEN `s:A->bool INTER u0 = {}` MP_TAC THENL
-    [CHEAT_TAC;
+    [(* Extract v from s IN IMAGE (\u. u DIFF ...) (B m) *)
+     UNDISCH_TAC `s IN IMAGE (\u:A->bool. u DIFF UNIONS {UNIONS ((B:num->(A->bool)->bool) i) | i < m}) (B m)` THEN
+     REWRITE_TAC[IN_IMAGE] THEN
+     DISCH_THEN(X_CHOOSE_THEN `v:A->bool` STRIP_ASSUME_TAC) THEN
+     (* Now we have: s = v DIFF UNIONS{...}, v IN B m *)
+     MP_TAC(ISPECL [`B:num->(A->bool)->bool`; `N:num`; `u0:A->bool`; `m:num`; `v:A->bool`]
+       SHRINK_LATER_DISJOINT_SET) THEN
+     ANTS_TAC THENL
+     [REPEAT CONJ_TAC THEN FIRST_ASSUM ACCEPT_TAC;
+      UNDISCH_TAC `s:A->bool = v DIFF UNIONS {UNIONS ((B:num->(A->bool)->bool) i) | i < m}` THEN
+      DISCH_THEN(SUBST1_TAC o SYM) THEN DISCH_THEN ACCEPT_TAC];
      ALL_TAC] THEN
     (* Contradiction: s INTER u0 = {} but s meets u0 INTER w1 *)
     ASM SET_TAC[]]])
