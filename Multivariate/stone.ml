@@ -539,7 +539,13 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
     MATCH_MP_TAC MBALL_EMPTY THEN REWRITE_TAC[REAL_LE_REFL];
     MATCH_MP_TAC MBALL_SUBSET_CONCENTRIC THEN
     MATCH_MP_TAC INV_3N_LE_INV_N THEN ASM_REWRITE_TAC[]];
-   (* Property 4: V is countably locally finite - using CHEAT_TAC for now *)
+   (* Property 4: V is countably locally finite
+      Goal: countably_locally_finite_in top (UNIONS{E_layer n | n >= 1} DIFF {{}})
+      Strategy: Use f(n) = if n >= 1 then E_layer n DIFF {{}} else {}
+      Part 1: V = UNIONS{f n | n} (set equality)
+      Part 2: !n. locally_finite_in top (f n)
+        - n = 0: f(0) = {} is trivially locally finite
+        - n >= 1: use SMALL_BALL_MEETS_ONE with separation property *)
    CHEAT_TAC]);;
 
 let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT_locally_finite_DISABLED = 0;;
