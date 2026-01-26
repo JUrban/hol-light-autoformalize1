@@ -561,6 +561,7 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
      REWRITE_TAC[IN_UNIONS; IN_DIFF; IN_ELIM_THM; IN_SING] THEN
      STRIP_TAC THEN
      (* e IN f n' for some n', need e IN UNIONS{E_layer n | n >= 1} and e != {} *)
+     (* Strategy: case split on n' >= 1, use E_layer n' as witness, handle n'=0 contradiction *)
      CHEAT_TAC];
     (* Part 2: !n. locally_finite_in top (f n) *)
     X_GEN_TAC `n:num` THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
