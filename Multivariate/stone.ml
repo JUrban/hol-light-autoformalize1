@@ -307,12 +307,57 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
       Taking the minimum u (in well-ordering) with x IN S_n(u), we get x IN T_n(u).
       Then x IN E_n(u) (x is in its own 1/3n-neighborhood). *)
    CHEAT_TAC;
-   (* Property 3: V refines U - each En n u SUBSET u
-      For v IN V, we have v = En n0 u for some n0 >= 1, u IN U.
-      En n0 u = UNIONS{mball(y, 1/3n0) | y IN Tn n0 u}.
-      For y IN Tn n0 u, y IN Sn n0 u, so mball(y, 1/n0) SUBSET u.
-      Since inv(3*n0) <= inv(n0), we get mball(y, 1/3n0) SUBSET mball(y, 1/n0) SUBSET u. *)
-   CHEAT_TAC;
+   (* Property 3: V refines U - each En n u SUBSET u *)
+   REWRITE_TAC[IN_DIFF; IN_SING] THEN
+   REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
+   X_GEN_TAC `v:A->bool` THEN
+   DISCH_THEN(CONJUNCTS_THEN2 MP_TAC ASSUME_TAC) THEN
+   DISCH_THEN(X_CHOOSE_THEN `layer:(A->bool)->bool` MP_TAC) THEN
+   DISCH_THEN(CONJUNCTS_THEN2 MP_TAC ASSUME_TAC) THEN
+   DISCH_THEN(X_CHOOSE_THEN `n0:num` STRIP_ASSUME_TAC) THEN
+   SUBGOAL_THEN `v:A->bool IN (E_layer:num->(A->bool)->bool) n0` MP_TAC THENL
+   [ASM_MESON_TAC[]; ALL_TAC] THEN
+   EXPAND_TAC "E_layer" THEN REWRITE_TAC[IN_ELIM_THM] THEN
+   DISCH_THEN(X_CHOOSE_THEN `u:A->bool` STRIP_ASSUME_TAC) THEN
+   EXISTS_TAC `u:A->bool` THEN ASM_REWRITE_TAC[] THEN
+   (* Show En n0 u SUBSET u using element membership *)
+   ASM_REWRITE_TAC[SUBSET] THEN X_GEN_TAC `z:A` THEN
+   EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+   REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
+   (* Goal: (?t. (?x n. x IN Tn n u /\ t = mball(x, inv(3*n))) /\ z IN t) ==> z IN u *)
+   (* The GSPEC bound both x and n, but proof still works *)
+   DISCH_THEN(X_CHOOSE_THEN `ball:A->bool` MP_TAC) THEN
+   DISCH_THEN(CONJUNCTS_THEN2 MP_TAC ASSUME_TAC) THEN
+   DISCH_THEN(X_CHOOSE_THEN `y:A` MP_TAC) THEN
+   DISCH_THEN(X_CHOOSE_THEN `n':num` STRIP_ASSUME_TAC) THEN
+   (* y IN Tn n' u, ball = mball(y, inv(3*n')), z IN ball *)
+   SUBGOAL_THEN `(y:A) IN (Sn:num->(A->bool)->A->bool) n' u` MP_TAC THENL
+   [FIRST_X_ASSUM(fun th -> MP_TAC th THEN EXPAND_TAC "Tn" THEN SET_TAC[]);
+    ALL_TAC] THEN
+   EXPAND_TAC "Sn" THEN REWRITE_TAC[IN_ELIM_THM] THEN
+   STRIP_TAC THEN
+   (* From y IN Sn n' u: y IN mspace m /\ mball(y, inv n') SUBSET u *)
+   (* We have z IN ball = mball(y, inv(3*n')), need z IN u *)
+   (* Need n' <> 0 for INV_3N_LE_INV_N. Derive from z IN mball m (y, inv(&3*&n'))
+      being non-empty: if n' = 0, then radius = inv(0) = 0 and ball is empty *)
+   SUBGOAL_THEN `~(n' = 0)` ASSUME_TAC THENL
+   [DISCH_TAC THEN
+    SUBGOAL_THEN `mball m (y:A, inv(&3 * &n')) = {}` MP_TAC THENL
+    [REWRITE_TAC[MBALL_EQ_EMPTY] THEN DISJ2_TAC THEN
+     ASM_REWRITE_TAC[REAL_OF_NUM_EQ; REAL_MUL_RZERO; REAL_INV_0; REAL_LE_REFL];
+     ALL_TAC] THEN
+    ASM SET_TAC[];
+    ALL_TAC] THEN
+   (* Now z IN ball = mball(y, inv(&3*&n')) and n' <> 0 *)
+   (* mball(y, inv(&3*&n')) SUBSET mball(y, inv(&n')) by MBALL_SUBSET_CONCENTRIC *)
+   SUBGOAL_THEN `z:A IN mball m (y, inv(&n'))` MP_TAC THENL
+   [SUBGOAL_THEN `mball m (y:A, inv(&3 * &n')) SUBSET mball m (y, inv(&n'))` MP_TAC THENL
+    [MATCH_MP_TAC MBALL_SUBSET_CONCENTRIC THEN
+     MATCH_MP_TAC INV_3N_LE_INV_N THEN ASM_REWRITE_TAC[];
+     ALL_TAC] THEN
+    ASM SET_TAC[];
+    ALL_TAC] THEN
+   ASM SET_TAC[];
    (* Property 4: V is countably locally finite
       E_layer n = {E_n(u) | u IN U} is locally finite because:
       - T_n elements are at least 1/n apart (by construction using well-ordering)
