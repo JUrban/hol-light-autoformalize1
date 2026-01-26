@@ -229,6 +229,15 @@ let SMALL_BALL_MEETS_ONE = prove
    ASM_SIMP_TAC[MDIST_SYM] THEN ASM_REAL_ARITH_TAC;
    EXISTS_TAC `{}:A->bool` THEN ASM_MESON_TAC[]]);;
 
+(* Helper: inv(&3 * &n) > 0 when n >= 1 *)
+let INV_3N_POS = prove
+ (`!n. n >= 1 ==> &0 < inv(&3 * &n)`,
+  GEN_TAC THEN DISCH_TAC THEN
+  MATCH_MP_TAC REAL_LT_INV THEN
+  MATCH_MP_TAC REAL_LT_MUL THEN
+  REWRITE_TAC[REAL_ARITH `&0 < &3`] THEN
+  ASM_SIMP_TAC[REAL_OF_NUM_LT; ARITH_RULE `n >= 1 ==> 0 < n`]);;
+
 (* Lemma 39.2: Main theorem *)
 let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
  (`!top:A topology U.
@@ -253,21 +262,45 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
      E_n = {E_n(u) | u IN U, ~(E_n(u) = {})}
      V = UNIONS{E_n | n >= 1}
   *)
-  ABBREV_TAC `Sn = \n (u:A->bool).
+  ABBREV_TAC `Sn = \(n:num) (u:A->bool).
     {x | x IN mspace m /\ mball m (x, inv(&n)) SUBSET u}` THEN
-  ABBREV_TAC `Tn = \n (u:A->bool).
-    Sn n u DIFF UNIONS {v:A->bool | (ord:(A->bool)->(A->bool)->bool) v u /\ ~(v = u)}` THEN
-  ABBREV_TAC `En = \n (u:A->bool).
-    UNIONS {mball m (x:A, inv(&3 * &n)) | x IN Tn n u}` THEN
-  ABBREV_TAC `E_layer = \n:num. {(En:num->(A->bool)->A->bool) n u | u IN U}` THEN
+  ABBREV_TAC `Tn = \(n:num) (u:A->bool).
+    (Sn:num->(A->bool)->A->bool) n u DIFF UNIONS {v:A->bool | (ord:(A->bool)->(A->bool)->bool) v u /\ ~(v = u)}` THEN
+  ABBREV_TAC `En = \(n:num) (u:A->bool).
+    UNIONS {mball m (x:A, inv(&3 * &n)) | x IN (Tn:num->(A->bool)->A->bool) n u}` THEN
+  ABBREV_TAC `E_layer = \(n:num). {(En:num->(A->bool)->A->bool) n u | u IN U}` THEN
   (* V = UNIONS{E_layer n | n >= 1} but removing empty sets *)
   EXISTS_TAC `UNIONS {E_layer n | n >= 1} DIFF {{}}:(A->bool)->bool` THEN
   (* The proof splits into four parts - all with CHEAT_TAC for now *)
   REPEAT CONJ_TAC THENL
-  [(* Property 1: V is open
-      Each E_n(u) = UNIONS{mball(x, 1/3n) | x IN Tn n u} is a union of open balls,
-      hence open in mtopology m = top. *)
-   CHEAT_TAC;
+  [(* Property 1: V is open - each E_n(u) is a union of open balls *)
+   REWRITE_TAC[IN_DIFF; IN_SING] THEN
+   REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
+   X_GEN_TAC `v:A->bool` THEN
+   (* Goal: (?t. (?n. n >= 1 /\ t = E_layer n) /\ v IN t) /\ ~(v = {}) ==> open_in top v *)
+   DISCH_THEN(CONJUNCTS_THEN2 MP_TAC ASSUME_TAC) THEN
+   DISCH_THEN(X_CHOOSE_THEN `layer:(A->bool)->bool` MP_TAC) THEN
+   DISCH_THEN(CONJUNCTS_THEN2 MP_TAC ASSUME_TAC) THEN
+   DISCH_THEN(X_CHOOSE_THEN `n0:num` STRIP_ASSUME_TAC) THEN
+   (* Now: n0 >= 1, layer = E_layer n0, v IN layer *)
+   SUBGOAL_THEN `v:A->bool IN (E_layer:num->(A->bool)->bool) n0` MP_TAC THENL
+   [ASM_MESON_TAC[]; ALL_TAC] THEN
+   EXPAND_TAC "E_layer" THEN REWRITE_TAC[IN_ELIM_THM] THEN
+   DISCH_THEN(X_CHOOSE_THEN `u:A->bool` STRIP_ASSUME_TAC) THEN
+   (* v = En n0 u *)
+   ASM_REWRITE_TAC[] THEN
+   (* Goal: open_in top (En n0 u) *)
+   (* Expand En n0 u to UNIONS{mball m (x, inv(&3 * &n0)) | x IN Tn n0 u} *)
+   SUBGOAL_THEN `(En:num->(A->bool)->A->bool) n0 u =
+                 UNIONS {mball m (x:A, inv(&3 * &n0)) | x IN (Tn:num->(A->bool)->A->bool) n0 u}`
+     SUBST1_TAC THENL
+   [EXPAND_TAC "En" THEN REFL_TAC; ALL_TAC] THEN
+   (* Now goal: open_in top (UNIONS{mball m (x, inv(&3 * &n0)) | x IN Tn n0 u}) *)
+   SUBGOAL_THEN `top:A topology = mtopology m` SUBST1_TAC THENL
+   [ASM_MESON_TAC[]; ALL_TAC] THEN
+   (* Use OPEN_IN_UNIONS: each element is an open ball *)
+   MATCH_MP_TAC OPEN_IN_UNIONS THEN
+   REWRITE_TAC[FORALL_IN_GSPEC; OPEN_IN_MBALL];
    (* Property 2: V covers topspace
       For any x in topspace, x is in some open u in U. Since u is open,
       there exists n with mball(x, 1/n) SUBSET u. So x IN S_n(u).
