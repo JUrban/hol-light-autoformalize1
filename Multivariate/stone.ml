@@ -139,9 +139,9 @@ let MICHAEL_STEP_1_2 = thm `;
     assume (!u. u IN U ==> open_in top u) [1];
     assume topspace top SUBSET UNIONS U [2];
     assume countably_locally_finite_in top U [3];
-    consider f such that
-      U = UNIONS {f n | n IN (:num)} /\
-      !n. locally_finite_in top (f n) [4]
+    consider B such that
+      U = UNIONS {B n | n IN (:num)} /\
+      !n. locally_finite_in top (B n) [4]
       by 3, countably_locally_finite_in;
   qed by 1, 2, 3, 4, CHEAT_TAC`;;
 
