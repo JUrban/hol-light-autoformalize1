@@ -301,11 +301,7 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    (* Use OPEN_IN_UNIONS: each element is an open ball *)
    MATCH_MP_TAC OPEN_IN_UNIONS THEN
    REWRITE_TAC[FORALL_IN_GSPEC; OPEN_IN_MBALL];
-   (* Property 2: V covers topspace
-      For any x in topspace, x is in some open u in U. Since u is open,
-      there exists n with mball(x, 1/n) SUBSET u. So x IN S_n(u).
-      Taking the minimum u (in well-ordering) with x IN S_n(u), we get x IN T_n(u).
-      Then x IN E_n(u) (x is in its own 1/3n-neighborhood). *)
+   (* Property 2: V covers topspace - temporarily cheated while debugging *)
    CHEAT_TAC;
    (* Property 3: V refines U - each En n u SUBSET u *)
    REWRITE_TAC[IN_DIFF; IN_SING] THEN
