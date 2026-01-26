@@ -76,12 +76,16 @@ let COMPACT_IMP_PARACOMPACT = thm `;
       consider V such that
         FINITE V /\ V SUBSET U /\ topspace top SUBSET UNIONS V [3]
         by 1, 2, COMPACT_SPACE_ALT;
+      !v. v IN V ==> open_in top v [4] by 2, 3, SUBSET;
+      !v. v IN V ==> ?u. u IN U /\ v SUBSET u [5] by 3, SUBSET_REFL, SUBSET;
+      UNIONS V SUBSET topspace top [6]
+        by 2, 3, UNIONS_SUBSET, OPEN_IN_SUBSET, SUBSET;
+      locally_finite_in top V [7] by 3, 6, FINITE_IMP_LOCALLY_FINITE_IN;
       thus ?V. (!v. v IN V ==> open_in top v) /\
                topspace top SUBSET UNIONS V /\
                (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
                locally_finite_in top V
-        by 2, 3, FINITE_IMP_LOCALLY_FINITE_IN, OPEN_IN_SUBSET,
-           UNIONS_SUBSET, SUBSET, SUBSET_REFL, CHEAT_TAC;
+        by 3, 4, 5, 7;
     end;
   qed by main, paracompact_space`;;
 
