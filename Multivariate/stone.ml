@@ -328,10 +328,63 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    REWRITE_TAC[FORALL_IN_GSPEC] THEN
    REPEAT GEN_TAC THEN DISCH_TAC THEN
    REWRITE_TAC[OPEN_IN_MBALL];
-   (* Property 2: V covers topspace *)
+   (* Property 2: V covers topspace
+      For x in topspace, we need x in some v in V.
+      Key steps:
+      1. Since U covers topspace and u is open, exists r > 0 with mball(x,r) SUBSET u
+      2. By REAL_ARCH_INV, get n >= 1 with inv(&n) < r, so mball(x,inv(&n)) SUBSET u
+      3. Then x IN Sn n u since x IN mspace m and mball(x, inv(&n)) SUBSET u
+      4. Use WOSET_MINIMAL_CONTAINING to get u_min = minimal element containing x
+         with mball(x, inv(&n)) SUBSET u_min
+      5. Then x IN Tn n u_min (since x not in any ord-smaller set)
+      6. x IN mball(x, inv(&3*&n)) trivially (x IN mspace m, mdist(x,x) = 0 < inv(&3*&n))
+      7. Therefore x IN En n u_min = UNIONS{mball(y, inv(&3*&n)) | y IN Tn n u_min}
+      8. En n u_min is non-empty (contains x) and in E_layer n
+      Complex proof - using CHEAT_TAC for now. *)
    CHEAT_TAC;
-   (* Property 3: V refines U *)
-   CHEAT_TAC;
+   (* Property 3: V refines U - each v in V is subset of some u in U
+      v = En n u0 for some u0 IN U, and En n u0 SUBSET u0 by construction:
+      - Tn n u0 SUBSET Sn n u0 = {x | mball(x,1/n) SUBSET u0}
+      - En n u0 = UNIONS{mball(x,1/3n) | x IN Tn n u0}
+      - For x in Tn, mball(x,1/3n) SUBSET mball(x,1/n) SUBSET u0
+      - So En n u0 SUBSET u0 *)
+   REWRITE_TAC[IN_DIFF; IN_SING; IN_UNIONS; IN_ELIM_THM] THEN
+   X_GEN_TAC `v:A->bool` THEN STRIP_TAC THEN
+   (* Get u0 such that v = En n u0 *)
+   SUBGOAL_THEN `?u0. u0 IN U /\ v = (En:num->(A->bool)->A->bool) n u0`
+     STRIP_ASSUME_TAC THENL
+   [UNDISCH_TAC `v:A->bool IN t` THEN
+    FIRST_X_ASSUM(SUBST1_TAC) THEN  (* t = E_layer n *)
+    EXPAND_TAC "E_layer" THEN REWRITE_TAC[IN_ELIM_THM];
+    ALL_TAC] THEN
+   (* Witness u0 *)
+   EXISTS_TAC `u0:A->bool` THEN ASM_REWRITE_TAC[] THEN
+   (* Need: En n u0 SUBSET u0 *)
+   ASM_REWRITE_TAC[] THEN
+   EXPAND_TAC "En" THEN REWRITE_TAC[UNIONS_SUBSET; FORALL_IN_GSPEC] THEN
+   (* After FORALL_IN_GSPEC, goal: !x n. x IN Tn n u0 ==> mball SUBSET u0 *)
+   (* Note: both x and n are universally quantified here *)
+   X_GEN_TAC `y:A` THEN X_GEN_TAC `n':num` THEN DISCH_TAC THEN
+   (* From y IN Tn n' u0, get y IN Sn n' u0 (Tn is Sn DIFF something) *)
+   SUBGOAL_THEN `y:A IN (Sn:num->(A->bool)->A->bool) n' u0` ASSUME_TAC THENL
+   [UNDISCH_TAC `y:A IN (Tn:num->(A->bool)->A->bool) n' u0` THEN
+    EXPAND_TAC "Tn" THEN REWRITE_TAC[IN_DIFF] THEN SIMP_TAC[];
+    ALL_TAC] THEN
+   (* From y IN Sn n' u0, get y IN mspace m and mball(y, 1/n') SUBSET u0 *)
+   UNDISCH_TAC `y:A IN (Sn:num->(A->bool)->A->bool) n' u0` THEN
+   EXPAND_TAC "Sn" THEN REWRITE_TAC[IN_ELIM_THM] THEN STRIP_TAC THEN
+   (* mball(y, 1/3n') SUBSET mball(y, 1/n') SUBSET u0 *)
+   MATCH_MP_TAC SUBSET_TRANS THEN
+   EXISTS_TAC `mball m (y:A, inv(&n'))` THEN ASM_REWRITE_TAC[] THEN
+   (* Need: inv(&3*&n') <= inv(&n') which requires n' >= 1 *)
+   (* For n' = 0: inv(&0) = &0, so mball(y, 0) = {} SUBSET u0 trivially *)
+   (* For n' >= 1: use INV_3N_LE_INV_N *)
+   ASM_CASES_TAC `n' = 0` THENL
+   [ASM_REWRITE_TAC[REAL_MUL_RZERO; REAL_INV_0] THEN
+    MATCH_MP_TAC(SET_RULE `s = {} ==> s SUBSET t`) THEN
+    MATCH_MP_TAC MBALL_EMPTY THEN REWRITE_TAC[REAL_LE_REFL];
+    MATCH_MP_TAC MBALL_SUBSET_CONCENTRIC THEN
+    MATCH_MP_TAC INV_3N_LE_INV_N THEN ASM_REWRITE_TAC[]];
    (* Property 4: V is countably locally finite
       E_layer n = {E_n(u) | u IN U} is locally finite because:
       - T_n elements are at least 1/n apart (by construction using well-ordering)
