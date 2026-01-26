@@ -186,7 +186,12 @@ let MICHAEL_LEMMA = thm `;
     assume (!u. u IN U ==> open_in top u) [2];
     assume topspace top SUBSET UNIONS U [3];
     assume countably_locally_finite_in top U [4];
-  qed by 1, 2, 3, 4, MICHAEL_STEP_1_2, MICHAEL_STEP_2_3, MICHAEL_STEP_3_4, CHEAT_TAC`;;
+    consider C such that
+      topspace top SUBSET UNIONS C /\
+      (!c. c IN C ==> ?u. u IN U /\ c SUBSET u) /\
+      locally_finite_in top C [5]
+      by 2, 3, 4, MICHAEL_STEP_1_2;
+  qed by 1, 2, 3, 5, CHEAT_TAC`;;
 
 (* ------------------------------------------------------------------------- *)
 (* THEOREM 41.4: Every metrizable space is paracompact                       *)
