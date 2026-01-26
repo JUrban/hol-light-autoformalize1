@@ -328,19 +328,56 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    REWRITE_TAC[FORALL_IN_GSPEC] THEN
    REPEAT GEN_TAC THEN DISCH_TAC THEN
    REWRITE_TAC[OPEN_IN_MBALL];
-   (* Property 2: V covers topspace
-      For x in topspace, we need x in some v in V.
-      Key steps:
-      1. Since U covers topspace and u is open, exists r > 0 with mball(x,r) SUBSET u
-      2. By REAL_ARCH_INV, get n >= 1 with inv(&n) < r, so mball(x,inv(&n)) SUBSET u
-      3. Then x IN Sn n u since x IN mspace m and mball(x, inv(&n)) SUBSET u
-      4. Use WOSET_MINIMAL_CONTAINING to get u_min = minimal element containing x
-         with mball(x, inv(&n)) SUBSET u_min
-      5. Then x IN Tn n u_min (since x not in any ord-smaller set)
-      6. x IN mball(x, inv(&3*&n)) trivially (x IN mspace m, mdist(x,x) = 0 < inv(&3*&n))
-      7. Therefore x IN En n u_min = UNIONS{mball(y, inv(&3*&n)) | y IN Tn n u_min}
-      8. En n u_min is non-empty (contains x) and in E_layer n
-      Complex proof - using CHEAT_TAC for now. *)
+   (* Property 2: V covers topspace *)
+   REWRITE_TAC[SUBSET] THEN X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+   (* x IN topspace top = mspace m since top = mtopology m *)
+   SUBGOAL_THEN `x:A IN mspace m` ASSUME_TAC THENL
+   [UNDISCH_TAC `x:A IN topspace top` THEN
+    UNDISCH_TAC `mtopology m:A topology = top` THEN
+    DISCH_THEN(SUBST1_TAC o SYM) THEN
+    REWRITE_TAC[TOPSPACE_MTOPOLOGY];
+    ALL_TAC] THEN
+   (* x is in some u in U since U covers topspace *)
+   SUBGOAL_THEN `?u:A->bool. u IN U /\ x IN u` STRIP_ASSUME_TAC THENL
+   [UNDISCH_TAC `topspace top SUBSET UNIONS (U:(A->bool)->bool)` THEN
+    REWRITE_TAC[SUBSET; IN_UNIONS] THEN
+    DISCH_THEN(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN MESON_TAC[];
+    ALL_TAC] THEN
+   (* u is open in mtopology m, so exists r > 0 with mball(x,r) SUBSET u *)
+   SUBGOAL_THEN `?r. &0 < r /\ mball m (x:A,r) SUBSET u` STRIP_ASSUME_TAC THENL
+   [UNDISCH_TAC `!u:A->bool. u IN U ==> open_in top u` THEN
+    DISCH_THEN(MP_TAC o SPEC `u:A->bool`) THEN ASM_REWRITE_TAC[] THEN
+    UNDISCH_TAC `mtopology m:A topology = top` THEN
+    DISCH_THEN(SUBST1_TAC o SYM) THEN
+    REWRITE_TAC[OPEN_IN_MTOPOLOGY] THEN STRIP_TAC THEN
+    FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `r:real` STRIP_ASSUME_TAC) THEN
+    EXISTS_TAC `r:real` THEN ASM_REWRITE_TAC[];
+    ALL_TAC] THEN
+   (* By REAL_ARCH_INV, get n >= 1 with inv(&n) < r *)
+   MP_TAC(SPEC `r:real` REAL_ARCH_INV) THEN ASM_REWRITE_TAC[] THEN
+   DISCH_THEN(X_CHOOSE_THEN `N:num` STRIP_ASSUME_TAC) THEN
+   (* mball(x, inv(&N)) SUBSET mball(x, r) SUBSET u *)
+   SUBGOAL_THEN `mball m (x:A, inv(&N)) SUBSET u` ASSUME_TAC THENL
+   [MATCH_MP_TAC SUBSET_TRANS THEN EXISTS_TAC `mball m (x:A, r)` THEN
+    ASM_REWRITE_TAC[] THEN MATCH_MP_TAC MBALL_SUBSET_CONCENTRIC THEN
+    ASM_SIMP_TAC[REAL_LT_IMP_LE];
+    ALL_TAC] THEN
+   (* So x IN Sn N u since x IN mspace m and mball(x, inv(&N)) SUBSET u *)
+   SUBGOAL_THEN `x:A IN (Sn:num->(A->bool)->A->bool) N u` ASSUME_TAC THENL
+   [EXPAND_TAC "Sn" THEN REWRITE_TAC[IN_ELIM_THM] THEN ASM_REWRITE_TAC[];
+    ALL_TAC] THEN
+   (* Use WOSET_MINIMAL_CONTAINING: get u_min minimal in U with x IN some set *)
+   (* First need to show there exists w IN U with x in Sn N w *)
+   SUBGOAL_THEN `?w:A->bool. w IN U /\ x IN (Sn:num->(A->bool)->A->bool) N w`
+     STRIP_ASSUME_TAC THENL
+   [EXISTS_TAC `u:A->bool` THEN ASM_REWRITE_TAC[]; ALL_TAC] THEN
+   (* Apply WOSET_MINIMAL_CONTAINING to get u_min *)
+   MP_TAC(ISPECL [`ord:(A->bool)->(A->bool)->bool`; `U:(A->bool)->bool`; `x:A`]
+     WOSET_MINIMAL_CONTAINING) THEN
+   (* Need to adjust - WOSET_MINIMAL_CONTAINING needs x IN u, not x IN Sn N u *)
+   (* Actually, we need a different approach. The minimal element should be
+      the one that contains x in its Sn set. Let me simplify with CHEAT_TAC *)
    CHEAT_TAC;
    (* Property 3: V refines U - each v in V is subset of some u in U
       v = En n u0 for some u0 IN U, and En n u0 SUBSET u0 by construction:
