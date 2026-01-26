@@ -668,7 +668,13 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
          SUBGOAL_THEN `?z1:A. z1 IN (Tn:num->(A->bool)->A->bool) n u1 /\
                               y1 IN mball m (z1, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
          [(* y1 IN En n u1 = UNIONS{mball(x,r)|x IN Tn n u1}. By IN_UNIONS_MBALL,
-            this gives ?x. x IN Tn n u1 /\ y1 IN mball(x,r), so z1 = x works *)
+            this gives ?x. x IN Tn n u1 /\ y1 IN mball(x,r), so z1 = x works. *)
+          SUBGOAL_THEN `y1:A IN UNIONS {mball m (x:A, inv(&3 * &n)) | x IN (Tn:num->(A->bool)->A->bool) n u1}` MP_TAC THENL
+          [UNDISCH_TAC `y1:A IN (En:num->(A->bool)->A->bool) n u1` THEN
+           EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV);
+           ALL_TAC] THEN
+          (* Goal: y1 IN UNIONS{...} ==> ?z1. z1 IN Tn n u1 /\ y1 IN mball(z1,...)
+             Use IN_UNIONS_MBALL to rewrite and simplify *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Step 3: Extract z2 IN Tn n u2 with y2 IN mball(z2, inv(&3*&n)) *)
