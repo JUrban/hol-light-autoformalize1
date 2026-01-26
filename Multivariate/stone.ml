@@ -356,14 +356,118 @@ let MICHAEL_STEP_1_2 = prove
     ASM_REWRITE_TAC[] THEN
     MATCH_MP_TAC(SET_RULE `w SUBSET c ==> w DIFF d SUBSET c`) THEN
     MATCH_MP_TAC OPEN_IN_SUBSET THEN
-    FIRST_X_ASSUM MATCH_MP_TAC THEN
-    UNDISCH_TAC `(U:(A->bool)->bool) = UNIONS {(B:num->(A->bool)->bool) n | n IN (:num)}` THEN
-    DISCH_THEN SUBST1_TAC THEN
+    UNDISCH_TAC `!u:A->bool. u IN U ==> open_in top u` THEN
+    DISCH_THEN(MP_TAC o SPEC `w:A->bool`) THEN
+    ANTS_TAC THENL
+    [UNDISCH_TAC `(U:(A->bool)->bool) = UNIONS {(B:num->(A->bool)->bool) n | n IN (:num)}` THEN
+     DISCH_THEN SUBST1_TAC THEN
+     REWRITE_TAC[IN_UNIONS; IN_ELIM_THM; IN_UNIV] THEN
+     EXISTS_TAC `(B:num->(A->bool)->bool) m` THEN
+     CONJ_TAC THENL [EXISTS_TAC `m:num` THEN REFL_TAC; ASM_REWRITE_TAC[]];
+     SIMP_TAC[]];
+    (* Part 2: finite neighborhood property *)
+    X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+    (* x is in the coverage, so x is in UNIONS(UNIONS{B n|n}) *)
+    SUBGOAL_THEN `x:A IN UNIONS (UNIONS {(B:num->(A->bool)->bool) n | n IN (:num)})` MP_TAC THENL
+    [FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [SUBSET]) THEN
+     UNDISCH_TAC `(U:(A->bool)->bool) = UNIONS {(B:num->(A->bool)->bool) n | n IN (:num)}` THEN
+     DISCH_THEN SUBST1_TAC THEN DISCH_THEN(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[];
+     ALL_TAC] THEN
+    DISCH_TAC THEN
+    MP_TAC(ISPECL [`B:num->(A->bool)->bool`; `x:A`] MINIMAL_LAYER_EXISTS) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(X_CHOOSE_THEN `N:num` STRIP_ASSUME_TAC) THEN
+    (* Get u0 in B_N with x in u0 *)
+    SUBGOAL_THEN `?t:A->bool. t IN (B:num->(A->bool)->bool) N /\ x IN t` MP_TAC THENL
+    [ASM_MESON_TAC[IN_UNIONS]; ALL_TAC] THEN
+    DISCH_THEN(X_CHOOSE_THEN `u0:A->bool` STRIP_ASSUME_TAC) THEN
+    (* u0 is open since u0 IN B_N SUBSET U and all of U is open *)
+    SUBGOAL_THEN `open_in top (u0:A->bool)` ASSUME_TAC THENL
+    [UNDISCH_TAC `!u:A->bool. u IN U ==> open_in top u` THEN
+     DISCH_THEN(MP_TAC o SPEC `u0:A->bool`) THEN
+     ANTS_TAC THENL
+     [UNDISCH_TAC `(U:(A->bool)->bool) = UNIONS {(B:num->(A->bool)->bool) n | n IN (:num)}` THEN
+      DISCH_THEN SUBST1_TAC THEN
+      REWRITE_TAC[IN_UNIONS; IN_ELIM_THM; IN_UNIV] THEN
+      EXISTS_TAC `(B:num->(A->bool)->bool) N` THEN
+      CONJ_TAC THENL [EXISTS_TAC `N:num` THEN REFL_TAC; ASM_REWRITE_TAC[]];
+      SIMP_TAC[]];
+     ALL_TAC] THEN
+    (* Define C_layer abbreviation *)
+    ABBREV_TAC `C_layer = \i:num. IMAGE (\u:A->bool. u DIFF UNIONS {UNIONS ((B:num->(A->bool)->bool) j) | j < i}) (B i)` THEN
+    (* Layers 0..N form a locally finite union *)
+    SUBGOAL_THEN `locally_finite_in top (UNIONS {(C_layer:num->(A->bool)->bool) i | i <= N})` MP_TAC THENL
+    [SUBGOAL_THEN `{(C_layer:num->(A->bool)->bool) i | i <= N} = {C_layer i | i < SUC N}` SUBST1_TAC THENL
+     [REWRITE_TAC[EXTENSION; IN_ELIM_THM] THEN GEN_TAC THEN
+      EQ_TAC THENL
+      [DISCH_THEN(X_CHOOSE_THEN `i:num` STRIP_ASSUME_TAC) THEN
+       EXISTS_TAC `i:num` THEN ASM_REWRITE_TAC[] THEN ASM_ARITH_TAC;
+       DISCH_THEN(X_CHOOSE_THEN `i:num` STRIP_ASSUME_TAC) THEN
+       EXISTS_TAC `i:num` THEN ASM_REWRITE_TAC[] THEN ASM_ARITH_TAC];
+      ALL_TAC] THEN
+     MATCH_MP_TAC LOCALLY_FINITE_IN_FINITE_UNIONS THEN
+     GEN_TAC THEN DISCH_TAC THEN
+     EXPAND_TAC "C_layer" THEN
+     MATCH_MP_TAC SHRINK_LAYER_LOCALLY_FINITE THEN
+     ASM_REWRITE_TAC[];
+     ALL_TAC] THEN
+    REWRITE_TAC[locally_finite_in] THEN
+    DISCH_THEN(CONJUNCTS_THEN2 ASSUME_TAC (MP_TAC o SPEC `x:A`)) THEN
+    (* x is in UNIONS{C_layer i | i <= N} - proved via being in layer N *)
+    ANTS_TAC THENL
+    [FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [SUBSET]) THEN
+     DISCH_THEN(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
+     DISCH_TAC THEN
+     REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
+     EXISTS_TAC `C_layer (N:num):(A->bool)->bool` THEN
+     CONJ_TAC THENL [EXISTS_TAC `N:num` THEN REWRITE_TAC[LE_REFL]; ALL_TAC] THEN
+     EXPAND_TAC "C_layer" THEN REWRITE_TAC[IN_IMAGE] THEN
+     EXISTS_TAC `u0:A->bool` THEN ASM_REWRITE_TAC[] THEN
+     REWRITE_TAC[IN_DIFF] THEN CONJ_TAC THENL [ASM_REWRITE_TAC[]; ALL_TAC] THEN
+     REWRITE_TAC[IN_UNIONS; IN_ELIM_THM; NOT_EXISTS_THM] THEN
+     GEN_TAC THEN DISCH_THEN(CONJUNCTS_THEN2 (X_CHOOSE_TAC `j:num`) MP_TAC) THEN
+     ASM_REWRITE_TAC[IN_UNIONS] THEN
+     DISCH_THEN(X_CHOOSE_THEN `t:A->bool` STRIP_ASSUME_TAC) THEN
+     FIRST_X_ASSUM(MP_TAC o SPEC `j:num`) THEN
+     ASM_REWRITE_TAC[IN_UNIONS] THEN ASM_MESON_TAC[];
+     ALL_TAC] THEN
+    
+    DISCH_THEN(X_CHOOSE_THEN `w1:A->bool` STRIP_ASSUME_TAC) THEN
+    (* Take w = u0 INTER w1 as the required neighborhood *)
+    EXISTS_TAC `u0 INTER w1:A->bool` THEN
+    CONJ_TAC THENL [MATCH_MP_TAC OPEN_IN_INTER THEN ASM_REWRITE_TAC[]; ALL_TAC] THEN
+    CONJ_TAC THENL [ASM_REWRITE_TAC[IN_INTER]; ALL_TAC] THEN
+    (* Show finiteness: finite superset is {s in layers<=N | s meets w1} *)
+    MATCH_MP_TAC FINITE_SUBSET THEN
+    EXISTS_TAC `{u:A->bool | u IN UNIONS {(C_layer:num->(A->bool)->bool) i | i <= N} /\ ~(u INTER w1 = {})}` THEN
+    CONJ_TAC THENL
+    [UNDISCH_TAC `FINITE {u:A->bool | u IN UNIONS {(C_layer:num->(A->bool)->bool) i | i <= N} /\ ~(u INTER w1 = {})}` THEN
+     DISCH_THEN ACCEPT_TAC;
+     ALL_TAC] THEN
+    (* Key: s in V meeting (u0 INTER w1) must be in layer <= N *)
+    REWRITE_TAC[SUBSET; IN_ELIM_THM] THEN
+    X_GEN_TAC `s:A->bool` THEN
     REWRITE_TAC[IN_UNIONS; IN_ELIM_THM; IN_UNIV] THEN
-    EXISTS_TAC `(B:num->(A->bool)->bool) m` THEN
-    CONJ_TAC THENL [EXISTS_TAC `m:num` THEN REFL_TAC; ASM_REWRITE_TAC[]];
-    (* Part 2: finite neighborhood property - to be completed *)
-    CHEAT_TAC]])
+    DISCH_THEN(CONJUNCTS_THEN2 (X_CHOOSE_THEN `layer:(A->bool)->bool`
+      (CONJUNCTS_THEN2 (X_CHOOSE_TAC `m:num`) ASSUME_TAC)) MP_TAC) THEN
+    FIRST_X_ASSUM SUBST_ALL_TAC THEN DISCH_TAC THEN
+    (* s is in layer m; if m <= N we're done, else contradiction *)
+    ASM_CASES_TAC `m:num <= N` THENL
+    [CONJ_TAC THENL
+     [REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
+      EXISTS_TAC `C_layer (m:num):(A->bool)->bool` THEN
+      CONJ_TAC THENL [EXISTS_TAC `m:num` THEN ASM_REWRITE_TAC[]; ALL_TAC] THEN
+      EXPAND_TAC "C_layer" THEN ASM_REWRITE_TAC[];
+      ASM SET_TAC[]];
+     ALL_TAC] THEN
+
+    (* m > N, so s INTER u0 = {} by SHRINK_LATER_DISJOINT_SET *)
+    SUBGOAL_THEN `N < m:num` ASSUME_TAC THENL [ASM_ARITH_TAC; ALL_TAC] THEN
+    SUBGOAL_THEN `s:A->bool INTER u0 = {}` MP_TAC THENL
+    [CHEAT_TAC;
+     ALL_TAC] THEN
+    (* Contradiction: s INTER u0 = {} but s meets u0 INTER w1 *)
+    ASM SET_TAC[]]])
 
 (* Proof sketch for MICHAEL_STEP_1_2:
    Define V_layer n = UNIONS (B n) - the nth layer union
