@@ -344,8 +344,26 @@ let MICHAEL_STEP_1_2 = prove
     EXISTS_TAC `(B:num->(A->bool)->bool) n` THEN
     ASM_REWRITE_TAC[] THEN EXISTS_TAC `n:num` THEN REWRITE_TAC[];
     ASM_REWRITE_TAC[] THEN SET_TAC[]];
-   (* Local finiteness *)
-   CHEAT_TAC])
+   (* Local finiteness - Part 1 proved, Part 2 needs work *)
+   REWRITE_TAC[locally_finite_in] THEN CONJ_TAC THENL
+   [(* Part 1: UNIONS V SUBSET topspace - shrunk sets SUBSET open sets *)
+    REWRITE_TAC[UNIONS_SUBSET; FORALL_IN_UNIONS; FORALL_IN_GSPEC; IN_UNIV;
+                FORALL_IN_IMAGE] THEN
+    REPEAT GEN_TAC THEN REWRITE_TAC[IN_ELIM_THM] THEN
+    DISCH_THEN(CONJUNCTS_THEN2 (X_CHOOSE_TAC `m:num`) MP_TAC) THEN
+    ASM_REWRITE_TAC[IN_IMAGE] THEN
+    DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
+    ASM_REWRITE_TAC[] THEN
+    MATCH_MP_TAC(SET_RULE `w SUBSET c ==> w DIFF d SUBSET c`) THEN
+    MATCH_MP_TAC OPEN_IN_SUBSET THEN
+    FIRST_X_ASSUM MATCH_MP_TAC THEN
+    UNDISCH_TAC `(U:(A->bool)->bool) = UNIONS {(B:num->(A->bool)->bool) n | n IN (:num)}` THEN
+    DISCH_THEN SUBST1_TAC THEN
+    REWRITE_TAC[IN_UNIONS; IN_ELIM_THM; IN_UNIV] THEN
+    EXISTS_TAC `(B:num->(A->bool)->bool) m` THEN
+    CONJ_TAC THENL [EXISTS_TAC `m:num` THEN REFL_TAC; ASM_REWRITE_TAC[]];
+    (* Part 2: finite neighborhood property - to be completed *)
+    CHEAT_TAC]])
 
 (* Proof sketch for MICHAEL_STEP_1_2:
    Define V_layer n = UNIONS (B n) - the nth layer union
