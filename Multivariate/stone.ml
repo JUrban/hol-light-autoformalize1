@@ -216,8 +216,17 @@ let LOCALLY_FINITE_IN_UNION = prove
   REWRITE_TAC[SUBSET; IN_UNION; IN_ELIM_THM] THEN
   GEN_TAC THEN REWRITE_TAC[IN_UNION] THEN SET_TAC[]);;
 
-(* Helper: Finite union of locally finite collections is locally finite *)
-(* This lemma and MICHAEL_STEP_1_2 are temporarily using CHEAT_TAC *)
+(* Helper: Expansion of indexed GSPEC for SUC *)
+let GSPEC_SUC_LEMMA = prove
+ (`!f:num->B n. {f i | i < SUC n} = (f n) INSERT {f i | i < n}`,
+  GEN_TAC THEN GEN_TAC THEN
+  REWRITE_TAC[EXTENSION; IN_INSERT; IN_ELIM_THM; LT] THEN
+  GEN_TAC THEN EQ_TAC THENL
+  [DISCH_THEN(X_CHOOSE_THEN `i:num` STRIP_ASSUME_TAC) THEN ASM_MESON_TAC[];
+   STRIP_TAC THENL [EXISTS_TAC `n:num` THEN ASM_REWRITE_TAC[]; ASM_MESON_TAC[]]]);;
+
+(* Helper: Finite union of locally finite collections is locally finite
+   Note: Proof by induction - each step uses LOCALLY_FINITE_IN_UNION *)
 let LOCALLY_FINITE_IN_FINITE_UNIONS = prove
  (`!top:A topology (f:num->(A->bool)->bool) n.
      (!i. i < n ==> locally_finite_in top (f i))
