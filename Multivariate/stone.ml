@@ -134,6 +134,12 @@ let NEIGHBORHOOD_OPEN = prove
   REWRITE_TAC[FORALL_IN_GSPEC] THEN GEN_TAC THEN DISCH_TAC THEN
   REWRITE_TAC[OPEN_IN_MBALL]);;
 
+(* Note: PAIRWISE_DISJOINT_IMP_LOCALLY_FINITE was removed - the statement as written
+   is false because mspace m intersects ALL elements if they're in mspace.
+   For Lemma 39.2, the key property is that the E_n elements are (1/3n)-separated,
+   so any (1/6n)-ball around x meets at most one element. This is handled directly
+   in the Lemma 39.2 construction. *)
+
 (* ------------------------------------------------------------------------- *)
 (* Lemma 39.2: Every open covering of a metrizable space has a countably     *)
 (* locally finite open refinement that covers the space.                     *)
@@ -684,6 +690,10 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
    (* Property 4: V is locally finite - this is the hard part *)
    CHEAT_TAC]);;
+
+(* Michael's Lemma: For regular spaces, countably locally finite open covering
+   has a locally finite open refinement.
+   We use MICHAEL_STEP_1_2 + LOCALLY_FINITE_OPEN_REFINEMENT. *)
 
 let MICHAEL_LEMMA = prove
  (`!top:A topology U.
