@@ -1,5 +1,8 @@
 (* work.ml - Using declarative mizar/miz3 proof style *)
 
+(* Load the well-ordering theorem for Lemma 39.2 *)
+needs "Library/wo.ml";;
+
 (* ========================================================================= *)
 (* THEOREM 41.4: Every metrizable space is paracompact                       *)
 (* ========================================================================= *)
@@ -145,13 +148,88 @@ let NEIGHBORHOOD_OPEN = prove
 (* locally finite open refinement that covers the space.                     *)
 (* ------------------------------------------------------------------------- *)
 
-(* For the full proof, we need:
-   1. Well-order the covering U
-   2. For each n, define S_n(u) = {x | mball(x, 1/n) SUBSET u}
-   3. Define T_n(u) = S_n(u) - UNIONS{v | v < u in well-order}
-   4. Define E_n(u) = 1/(3n)-neighborhood of T_n(u)
-   5. E_n = {E_n(u) | u IN U} is locally finite (elements pairwise disjoint)
-   6. E = UNIONS{E_n | n > 0} covers topspace and is countably locally finite *)
+(* Helper: if d(x,y) >= 2r then mball(x,r) and mball(y,r) are disjoint *)
+let SEPARATED_DISJOINT_BALLS = prove
+ (`!m:A metric x y r.
+    x IN mspace m /\ y IN mspace m /\ &0 < r /\ r + r <= mdist m (x,y)
+    ==> mball m (x,r) INTER mball m (y,r) = {}`,
+  REPEAT GEN_TAC THEN STRIP_TAC THEN
+  REWRITE_TAC[EXTENSION; IN_INTER; NOT_IN_EMPTY; IN_MBALL] THEN
+  X_GEN_TAC `z:A` THEN
+  ASM_CASES_TAC `z:A IN mspace m` THEN ASM_REWRITE_TAC[] THEN
+  ASM_CASES_TAC `mdist m (x:A,z) < r` THEN ASM_REWRITE_TAC[] THEN
+  ASM_CASES_TAC `mdist m (y:A,z) < r` THEN ASM_REWRITE_TAC[] THEN
+  MP_TAC(ISPECL [`m:A metric`; `x:A`; `z:A`; `y:A`] MDIST_TRIANGLE) THEN
+  ASM_REWRITE_TAC[] THEN
+  SUBGOAL_THEN `mdist m (z:A, y) = mdist m (y, z)` SUBST1_TAC THENL
+  [MATCH_MP_TAC MDIST_SYM THEN ASM_REWRITE_TAC[]; ALL_TAC] THEN
+  ASM_REAL_ARITH_TAC);;
+
+(* Helper: if T_n elements are 3r apart, then r-neighborhoods are r-apart *)
+let EN_SEPARATION = prove
+ (`!m:A metric r x y.
+    x IN mspace m /\ y IN mspace m /\
+    &0 < r /\
+    &3 * r <= mdist m (x, y)
+    ==> !x' y'. x' IN mball m (x, r) /\ y' IN mball m (y, r)
+                ==> r <= mdist m (x', y')`,
+  REPEAT GEN_TAC THEN STRIP_TAC THEN
+  MAP_EVERY X_GEN_TAC [`x':A`; `y':A`] THEN
+  REWRITE_TAC[IN_MBALL] THEN STRIP_TAC THEN
+  (* We'll show: d(x,y) <= d(x,x') + d(x',y') + d(y',y) *)
+  (* Since d(x,y) >= 3r and d(x,x'), d(y,y') < r, we get d(x',y') >= r *)
+  MATCH_MP_TAC REAL_LE_TRANS THEN
+  EXISTS_TAC `mdist m (x:A,y) - mdist m (x,x') - mdist m (y,y')` THEN
+  CONJ_TAC THENL
+  [ASM_REAL_ARITH_TAC;
+   (* d(x',y') >= d(x,y) - d(x,x') - d(y',y) by triangle inequality *)
+   MP_TAC(ISPECL [`m:A metric`; `x:A`; `x':A`; `y:A`] MDIST_TRIANGLE) THEN
+   MP_TAC(ISPECL [`m:A metric`; `x':A`; `y':A`; `y:A`] MDIST_TRIANGLE) THEN
+   ASM_REWRITE_TAC[] THEN
+   SUBGOAL_THEN `mdist m (y':A,y) = mdist m (y,y')` SUBST1_TAC THENL
+   [MATCH_MP_TAC MDIST_SYM THEN ASM_REWRITE_TAC[]; REAL_ARITH_TAC]]);;
+
+(* Helper: 1/(3n) <= 1/n when n >= 1 *)
+let INV_3N_LE_INV_N = prove
+ (`!n. ~(n = 0) ==> inv(&3 * &n) <= inv(&n)`,
+  GEN_TAC THEN DISCH_TAC THEN
+  MATCH_MP_TAC REAL_LE_INV2 THEN
+  CONJ_TAC THENL
+  [ASM_SIMP_TAC[REAL_OF_NUM_LT; LE_1]; ALL_TAC] THEN
+  REWRITE_TAC[REAL_ARITH `&n <= &3 * &n <=> &0 <= &2 * &n`] THEN
+  MATCH_MP_TAC REAL_LE_MUL THEN REWRITE_TAC[REAL_POS]);;
+
+(* Helper: any (1/6n)-ball meets at most one element of E_n when elements are (1/3n)-separated *)
+let SMALL_BALL_MEETS_ONE = prove
+ (`!m:A metric x r E_set.
+    x IN mspace m /\ &0 < r /\
+    (!e1 e2. e1 IN E_set /\ e2 IN E_set /\ ~(e1 = e2)
+             ==> !y1 y2. y1 IN e1 /\ y2 IN e2 ==> r <= mdist m (y1, y2))
+    ==> ?v. !e. e IN E_set /\ ~(mball m (x, r / &2) INTER e = {})
+                ==> e = v`,
+  REPEAT STRIP_TAC THEN
+  ASM_CASES_TAC `?e:A->bool. e IN E_set /\ ~(mball m (x:A, r / &2) INTER e = {})` THENL
+  [FIRST_X_ASSUM(X_CHOOSE_THEN `v:A->bool` STRIP_ASSUME_TAC) THEN
+   EXISTS_TAC `v:A->bool` THEN
+   X_GEN_TAC `e:A->bool` THEN STRIP_TAC THEN
+   ASM_CASES_TAC `e:A->bool = v` THEN ASM_REWRITE_TAC[] THEN
+   (* If e != v, get y1 in ball INTER v and y2 in ball INTER e *)
+   SUBGOAL_THEN `?y1:A. y1 IN mball m (x, r / &2) /\ y1 IN v` STRIP_ASSUME_TAC THENL
+   [ASM SET_TAC[]; ALL_TAC] THEN
+   SUBGOAL_THEN `?y2:A. y2 IN mball m (x, r / &2) /\ y2 IN e` STRIP_ASSUME_TAC THENL
+   [ASM SET_TAC[]; ALL_TAC] THEN
+   (* y1 and y2 are both in B(x, r/2), so d(y1,y2) < r, contradicting separation *)
+   FIRST_X_ASSUM(MP_TAC o SPECL [`v:A->bool`; `e:A->bool`]) THEN
+   ASM_REWRITE_TAC[] THEN DISCH_THEN(MP_TAC o SPECL [`y1:A`; `y2:A`]) THEN
+   ASM_REWRITE_TAC[] THEN REWRITE_TAC[REAL_NOT_LE] THEN
+   UNDISCH_TAC `y1:A IN mball m (x, r / &2)` THEN REWRITE_TAC[IN_MBALL] THEN
+   UNDISCH_TAC `y2:A IN mball m (x, r / &2)` THEN REWRITE_TAC[IN_MBALL] THEN
+   REPEAT STRIP_TAC THEN
+   MP_TAC(ISPECL [`m:A metric`; `y1:A`; `x:A`; `y2:A`] MDIST_TRIANGLE) THEN
+   ASM_SIMP_TAC[MDIST_SYM] THEN ASM_REAL_ARITH_TAC;
+   EXISTS_TAC `{}:A->bool` THEN ASM_MESON_TAC[]]);;
+
+(* Lemma 39.2: Main theorem *)
 let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
  (`!top:A topology U.
     metrizable_space top /\
@@ -161,8 +239,53 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
             topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
             countably_locally_finite_in top V`,
-  (* TODO: Implement the full Lemma 39.2 construction *)
-  CHEAT_TAC);;
+  REPEAT STRIP_TAC THEN
+  (* Get metric m such that top = mtopology m *)
+  FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [metrizable_space]) THEN
+  DISCH_THEN(X_CHOOSE_THEN `m:A metric` (ASSUME_TAC o SYM)) THEN
+  (* Well-order U using WO *)
+  MP_TAC(ISPEC `U:(A->bool)->bool` WO) THEN
+  DISCH_THEN(X_CHOOSE_THEN `ord:(A->bool)->(A->bool)->bool` STRIP_ASSUME_TAC) THEN
+  (* Define the key sets:
+     S_n(u) = {x in mspace | mball(x, 1/n) SUBSET u}
+     T_n(u) = S_n(u) - UNIONS{v | ord v u /\ ~(v = u)}
+     E_n(u) = UNIONS{mball(x, 1/(3n)) | x IN T_n(u)}
+     E_n = {E_n(u) | u IN U, ~(E_n(u) = {})}
+     V = UNIONS{E_n | n >= 1}
+  *)
+  ABBREV_TAC `Sn = \n (u:A->bool).
+    {x | x IN mspace m /\ mball m (x, inv(&n)) SUBSET u}` THEN
+  ABBREV_TAC `Tn = \n (u:A->bool).
+    Sn n u DIFF UNIONS {v:A->bool | (ord:(A->bool)->(A->bool)->bool) v u /\ ~(v = u)}` THEN
+  ABBREV_TAC `En = \n (u:A->bool).
+    UNIONS {mball m (x:A, inv(&3 * &n)) | x IN Tn n u}` THEN
+  ABBREV_TAC `E_layer = \n:num. {(En:num->(A->bool)->A->bool) n u | u IN U}` THEN
+  (* V = UNIONS{E_layer n | n >= 1} but removing empty sets *)
+  EXISTS_TAC `UNIONS {E_layer n | n >= 1} DIFF {{}}:(A->bool)->bool` THEN
+  (* The proof splits into four parts - all with CHEAT_TAC for now *)
+  REPEAT CONJ_TAC THENL
+  [(* Property 1: V is open
+      Each E_n(u) = UNIONS{mball(x, 1/3n) | x IN Tn n u} is a union of open balls,
+      hence open in mtopology m = top. *)
+   CHEAT_TAC;
+   (* Property 2: V covers topspace
+      For any x in topspace, x is in some open u in U. Since u is open,
+      there exists n with mball(x, 1/n) SUBSET u. So x IN S_n(u).
+      Taking the minimum u (in well-ordering) with x IN S_n(u), we get x IN T_n(u).
+      Then x IN E_n(u) (x is in its own 1/3n-neighborhood). *)
+   CHEAT_TAC;
+   (* Property 3: V refines U
+      Each E_n(u) SUBSET u because:
+      - x IN T_n(u) ==> x IN S_n(u) ==> mball(x, 1/n) SUBSET u
+      - mball(x, 1/3n) SUBSET mball(x, 1/n) SUBSET u *)
+   CHEAT_TAC;
+   (* Property 4: V is countably locally finite
+      E_layer n = {E_n(u) | u IN U} is locally finite because:
+      - T_n elements are at least 1/n apart (by construction using well-ordering)
+      - E_n elements are at least 1/3n apart (triangle inequality)
+      - So any 1/6n-ball meets at most one E_n(u)
+      Hence V = UNIONS{E_layer n | n >= 1} is countably locally finite. *)
+   CHEAT_TAC]);;
 
 (* ------------------------------------------------------------------------- *)
 (* Lemma 41.3 (Michael's Lemma): For a regular space, countably locally      *)
