@@ -498,10 +498,58 @@ let MICHAEL_STEP_1_2 = prove
    equivalences between properties of the space, not direct constructions.
    For METRIZABLE_IMP_PARACOMPACT, we use a more direct approach combining steps. *)
 
+(* The closures of a locally finite family form a locally finite family of closed sets *)
+(* This is already proved in metric.ml as LOCALLY_FINITE_IN_CLOSURES *)
+
+(* Key helper: in a regular space, for a locally finite family C refining open U,
+   we can expand each c to an open set while maintaining local finiteness and refinement.
+
+   The construction (following textbook proof of (3)=>(4)):
+   1. Let D = {closure_of c | c IN C} - locally finite closed family
+   2. For each c in C, define:
+      - D'(c) = {d IN D : d SUBSET topspace DIFF c} (closures disjoint from c)
+      - E(c) = topspace DIFF UNIONS D'(c)  (open, since D' is locally finite closed)
+      - V(c) = E(c) INTER u_c where c SUBSET u_c IN U
+   3. V = {V(c) | c IN C}
+
+   Properties:
+   - c SUBSET E(c) (any closure disjoint from c doesn't touch c)
+   - V(c) is open (intersection of two open sets)
+   - V(c) SUBSET u_c (trivial)
+   - V covers topspace (since c SUBSET V(c) and C covers)
+   - V is locally finite (key argument using local finiteness of D)
+*)
+
+(* Helper: each point is in only finitely many closures of a locally finite family *)
+let FINITE_CLOSURES_AT_POINT = prove
+ (`!top:A topology C x.
+     locally_finite_in top C /\ x IN topspace top
+     ==> FINITE {c | c IN C /\ x IN top closure_of c}`,
+  REPEAT GEN_TAC THEN REWRITE_TAC[locally_finite_in] THEN STRIP_TAC THEN
+  FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
+  MATCH_MP_TAC FINITE_SUBSET THEN
+  EXISTS_TAC `{c:A->bool | c IN C /\ ~(c INTER w = {})}` THEN
+  ASM_REWRITE_TAC[] THEN
+  REWRITE_TAC[SUBSET; IN_ELIM_THM] THEN
+  X_GEN_TAC `c:A->bool` THEN STRIP_TAC THEN ASM_REWRITE_TAC[] THEN
+  (* If x IN closure_of c and w is open neighborhood of x, then c INTER w != {} *)
+  (* By OPEN_IN_INTER_CLOSURE_OF_EQ_EMPTY: w INTER closure c = {} <=> w INTER c = {} *)
+  (* Since x IN w INTER closure c, we have ~(w INTER closure c = {}), hence ~(w INTER c = {}) *)
+  MP_TAC(ISPECL [`top:A topology`; `w:A->bool`; `c:A->bool`]
+    OPEN_IN_INTER_CLOSURE_OF_EQ_EMPTY) THEN
+  ASM_REWRITE_TAC[] THEN DISCH_TAC THEN
+  (* Goal: ~(c INTER w = {}) which equals ~(w INTER c = {}) *)
+  ONCE_REWRITE_TAC[INTER_COMM] THEN
+  FIRST_ASSUM(MP_TAC o MATCH_MP (TAUT `(a <=> b) ==> ~a ==> ~b`)) THEN
+  DISCH_THEN MATCH_MP_TAC THEN
+  REWRITE_TAC[GSYM MEMBER_NOT_EMPTY; IN_INTER] THEN
+  EXISTS_TAC `x:A` THEN ASM_REWRITE_TAC[]);;
+
 (* Helper for going from locally finite to locally finite open in a regular space.
    This combines steps (2)=>(3)=>(4) from the textbook proof. *)
-let LOCALLY_FINITE_OPEN_REFINEMENT = thm `;
-  !top:A topology U C.
+let LOCALLY_FINITE_OPEN_REFINEMENT = prove
+ (`!top:A topology U C.
     regular_space top /\
     (!u. u IN U ==> open_in top u) /\
     topspace top SUBSET UNIONS C /\
@@ -510,8 +558,41 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = thm `;
     ==> ?V. (!v. v IN V ==> open_in top v) /\
             topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
-            locally_finite_in top V
-  by CHEAT_TAC`;;
+            locally_finite_in top V`,
+  REPEAT STRIP_TAC THEN
+  (* Define the closures D = {closure_of c | c IN C} *)
+  ABBREV_TAC `D = {top closure_of c:A->bool | c IN C}` THEN
+  SUBGOAL_THEN `locally_finite_in top (D:(A->bool)->bool)` ASSUME_TAC THENL
+  [EXPAND_TAC "D" THEN MATCH_MP_TAC LOCALLY_FINITE_IN_CLOSURES THEN
+   ASM_REWRITE_TAC[];
+   ALL_TAC] THEN
+  SUBGOAL_THEN `!d:A->bool. d IN D ==> closed_in top d` ASSUME_TAC THENL
+  [EXPAND_TAC "D" THEN REWRITE_TAC[FORALL_IN_GSPEC] THEN
+   GEN_TAC THEN DISCH_TAC THEN REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
+   ALL_TAC] THEN
+  (* D covers topspace since C does and c SUBSET closure_of c *)
+  SUBGOAL_THEN `topspace top SUBSET UNIONS (D:(A->bool)->bool)` ASSUME_TAC THENL
+  [REWRITE_TAC[SUBSET] THEN X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+   UNDISCH_TAC `topspace top SUBSET UNIONS (C:(A->bool)->bool)` THEN
+   REWRITE_TAC[SUBSET] THEN DISCH_THEN(MP_TAC o SPEC `x:A`) THEN
+   ASM_REWRITE_TAC[IN_UNIONS] THEN
+   DISCH_THEN(X_CHOOSE_THEN `c:A->bool` STRIP_ASSUME_TAC) THEN
+   REWRITE_TAC[IN_UNIONS] THEN EXPAND_TAC "D" THEN
+   REWRITE_TAC[IN_ELIM_THM] THEN
+   EXISTS_TAC `top closure_of c:A->bool` THEN
+   CONJ_TAC THENL [EXISTS_TAC `c:A->bool` THEN ASM_REWRITE_TAC[]; ALL_TAC] THEN
+   (* x IN c and c SUBSET closure_of c (when c SUBSET topspace) *)
+   MP_TAC(ISPECL [`top:A topology`; `c:A->bool`] CLOSURE_OF_SUBSET) THEN
+   UNDISCH_TAC `locally_finite_in top (C:(A->bool)->bool)` THEN
+   REWRITE_TAC[locally_finite_in] THEN STRIP_TAC THEN
+   SUBGOAL_THEN `c:A->bool SUBSET topspace top` MP_TAC THENL
+   [ASM SET_TAC[]; DISCH_TAC THEN ASM_REWRITE_TAC[] THEN ASM SET_TAC[]];
+   ALL_TAC] THEN
+  (* For each c in C, choose u_c in U with c SUBSET u_c *)
+  (* For each c, define E(c) = topspace DIFF UNIONS{d IN D : d SUBSET topspace DIFF c} *)
+  (* Define V(c) = E(c) INTER u_c *)
+  (* The rest of the proof requires careful construction *)
+  CHEAT_TAC);;
 
 let MICHAEL_LEMMA = thm `;
   !top:A topology U.
