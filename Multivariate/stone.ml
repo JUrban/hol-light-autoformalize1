@@ -194,6 +194,37 @@ let MINIMAL_LAYER_EXISTS = prove
    - Each layer C_n refines B_n, so is locally finite by LOCALLY_FINITE_IN_REFINEMENT
    - For x in some u in B_N, elements of C_m (m > N) don't intersect u
    - So we only need to consider finitely many layers around x *)
+(* Helper: Union of two locally finite collections is locally finite *)
+let LOCALLY_FINITE_IN_UNION = prove
+ (`!top:A topology u v.
+     locally_finite_in top u /\ locally_finite_in top v
+     ==> locally_finite_in top (u UNION v)`,
+  REPEAT GEN_TAC THEN REWRITE_TAC[locally_finite_in] THEN STRIP_TAC THEN
+  CONJ_TAC THENL [ASM SET_TAC[]; ALL_TAC] THEN
+  X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+  FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN
+  FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_THEN `w1:A->bool` STRIP_ASSUME_TAC) THEN
+  DISCH_THEN(X_CHOOSE_THEN `w2:A->bool` STRIP_ASSUME_TAC) THEN
+  EXISTS_TAC `w1 INTER w2:A->bool` THEN
+  ASM_SIMP_TAC[OPEN_IN_INTER; IN_INTER] THEN
+  MATCH_MP_TAC FINITE_SUBSET THEN
+  EXISTS_TAC `{s:A->bool | s IN u /\ ~(s INTER w1 = {})} UNION
+              {s | s IN v /\ ~(s INTER w2 = {})}` THEN
+  ASM_SIMP_TAC[FINITE_UNION] THEN
+  REWRITE_TAC[SUBSET; IN_UNION; IN_ELIM_THM] THEN
+  GEN_TAC THEN REWRITE_TAC[IN_UNION] THEN SET_TAC[]);;
+
+(* Helper: Finite union of locally finite collections is locally finite *)
+(* This lemma and MICHAEL_STEP_1_2 are temporarily using CHEAT_TAC *)
+let LOCALLY_FINITE_IN_FINITE_UNIONS = prove
+ (`!top:A topology (f:num->(A->bool)->bool) n.
+     (!i. i < n ==> locally_finite_in top (f i))
+     ==> locally_finite_in top (UNIONS {f i | i < n})`,
+  CHEAT_TAC);;
+
+(* Full MICHAEL_STEP_1_2 - temporarily simplified *)
 let MICHAEL_STEP_1_2 = prove
  (`!top:A topology U.
     (!u. u IN U ==> open_in top u) /\
@@ -203,6 +234,7 @@ let MICHAEL_STEP_1_2 = prove
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
             locally_finite_in top V`,
   CHEAT_TAC);;
+   (* This requires more careful work - temporarily using CHEAT_TAC *)
 
 (* Proof sketch for MICHAEL_STEP_1_2:
    Define V_layer n = UNIONS (B n) - the nth layer union
