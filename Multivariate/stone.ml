@@ -667,14 +667,16 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
          (* GSPEC issue: IN_ELIM_THM quantifies over all free vars including n *)
          SUBGOAL_THEN `?z1:A. z1 IN (Tn:num->(A->bool)->A->bool) n u1 /\
                               y1 IN mball m (z1, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* GSPEC issue: IN_ELIM_THM quantifies n variable *)
-          (* TODO: fix GSPEC variable capture - use custom lemma *)
+         [(* y1 IN En n u1 ==> ?z1. z1 IN Tn n u1 /\ y1 IN mball(z1, 1/3n) *)
+          (* GSPEC syntax issue: {f x | x IN s} vs {f x | x | x IN s} *)
+          (* Needs custom lemma to handle GSPEC equivalence - TODO *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Step 3: Extract z2 IN Tn n u2 with y2 IN mball(z2, inv(&3*&n)) *)
          SUBGOAL_THEN `?z2:A. z2 IN (Tn:num->(A->bool)->A->bool) n u2 /\
                               y2 IN mball m (z2, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* Same as z1 extraction *)
+         [(* y2 IN En n u2 ==> ?z2. z2 IN Tn n u2 /\ y2 IN mball(z2, 1/3n) *)
+          (* Same GSPEC syntax issue as z1 *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Now have z1, z2. Use woset trichotomy and SHRINK_SEPARATION *)
@@ -684,8 +686,8 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
          DISCH_THEN(MP_TAC o SPECL [`u1:A->bool`; `u2:A->bool`]) THEN
          ANTS_TAC THENL
          [(* Need: fld ord u1 /\ fld ord u2. Since fld ord = U, this is u1 IN U /\ u2 IN U *)
-          (* The fld ord = U assumption exists but UNDISCH_TAC matching fails *)
-          (* TODO: Debug why UNDISCH_TAC fails to match fld ord = U *)
+          (* Goal is U u1 /\ U u2; need to use: (s x) <=> x IN s *)
+          (* TODO: Figure out the right rewrite to convert U u1 to u1 IN U *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Now have: u1 = u2 \/ properly ord u1 u2 \/ properly ord u2 u1 *)
