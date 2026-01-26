@@ -671,13 +671,17 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
                                  <=> ?x. x IN s /\ y IN mball m (x,r) *)
          SUBGOAL_THEN `?z1:A. z1 IN (Tn:num->(A->bool)->A->bool) n u1 /\
                               y1 IN mball m (z1, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* GSPEC issue: IN_ELIM_THM quantifies n, creating fresh n' != outer n *)
+         [(* y1 IN UNIONS{mball(x,r)|x IN Tn n u1} ==> ?z1. z1 IN Tn n u1 /\ y1 IN mball *)
+          (* GSPEC variable capture issue: IN_ELIM_THM quantifies over n, creating
+             ?x n'. x IN Tn n' u1 /\ ... instead of using the outer fixed n.
+             Standard rewrites (SIMPLE_IMAGE, UNIONS_IMAGE, IN_UNIONS_MBALL) don't match.
+             Needs a custom lemma or different proof approach. *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Step 3: Extract z2 IN Tn n u2 with y2 IN mball(z2, inv(&3*&n)) *)
          SUBGOAL_THEN `?z2:A. z2 IN (Tn:num->(A->bool)->A->bool) n u2 /\
                               y2 IN mball m (z2, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* Same GSPEC issue as z1 *)
+         [(* Same GSPEC variable capture issue *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Now have z1, z2. Use woset trichotomy and SHRINK_SEPARATION *)
