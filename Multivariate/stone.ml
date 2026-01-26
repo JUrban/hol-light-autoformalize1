@@ -116,6 +116,41 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = thm `;
 (* This is the key step (1) => (4) from Michael's lemma.                     *)
 (* ------------------------------------------------------------------------- *)
 
+(* Step (1) => (2) of Michael's Lemma: countably locally finite => locally finite *)
+let MICHAEL_STEP_1_2 = thm `;
+  !top:A topology U.
+    (!u. u IN U ==> open_in top u) /\
+    topspace top SUBSET UNIONS U /\
+    countably_locally_finite_in top U
+    ==> ?V. topspace top SUBSET UNIONS V /\
+            (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
+            locally_finite_in top V
+  by CHEAT_TAC`;;
+
+(* Step (2) => (3) of Michael's Lemma: locally finite => closed locally finite *)
+let MICHAEL_STEP_2_3 = thm `;
+  !top:A topology U.
+    regular_space top /\
+    (!u. u IN U ==> open_in top u) /\
+    topspace top SUBSET UNIONS U
+    ==> ?V. topspace top SUBSET UNIONS V /\
+            (!v. v IN V ==> closed_in top v) /\
+            (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
+            locally_finite_in top V
+  by CHEAT_TAC`;;
+
+(* Step (3) => (4) of Michael's Lemma: locally finite => open locally finite *)
+let MICHAEL_STEP_3_4 = thm `;
+  !top:A topology U.
+    regular_space top /\
+    (!u. u IN U ==> open_in top u) /\
+    topspace top SUBSET UNIONS U
+    ==> ?V. (!v. v IN V ==> open_in top v) /\
+            topspace top SUBSET UNIONS V /\
+            (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
+            locally_finite_in top V
+  by CHEAT_TAC`;;
+
 let MICHAEL_LEMMA = thm `;
   !top:A topology U.
     regular_space top /\
@@ -126,7 +161,14 @@ let MICHAEL_LEMMA = thm `;
             topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
             locally_finite_in top V
-  by CHEAT_TAC`;;
+  proof
+    let top be A topology;
+    let U be (A->bool)->bool;
+    assume regular_space top [1];
+    assume (!u. u IN U ==> open_in top u) [2];
+    assume topspace top SUBSET UNIONS U [3];
+    assume countably_locally_finite_in top U [4];
+  qed by 1, 2, 3, 4, MICHAEL_STEP_1_2, MICHAEL_STEP_2_3, MICHAEL_STEP_3_4, CHEAT_TAC`;;
 
 (* ------------------------------------------------------------------------- *)
 (* THEOREM 41.4: Every metrizable space is paracompact                       *)
