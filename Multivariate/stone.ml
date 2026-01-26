@@ -155,6 +155,21 @@ let MICHAEL_STEP_1_2 = thm `;
       by 3, countably_locally_finite_in;
   qed by 1, 2, 3, 4, CHEAT_TAC`;;
 
+(* Proof sketch for MICHAEL_STEP_1_2:
+   Define V_layer n = UNIONS (B n) - the nth layer union
+   Define shrink n u = u DIFF (UNIONS {V_layer i | i < n})
+   Define C_n = {shrink n u | u IN B n}
+   Define C = UNIONS {C_n | n IN (:num)}
+
+   Key properties:
+   1. shrink n u SUBSET u, so C refines U
+   2. For x in topspace, let N = min {n | x in some u in B_n},
+      then x in shrink_N u (since x not in any V_i for i < N)
+   3. C_n is locally finite by LOCALLY_FINITE_IN_REFINEMENT
+   4. For x in some u in B_N, elements of C_m for m > N don't intersect u
+      (since shrink m v SUBSET v - V_N, and u SUBSET V_N)
+   5. Therefore C is locally finite *)
+
 (* Note: The steps (2)=>(3) and (3)=>(4) from Michael's original lemma are about
    equivalences between properties of the space, not direct constructions.
    For METRIZABLE_IMP_PARACOMPACT, we use a more direct approach combining steps. *)
