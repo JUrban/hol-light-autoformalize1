@@ -328,7 +328,9 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    REWRITE_TAC[FORALL_IN_GSPEC] THEN
    REPEAT GEN_TAC THEN DISCH_TAC THEN
    REWRITE_TAC[OPEN_IN_MBALL];
-   (* Property 2: V covers topspace *)
+   (* Property 2: V covers topspace
+      KEY INSIGHT: First find v_0 = <-minimal set containing x as a POINT,
+      then find N. This ensures x NOT IN v for any v < v_0. *)
    REWRITE_TAC[SUBSET] THEN X_GEN_TAC `x:A` THEN DISCH_TAC THEN
    (* x IN topspace top = mspace m since top = mtopology m *)
    SUBGOAL_THEN `x:A IN mspace m` ASSUME_TAC THENL
@@ -343,10 +345,53 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
     REWRITE_TAC[SUBSET; IN_UNIONS] THEN
     DISCH_THEN(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN MESON_TAC[];
     ALL_TAC] THEN
-   (* u is open in mtopology m, so exists r > 0 with mball(x,r) SUBSET u *)
-   SUBGOAL_THEN `?r. &0 < r /\ mball m (x:A,r) SUBSET u` STRIP_ASSUME_TAC THENL
+   (* FIRST: find v_0 = <-minimal set in U containing x as a point *)
+   (* Apply WOSET_WELL without consuming the woset assumption *)
+   SUBGOAL_THEN `?v0:A->bool. v0 IN U /\ x IN v0 /\
+                 (!w. w IN U /\ x IN w ==> (ord:(A->bool)->(A->bool)->bool) v0 w)`
+     STRIP_ASSUME_TAC THENL
+   [MP_TAC(ISPEC `ord:(A->bool)->(A->bool)->bool` WOSET_WELL) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(MP_TAC o SPEC `\w:A->bool. w IN U /\ x IN w`) THEN
+    REWRITE_TAC[] THEN ANTS_TAC THENL
+    [CONJ_TAC THENL
+     [UNDISCH_TAC `fld (ord:(A->bool)->(A->bool)->bool) = U` THEN
+      DISCH_THEN(fun th -> REWRITE_TAC[GSYM th]) THEN
+      REWRITE_TAC[IN] THEN SIMP_TAC[];
+      EXISTS_TAC `u:A->bool` THEN ASM_REWRITE_TAC[]];
+     MESON_TAC[]];
+    ALL_TAC] THEN
+   (* v0 is ord-minimal set containing x *)
+   (* For any v with ord v v0 and v != v0, we have x NOT IN v *)
+   SUBGOAL_THEN `!v:A->bool. (ord:(A->bool)->(A->bool)->bool) v v0 /\ ~(v = v0) ==> ~(x IN v)`
+     ASSUME_TAC THENL
+   [X_GEN_TAC `v:A->bool` THEN STRIP_TAC THEN
+    (* v is strictly smaller than v0. If x IN v, then v IN U (from fld ord) *)
+    (* and x IN v, so ord v0 v by minimality. But ord v v0 and v != v0 *)
+    (* gives v0 = v by antisymmetry, contradiction. *)
+    DISCH_TAC THEN
+    (* v IN fld(ord) since ord v v0 *)
+    SUBGOAL_THEN `v:A->bool IN U` ASSUME_TAC THENL
+    [UNDISCH_TAC `fld (ord:(A->bool)->(A->bool)->bool) = U` THEN
+     DISCH_THEN(SUBST1_TAC o SYM) THEN
+     (* v IN fld ord means ?y. ord v y \/ ord y v *)
+     REWRITE_TAC[IN_FLD] THEN
+     EXISTS_TAC `v0:A->bool` THEN DISJ1_TAC THEN ASM_REWRITE_TAC[];
+     ALL_TAC] THEN
+    (* Now v IN U and x IN v, so by minimality ord v0 v *)
+    FIRST_X_ASSUM(MP_TAC o SPEC `v:A->bool`) THEN
+    ASM_REWRITE_TAC[] THEN DISCH_TAC THEN
+    (* We have ord v v0 and ord v0 v, so v = v0 by antisymmetry *)
+    (* Use WOSET_ANTISYM: woset ord ==> ord x y /\ ord y x ==> x = y *)
+    MP_TAC(ISPEC `ord:(A->bool)->(A->bool)->bool` WOSET_ANTISYM) THEN
+    ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(MP_TAC o SPECL [`v:A->bool`; `v0:A->bool`]) THEN
+    ASM_REWRITE_TAC[];
+    ALL_TAC] THEN
+   (* v0 is open in mtopology m, so exists r > 0 with mball(x,r) SUBSET v0 *)
+   SUBGOAL_THEN `?r. &0 < r /\ mball m (x:A,r) SUBSET v0` STRIP_ASSUME_TAC THENL
    [UNDISCH_TAC `!u:A->bool. u IN U ==> open_in top u` THEN
-    DISCH_THEN(MP_TAC o SPEC `u:A->bool`) THEN ASM_REWRITE_TAC[] THEN
+    DISCH_THEN(MP_TAC o SPEC `v0:A->bool`) THEN ASM_REWRITE_TAC[] THEN
     UNDISCH_TAC `mtopology m:A topology = top` THEN
     DISCH_THEN(SUBST1_TAC o SYM) THEN
     REWRITE_TAC[OPEN_IN_MTOPOLOGY] THEN STRIP_TAC THEN
@@ -354,55 +399,103 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
     DISCH_THEN(X_CHOOSE_THEN `r:real` STRIP_ASSUME_TAC) THEN
     EXISTS_TAC `r:real` THEN ASM_REWRITE_TAC[];
     ALL_TAC] THEN
-   (* By REAL_ARCH_INV, get n >= 1 with inv(&n) < r *)
+   (* By REAL_ARCH_INV, get N >= 1 with inv(&N) < r *)
    MP_TAC(SPEC `r:real` REAL_ARCH_INV) THEN ASM_REWRITE_TAC[] THEN
    DISCH_THEN(X_CHOOSE_THEN `N:num` STRIP_ASSUME_TAC) THEN
-   (* mball(x, inv(&N)) SUBSET mball(x, r) SUBSET u *)
-   SUBGOAL_THEN `mball m (x:A, inv(&N)) SUBSET u` ASSUME_TAC THENL
+   (* mball(x, inv(&N)) SUBSET mball(x, r) SUBSET v0 *)
+   SUBGOAL_THEN `mball m (x:A, inv(&N)) SUBSET v0` ASSUME_TAC THENL
    [MATCH_MP_TAC SUBSET_TRANS THEN EXISTS_TAC `mball m (x:A, r)` THEN
     ASM_REWRITE_TAC[] THEN MATCH_MP_TAC MBALL_SUBSET_CONCENTRIC THEN
     ASM_SIMP_TAC[REAL_LT_IMP_LE];
     ALL_TAC] THEN
-   (* So x IN Sn N u since x IN mspace m and mball(x, inv(&N)) SUBSET u *)
-   SUBGOAL_THEN `x:A IN (Sn:num->(A->bool)->A->bool) N u` ASSUME_TAC THENL
+   (* So x IN Sn N v0 *)
+   SUBGOAL_THEN `x:A IN (Sn:num->(A->bool)->A->bool) N v0` ASSUME_TAC THENL
    [EXPAND_TAC "Sn" THEN REWRITE_TAC[IN_ELIM_THM] THEN ASM_REWRITE_TAC[];
     ALL_TAC] THEN
-   (* Use WOSET_WELL to get minimal u_min with x IN Sn N u_min *)
-   (* Let s = {w | w IN U /\ x IN Sn N w}. We have u IN s, so s is non-empty. *)
-   (* Since fld(ord) = U, s SUBSET fld(ord). Apply WOSET_WELL to get minimum. *)
-   UNDISCH_TAC `woset (ord:(A->bool)->(A->bool)->bool)` THEN
-   DISCH_THEN(MP_TAC o MATCH_MP WOSET_WELL) THEN
-   DISCH_THEN(MP_TAC o SPEC `\w:A->bool. w IN U /\ x IN (Sn:num->(A->bool)->A->bool) N w`) THEN
-   REWRITE_TAC[] THEN ANTS_TAC THENL
-   [CONJ_TAC THENL
-    [(* forall w. w IN U /\ x IN Sn N w ==> fld(ord) w *)
-     UNDISCH_TAC `fld (ord:(A->bool)->(A->bool)->bool) = U` THEN
-     DISCH_THEN(fun th -> REWRITE_TAC[GSYM th]) THEN
-     REWRITE_TAC[IN] THEN SIMP_TAC[];
-     (* exists w. w IN U /\ x IN Sn N w *)
-     EXISTS_TAC `u:A->bool` THEN ASM_REWRITE_TAC[]];
-    ALL_TAC] THEN
-   (* Get u_min with u_min IN U /\ x IN Sn N u_min /\ minimal *)
-   DISCH_THEN(X_CHOOSE_THEN `u_min:A->bool` STRIP_ASSUME_TAC) THEN
-   (* x IN Tn N u_min: x is in Sn N u_min and not in any ord-smaller set *)
-   SUBGOAL_THEN `x:A IN (Tn:num->(A->bool)->A->bool) N u_min` ASSUME_TAC THENL
+   (* x IN Tn N v0: x is in Sn N v0 and not in any ord-smaller set *)
+   SUBGOAL_THEN `x:A IN (Tn:num->(A->bool)->A->bool) N v0` ASSUME_TAC THENL
    [EXPAND_TAC "Tn" THEN REWRITE_TAC[IN_DIFF; IN_UNIONS; IN_ELIM_THM] THEN
     ASM_REWRITE_TAC[] THEN
     REWRITE_TAC[NOT_EXISTS_THM] THEN
     X_GEN_TAC `v:A->bool` THEN
     DISCH_THEN(CONJUNCTS_THEN2 (CONJUNCTS_THEN2 ASSUME_TAC ASSUME_TAC) ASSUME_TAC) THEN
-    (* v is ord-smaller than u_min and x IN v *)
-    (* By minimality of u_min, ~(v IN U /\ x IN Sn N v) *)
-    (* Since ord v u_min implies fld ord v, we have v IN U *)
-    (* So ~(x IN Sn N v), which means x NOT IN Sn N v *)
-    (* But we need x NOT IN v (as a point), which is different *)
-    (* This is where the proof gets tricky - CHEAT_TAC for now *)
-    CHEAT_TAC;
+    (* v is ord-smaller than v0 and v != v0, so x NOT IN v by our earlier result *)
+    FIRST_X_ASSUM(MP_TAC o SPEC `v:A->bool`) THEN
+    ASM_REWRITE_TAC[];
     ALL_TAC] THEN
    (* x IN mball(x, inv(&3*&N)) since mdist(x,x) = 0 < inv(&3*&N) *)
-   (* Therefore x IN En N u_min = UNIONS{mball(y, inv(&3*&N)) | y IN Tn N u_min} *)
-   (* En N u_min is non-empty and in E_layer N *)
-   CHEAT_TAC;
+   (* Therefore x IN En N v0 = UNIONS{mball(y, inv(&3*&N)) | y IN Tn N v0} *)
+   (* En N v0 is non-empty and in E_layer N, which is in V *)
+   (* Goal: x IN UNIONS (UNIONS {E_layer n | n >= 1} DIFF {{}})
+      = ?v. v IN (UNIONS {E_layer n | n >= 1} DIFF {{}}) /\ x IN v
+      Witness v = En N v0, then show: v IN UNIONS{...}, ~(v = {}), x IN v *)
+   REWRITE_TAC[IN_UNIONS] THEN
+   EXISTS_TAC `(En:num->(A->bool)->A->bool) N v0` THEN
+   REWRITE_TAC[IN_DIFF; IN_SING] THEN
+   (* Goal: En N v0 IN UNIONS{E_layer n | n >= 1} /\ ~(En N v0 = {}) /\ x IN En N v0 *)
+   REPEAT CONJ_TAC THENL
+   [(* En N v0 IN UNIONS{E_layer n | n >= 1} *)
+    REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
+    EXISTS_TAC `(E_layer:num->(A->bool)->bool) N` THEN CONJ_TAC THENL
+    [(* E_layer N is in {E_layer n | n >= 1} *)
+     EXISTS_TAC `N:num` THEN REWRITE_TAC[GE] THEN
+     UNDISCH_TAC `~(N = 0)` THEN ARITH_TAC;
+     (* En N v0 IN E_layer N *)
+     EXPAND_TAC "E_layer" THEN REWRITE_TAC[IN_ELIM_THM] THEN
+     EXISTS_TAC `v0:A->bool` THEN ASM_REWRITE_TAC[]];
+    (* ~(En N v0 = {}) - it contains x *)
+    REWRITE_TAC[GSYM MEMBER_NOT_EMPTY] THEN
+    EXISTS_TAC `x:A` THEN
+    (* x IN En N v0 - need to show x IN UNIONS{mball(y, 1/3N) | y IN Tn N v0} *)
+    (* The key: x IN Tn N v0, and x IN mball(x, 1/3N) since mdist(x,x) = 0 *)
+    EXPAND_TAC "En" THEN EXPAND_TAC "Tn" THEN
+    CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+    REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
+    EXISTS_TAC `mball m (x:A, inv(&3 * &N))` THEN
+    (* Goal: (exists x' n. x' IN Sn n v0 DIFF ... /\ ball = ball) /\ x IN ball *)
+    CONJ_TAC THENL
+    [(* exists x' n. x' IN Sn n v0 DIFF ... /\ ball = ball - witness x' = x, n = N *)
+     EXISTS_TAC `x:A` THEN EXISTS_TAC `N:num` THEN
+     (* Goal: x IN Sn N v0 DIFF UNIONS {...} /\ ball = ball *)
+     (* Split into two subgoals BEFORE any rewriting *)
+     CONJ_TAC THENL
+     [(* x IN Sn N v0 DIFF UNIONS {v | ord v v0 /\ ~(v = v0)} *)
+      (* We have x IN Tn N v0 by assumption 24, and Tn = Sn DIFF UNIONS{...} *)
+      UNDISCH_TAC `x:A IN (Tn:num->(A->bool)->A->bool) N v0` THEN
+      EXPAND_TAC "Tn" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+      SIMP_TAC[];
+      (* ball = ball *)
+      REFL_TAC];
+     (* x IN mball(x, inv(&3*&N)) *)
+     REWRITE_TAC[IN_MBALL] THEN
+     ASM_SIMP_TAC[MDIST_REFL] THEN
+     MATCH_MP_TAC REAL_LT_INV THEN
+     MATCH_MP_TAC REAL_LT_MUL THEN CONJ_TAC THENL
+     [REAL_ARITH_TAC;
+      REWRITE_TAC[REAL_OF_NUM_LT] THEN
+      UNDISCH_TAC `~(N = 0)` THEN ARITH_TAC]];
+    (* x IN En N v0 - same proof *)
+    EXPAND_TAC "En" THEN EXPAND_TAC "Tn" THEN
+    CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+    REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
+    EXISTS_TAC `mball m (x:A, inv(&3 * &N))` THEN
+    CONJ_TAC THENL
+    [(* exists x' n. x' IN Sn n v0 DIFF ... /\ ball = ball *)
+     EXISTS_TAC `x:A` THEN EXISTS_TAC `N:num` THEN
+     (* Split into two subgoals BEFORE any rewriting *)
+     CONJ_TAC THENL
+     [(* x IN Sn N v0 DIFF UNIONS {...} *)
+      UNDISCH_TAC `x:A IN (Tn:num->(A->bool)->A->bool) N v0` THEN
+      EXPAND_TAC "Tn" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+      SIMP_TAC[];
+      REFL_TAC];
+     REWRITE_TAC[IN_MBALL] THEN
+     ASM_SIMP_TAC[MDIST_REFL] THEN
+     MATCH_MP_TAC REAL_LT_INV THEN
+     MATCH_MP_TAC REAL_LT_MUL THEN CONJ_TAC THENL
+     [REAL_ARITH_TAC;
+      REWRITE_TAC[REAL_OF_NUM_LT] THEN
+      UNDISCH_TAC `~(N = 0)` THEN ARITH_TAC]]];
    (* Property 3: V refines U - each v in V is subset of some u in U
       v = En n u0 for some u0 IN U, and En n u0 SUBSET u0 by construction:
       - Tn n u0 SUBSET Sn n u0 = {x | mball(x,1/n) SUBSET u0}
@@ -979,7 +1072,11 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
    DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
    STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
-   (* Property 4: V is locally finite - this is the hard part *)
+   (* Property 4: V is locally finite
+      Key insight: V(c) = E(c) INTER f(c), and if V(c) INTER w != {} for some
+      neighborhood w, then closure(c) INTER w != {}.
+      Since D = {closure(c) | c IN C} is locally finite, V is locally finite.
+      The detailed proof requires showing the finiteness bound carefully. *)
    CHEAT_TAC]);;
 
 (* Michael's Lemma: For regular spaces, countably locally finite open covering
