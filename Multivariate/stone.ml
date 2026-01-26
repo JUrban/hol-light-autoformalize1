@@ -46,7 +46,7 @@ let LOCALLY_FINITE_IMP_COUNTABLY_LOCALLY_FINITE = thm `;
     assume locally_finite_in top U [1];
     set f = \n:num. if n = 0 then U else {}:(A->bool)->bool;
     f 0 = U [f0];
-    !n. ~(n = 0) ==> f n = {} [fn] by CHEAT_TAC;
+    !n. ~(n = 0) ==> f n = {} [fn] by ARITH_TAC;
     U = UNIONS {f n | n IN (:num)} [2] by f0, fn, CHEAT_TAC;
     !n. locally_finite_in top (f n) [3]
     proof
