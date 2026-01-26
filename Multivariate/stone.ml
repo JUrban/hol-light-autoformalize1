@@ -549,10 +549,68 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    EXISTS_TAC `\n:num. if n = 0 then {}
                else (E_layer:num->(A->bool)->bool) n DIFF {{}}` THEN
    CONJ_TAC THENL
-   [(* V = UNIONS {f n | n} *)
+   [(* V = UNIONS {f n | n} - use CHEAT_TAC for now *)
     CHEAT_TAC;
     (* Each f n is locally finite *)
-    CHEAT_TAC]]);;
+    X_GEN_TAC `n:num` THEN ASM_CASES_TAC `n = 0` THENL
+    [ASM_REWRITE_TAC[LOCALLY_FINITE_IN_EMPTY]; ALL_TAC] THEN
+    ASM_REWRITE_TAC[] THEN
+    (* E_layer n DIFF {{}} is locally finite *)
+    (* Key: for x in topspace, mball(x, 1/(6n)) meets at most one element *)
+    REWRITE_TAC[locally_finite_in] THEN CONJ_TAC THENL
+    [(* UNIONS (E_layer n DIFF {{}}) SUBSET topspace *)
+     REWRITE_TAC[UNIONS_SUBSET; IN_DIFF; IN_SING] THEN
+     X_GEN_TAC `s:A->bool` THEN STRIP_TAC THEN
+     (* s IN E_layer n, so s = En n u0 for some u0 IN U *)
+     UNDISCH_TAC `s:A->bool IN (E_layer:num->(A->bool)->bool) n` THEN
+     EXPAND_TAC "E_layer" THEN REWRITE_TAC[IN_ELIM_THM] THEN
+     DISCH_THEN(X_CHOOSE_THEN `u0:A->bool` (CONJUNCTS_THEN2 ASSUME_TAC SUBST_ALL_TAC)) THEN
+     (* En n u0 = UNIONS{mball(y, 1/3n) | y IN Tn n u0} SUBSET mspace m = topspace *)
+     EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+     REWRITE_TAC[UNIONS_SUBSET; FORALL_IN_GSPEC] THEN
+     X_GEN_TAC `y:A` THEN X_GEN_TAC `n':num` THEN DISCH_TAC THEN
+     UNDISCH_TAC `mtopology m:A topology = top` THEN
+     DISCH_THEN(SUBST1_TAC o SYM) THEN
+     REWRITE_TAC[TOPSPACE_MTOPOLOGY; MBALL_SUBSET_MSPACE];
+     (* Part 2: finite neighborhood property *)
+     X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+     (* x is in topspace = mspace m *)
+     SUBGOAL_THEN `x:A IN mspace m` ASSUME_TAC THENL
+     [UNDISCH_TAC `x:A IN topspace top` THEN
+      UNDISCH_TAC `mtopology m:A topology = top` THEN
+      DISCH_THEN(SUBST1_TAC o SYM) THEN
+      REWRITE_TAC[TOPSPACE_MTOPOLOGY];
+      ALL_TAC] THEN
+     (* Use mball(x, 1/(6n)) as the neighborhood *)
+     EXISTS_TAC `mball m (x:A, inv(&6 * &n))` THEN
+     CONJ_TAC THENL
+     [(* mball is open *)
+      UNDISCH_TAC `mtopology m:A topology = top` THEN
+      DISCH_THEN(SUBST1_TAC o SYM) THEN
+      REWRITE_TAC[OPEN_IN_MBALL];
+      ALL_TAC] THEN
+     CONJ_TAC THENL
+     [(* x IN mball *)
+      REWRITE_TAC[IN_MBALL] THEN
+      ASM_SIMP_TAC[MDIST_REFL] THEN
+      MATCH_MP_TAC REAL_LT_INV THEN
+      MATCH_MP_TAC REAL_LT_MUL THEN CONJ_TAC THENL
+      [REAL_ARITH_TAC;
+       REWRITE_TAC[REAL_OF_NUM_LT] THEN
+       UNDISCH_TAC `~(n = 0)` THEN ARITH_TAC];
+      ALL_TAC] THEN
+     (* FINITE {s | s IN E_layer n DIFF {{}} /\ ~(s INTER mball(...) = {})} *)
+     (* Key: this set has at most one element *)
+     MATCH_MP_TAC FINITE_SUBSET THEN
+     EXISTS_TAC `{s:A->bool | s IN (E_layer:num->(A->bool)->bool) n /\ ~(s INTER mball m (x, inv(&6 * &n)) = {})}` THEN
+     CONJ_TAC THENL
+     [(* The set meeting x's ball is finite - at most one element *)
+      (* TODO: This is the key part - showing at most one element meets the ball *)
+      (* For now, admit this - it requires the separation argument *)
+      CHEAT_TAC;
+      (* Subset property *)
+      REWRITE_TAC[SUBSET; IN_ELIM_THM; IN_DIFF; IN_SING] THEN
+      GEN_TAC THEN STRIP_TAC THEN ASM_REWRITE_TAC[]]]]]);;
 
 (* ------------------------------------------------------------------------- *)
 (* Lemma 41.3 (Michael's Lemma): For a regular space, countably locally      *)
