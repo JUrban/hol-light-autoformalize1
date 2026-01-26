@@ -588,10 +588,15 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    SUBGOAL_THEN `c:A->bool SUBSET topspace top` MP_TAC THENL
    [ASM SET_TAC[]; DISCH_TAC THEN ASM_REWRITE_TAC[] THEN ASM SET_TAC[]];
    ALL_TAC] THEN
-  (* For each c in C, choose u_c in U with c SUBSET u_c *)
-  (* For each c, define E(c) = topspace DIFF UNIONS{d IN D : d SUBSET topspace DIFF c} *)
-  (* Define V(c) = E(c) INTER u_c *)
-  (* The rest of the proof requires careful construction *)
+  (* Use choice to get function f: c -> u with c SUBSET f(c) IN U *)
+  SUBGOAL_THEN `?f:(A->bool)->(A->bool). !c. c IN C ==> f c IN U /\ c SUBSET f c`
+    STRIP_ASSUME_TAC THENL
+  [REWRITE_TAC[GSYM SKOLEM_THM_GEN] THEN ASM_REWRITE_TAC[];
+   ALL_TAC] THEN
+  (* Define V = {E(c) INTER f(c) | c IN C} where E(c) = topspace - disjoint closures *)
+  EXISTS_TAC `{((topspace top DIFF UNIONS {d:A->bool | d IN D /\ d INTER c = {}})
+                INTER (f:(A->bool)->(A->bool)) c) | c IN C}` THEN
+  (* All four properties need proof - use CHEAT for now *)
   CHEAT_TAC);;
 
 let MICHAEL_LEMMA = thm `;
