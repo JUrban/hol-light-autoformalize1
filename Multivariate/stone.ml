@@ -973,9 +973,7 @@ let MICHAEL_STEP_1_2 = prove
     SUBGOAL_THEN `N < m:num` ASSUME_TAC THENL [ASM_ARITH_TAC; ALL_TAC] THEN
     SUBGOAL_THEN `s:A->bool INTER u0 = {}` MP_TAC THENL
     [(* Extract v from s IN IMAGE (\u. u DIFF ...) (B m) *)
-     (* Debug: print the goal to see assumptions *)
-     PRINT_GOAL_TAC THEN
-     UNDISCH_TAC `s:A->bool IN (C_layer:num->(A->bool)->bool) m` THEN
+     FIRST_X_ASSUM(MP_TAC o check (fun th -> fst(dest_comb(concl th)) = `(IN) (s:A->bool)`)) THEN
      EXPAND_TAC "C_layer" THEN
      REWRITE_TAC[IN_IMAGE] THEN
      DISCH_THEN(X_CHOOSE_THEN `v:A->bool` STRIP_ASSUME_TAC) THEN
