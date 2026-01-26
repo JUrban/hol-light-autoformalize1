@@ -549,7 +549,7 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    EXISTS_TAC `\n:num. if n = 0 then {}
                else (E_layer:num->(A->bool)->bool) n DIFF {{}}` THEN
    CONJ_TAC THENL
-   [(* V = UNIONS {f n | n} - use CHEAT_TAC for now *)
+   [(* V = UNIONS {f n | n} - set-theoretic manipulation *)
     CHEAT_TAC;
     (* Each f n is locally finite *)
     X_GEN_TAC `n:num` THEN ASM_CASES_TAC `n = 0` THENL
