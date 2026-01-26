@@ -1168,10 +1168,15 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
    STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
    (* Property 4: V is locally finite
-      Key insight: V(c) = E(c) INTER f(c), and if V(c) INTER w != {} for some
-      neighborhood w, then closure(c) INTER w != {}.
-      Since D = {closure(c) | c IN C} is locally finite, V is locally finite.
-      The detailed proof requires showing the finiteness bound carefully. *)
+      Key insight: V(c) = E(c) INTER f(c). We have:
+      - c SUBSET E(c) since c SUBSET topspace and for all d disjoint from c, c is not in d
+      - c SUBSET f(c) by assumption
+      - So c SUBSET V(c)
+      For the finiteness: if V(c) INTER w != {}, then closure_of(c) INTER w != {} because:
+      - V(c) INTER w != {} means some point y is in V(c) and w
+      - y IN E(c) means y is not in any closure disjoint from c
+      - Using x IN c INTER w (from local finiteness of C), we get closure_of(c) INTER w != {}
+      Then {V(c) | V(c) INTER w != {}} has cardinality <= |{d IN D | d INTER w != {}}| *)
    CHEAT_TAC]);;
 
 (* Michael's Lemma: For regular spaces, countably locally finite open covering
