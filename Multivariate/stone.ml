@@ -620,14 +620,6 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
         MATCH_MP_TAC INV_3N_POS THEN REWRITE_TAC[GE] THEN
         UNDISCH_TAC `~(n = 0)` THEN ARITH_TAC;
         (* Separation property: distinct elements of E_layer n are 1/(3n)-separated *)
-        (* Proof sketch:
-           - For e1 = En n u1, e2 = En n u2 with u1 != u2 (distinct in U)
-           - y1 IN e1 means exists x1 IN Tn n u1 with y1 IN mball(x1, inv(&3*&n))
-           - y2 IN e2 means exists x2 IN Tn n u2 with y2 IN mball(x2, inv(&3*&n))
-           - WLOG ord u1 u2, so x2 NOT IN u1 (Tn definition excludes ord-smaller sets)
-           - x1 IN Sn n u1 means mball(x1, inv(&n)) SUBSET u1
-           - By SHRINK_SEPARATION: inv(&n) <= mdist(x1, x2)
-           - Since &3 * inv(&3*&n) = inv(&n), by EN_SEPARATION: inv(&3*&n) <= mdist(y1, y2) *)
         CHEAT_TAC];
        (* Use the result to show finiteness *)
        ASM_REWRITE_TAC[] THEN
