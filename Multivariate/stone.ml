@@ -155,24 +155,19 @@ let MICHAEL_STEP_1_2 = thm `;
       by 3, countably_locally_finite_in;
   qed by 1, 2, 3, 4, CHEAT_TAC`;;
 
-(* Step (2) => (3) of Michael's Lemma: locally finite => closed locally finite *)
-let MICHAEL_STEP_2_3 = thm `;
-  !top:A topology U.
-    regular_space top /\
-    (!u. u IN U ==> open_in top u) /\
-    topspace top SUBSET UNIONS U
-    ==> ?V. topspace top SUBSET UNIONS V /\
-            (!v. v IN V ==> closed_in top v) /\
-            (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
-            locally_finite_in top V
-  by CHEAT_TAC`;;
+(* Note: The steps (2)=>(3) and (3)=>(4) from Michael's original lemma are about
+   equivalences between properties of the space, not direct constructions.
+   For METRIZABLE_IMP_PARACOMPACT, we use a more direct approach combining steps. *)
 
-(* Step (3) => (4) of Michael's Lemma: locally finite => open locally finite *)
-let MICHAEL_STEP_3_4 = thm `;
-  !top:A topology U.
+(* Helper for going from locally finite to locally finite open in a regular space.
+   This combines steps (2)=>(3)=>(4) from the textbook proof. *)
+let LOCALLY_FINITE_OPEN_REFINEMENT = thm `;
+  !top:A topology U C.
     regular_space top /\
     (!u. u IN U ==> open_in top u) /\
-    topspace top SUBSET UNIONS U
+    topspace top SUBSET UNIONS C /\
+    (!c. c IN C ==> ?u. u IN U /\ c SUBSET u) /\
+    locally_finite_in top C
     ==> ?V. (!v. v IN V ==> open_in top v) /\
             topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
@@ -201,7 +196,7 @@ let MICHAEL_LEMMA = thm `;
       (!c. c IN C ==> ?u. u IN U /\ c SUBSET u) /\
       locally_finite_in top C [5]
       by 2, 3, 4, MICHAEL_STEP_1_2;
-  qed by 1, 2, 3, 5, CHEAT_TAC`;;
+  qed by 1, 2, 5, LOCALLY_FINITE_OPEN_REFINEMENT`;;
 
 (* ------------------------------------------------------------------------- *)
 (* THEOREM 41.4: Every metrizable space is paracompact                       *)
