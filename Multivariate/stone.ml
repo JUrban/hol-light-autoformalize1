@@ -33,6 +33,18 @@ let countably_locally_finite_in = new_definition
 (* Every locally finite collection is countably locally finite               *)
 (* ------------------------------------------------------------------------- *)
 
+let UNIONS_SINGLETON_SEQUENCE = prove
+ (`!(U:(A->bool)->bool).
+     U = UNIONS {(\n. if n = 0 then U else {}) n | n IN (:num)}`,
+  GEN_TAC THEN
+  MATCH_MP_TAC SUBSET_ANTISYM THEN CONJ_TAC THENL
+  [REWRITE_TAC[SUBSET; IN_UNIONS; IN_ELIM_THM; IN_UNIV] THEN
+   GEN_TAC THEN DISCH_TAC THEN
+   EXISTS_TAC `U:(A->bool)->bool` THEN ASM_REWRITE_TAC[] THEN
+   EXISTS_TAC `0` THEN REWRITE_TAC[];
+   REWRITE_TAC[UNIONS_SUBSET; FORALL_IN_GSPEC; IN_UNIV] THEN
+   GEN_TAC THEN COND_CASES_TAC THEN REWRITE_TAC[SUBSET_REFL; EMPTY_SUBSET]])
+
 let LOCALLY_FINITE_IN_EMPTY = thm `;
   !top:A topology. locally_finite_in top {}
   by SIMP_TAC[FINITE_IMP_LOCALLY_FINITE_IN; FINITE_EMPTY; UNIONS_0; EMPTY_SUBSET]`;;
@@ -47,7 +59,7 @@ let LOCALLY_FINITE_IMP_COUNTABLY_LOCALLY_FINITE = thm `;
     set f = \n:num. if n = 0 then U else {}:(A->bool)->bool;
     f 0 = U [f0];
     !n. ~(n = 0) ==> f n = {} [fn] by ARITH_TAC;
-    U = UNIONS {f n | n IN (:num)} [2] by f0, fn, CHEAT_TAC;
+    U = UNIONS {f n | n IN (:num)} [2] by f0, fn, UNIONS_SINGLETON_SEQUENCE;
     !n. locally_finite_in top (f n) [3]
     proof
       let n be num;
