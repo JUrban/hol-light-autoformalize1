@@ -101,8 +101,6 @@ let COMPACT_IMP_PARACOMPACT = thm `;
     end;
   qed by main, paracompact_space`;;
 
-(* Note: The above uses CHEAT_TAC for the existential witness construction *)
-
 (* ------------------------------------------------------------------------- *)
 (* Lemma 39.2: Every open covering of a metrizable space has a countably     *)
 (* locally finite open refinement that covers the space.                     *)
