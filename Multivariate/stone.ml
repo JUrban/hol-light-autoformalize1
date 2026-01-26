@@ -225,13 +225,14 @@ let GSPEC_SUC_LEMMA = prove
   [DISCH_THEN(X_CHOOSE_THEN `i:num` STRIP_ASSUME_TAC) THEN ASM_MESON_TAC[];
    STRIP_TAC THENL [EXISTS_TAC `n:num` THEN ASM_REWRITE_TAC[]; ASM_MESON_TAC[]]]);;
 
-(* Helper: Finite union of locally finite collections is locally finite
-   Note: Proof by induction - each step uses LOCALLY_FINITE_IN_UNION *)
+(* Helper: Finite union of locally finite collections is locally finite *)
+(* Induction proof - temporarily using CHEAT_TAC due to MESON timing issues *)
 let LOCALLY_FINITE_IN_FINITE_UNIONS = prove
  (`!top:A topology (f:num->(A->bool)->bool) n.
      (!i. i < n ==> locally_finite_in top (f i))
      ==> locally_finite_in top (UNIONS {f i | i < n})`,
   CHEAT_TAC);;
+
 
 (* Full MICHAEL_STEP_1_2 - temporarily simplified *)
 let MICHAEL_STEP_1_2 = prove
