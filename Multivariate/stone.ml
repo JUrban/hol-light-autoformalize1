@@ -117,6 +117,10 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = thm `;
 (* ------------------------------------------------------------------------- *)
 
 (* Step (1) => (2) of Michael's Lemma: countably locally finite => locally finite *)
+(* The key idea: given U = ∪_n B_n where each B_n is locally finite,
+   define V_i = UNIONS B_i and S_n(u) = u - UNIONS{V_i | i < n}
+   Then C_n = {S_n(u) | u ∈ B_n} and C = ∪_n C_n is locally finite *)
+
 let MICHAEL_STEP_1_2 = thm `;
   !top:A topology U.
     (!u. u IN U ==> open_in top u) /\
@@ -125,7 +129,17 @@ let MICHAEL_STEP_1_2 = thm `;
     ==> ?V. topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
             locally_finite_in top V
-  by CHEAT_TAC`;;
+  proof
+    let top be A topology;
+    let U be (A->bool)->bool;
+    assume (!u. u IN U ==> open_in top u) [1];
+    assume topspace top SUBSET UNIONS U [2];
+    assume countably_locally_finite_in top U [3];
+    consider f such that
+      U = UNIONS {f n | n IN (:num)} /\
+      !n. locally_finite_in top (f n) [4]
+      by 3, countably_locally_finite_in;
+  qed by 1, 2, 3, 4, CHEAT_TAC`;;
 
 (* Step (2) => (3) of Michael's Lemma: locally finite => closed locally finite *)
 let MICHAEL_STEP_2_3 = thm `;
