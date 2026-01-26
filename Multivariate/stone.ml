@@ -665,18 +665,19 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
             GSPEC issue: extraction introduces fresh n' variables instead of using outer n *)
          (* Step 2: Extract z1 IN Tn n u1 with y1 IN mball(z1, inv(&3*&n)) *)
          (* GSPEC issue: IN_ELIM_THM quantifies over all free vars including n *)
+         (* Step 2: Extract z1 IN Tn n u1 with y1 IN mball(z1, inv(&3*&n)) *)
+         (* y1 IN En n u1 = UNIONS{mball(x,1/3n)|x IN Tn n u1} by def
+            Use IN_UNIONS_MBALL: y IN UNIONS {mball m (x,r) | x IN s}
+                                 <=> ?x. x IN s /\ y IN mball m (x,r) *)
          SUBGOAL_THEN `?z1:A. z1 IN (Tn:num->(A->bool)->A->bool) n u1 /\
                               y1 IN mball m (z1, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* y1 IN En n u1 ==> ?z1. z1 IN Tn n u1 /\ y1 IN mball(z1, 1/3n) *)
-          (* GSPEC syntax issue: {f x | x IN s} vs {f x | x | x IN s} *)
-          (* Needs custom lemma to handle GSPEC equivalence - TODO *)
+         [(* GSPEC issue: IN_ELIM_THM quantifies n, creating fresh n' != outer n *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Step 3: Extract z2 IN Tn n u2 with y2 IN mball(z2, inv(&3*&n)) *)
          SUBGOAL_THEN `?z2:A. z2 IN (Tn:num->(A->bool)->A->bool) n u2 /\
                               y2 IN mball m (z2, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* y2 IN En n u2 ==> ?z2. z2 IN Tn n u2 /\ y2 IN mball(z2, 1/3n) *)
-          (* Same GSPEC syntax issue as z1 *)
+         [(* Same GSPEC issue as z1 *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Now have z1, z2. Use woset trichotomy and SHRINK_SEPARATION *)
