@@ -710,7 +710,17 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
           [(* z2 IN Tn n u2 = Sn n u2 DIFF UNIONS{v | ord v u2 /\ ~(v = u2)} *)
            (* Since properly ord u1 u2, we have ord u1 u2 /\ ~(u1 = u2) *)
            (* So u1 is in the UNIONS, meaning z2 NOT IN u1 *)
-           CHEAT_TAC;
+           UNDISCH_TAC `z2:A IN (Tn:num->(A->bool)->A->bool) n u2` THEN
+           EXPAND_TAC "Tn" THEN
+           CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+           REWRITE_TAC[IN_DIFF; IN_UNIONS; IN_ELIM_THM] THEN
+           REWRITE_TAC[NOT_EXISTS_THM; TAUT `~(a /\ b) <=> a ==> ~b`] THEN
+           DISCH_THEN(CONJUNCTS_THEN2 ASSUME_TAC MP_TAC) THEN
+           DISCH_THEN(MP_TAC o SPEC `u1:A->bool`) THEN
+           (* Need to prove ord u1 u2 /\ ~(u1 = u2) from properly ord u1 u2 *)
+           UNDISCH_TAC `properly ord (u1:A->bool) u2` THEN
+           REWRITE_TAC[properly] THEN
+           SIMP_TAC[];
            ALL_TAC] THEN
           (* Step 2: mball(z1, inv(&n)) SUBSET u1 *)
           SUBGOAL_THEN `mball m (z1:A, inv(&n)) SUBSET u1` ASSUME_TAC THENL
@@ -770,7 +780,17 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
           [(* z1 IN Tn n u1 = Sn n u1 DIFF UNIONS{v | ord v u1 /\ ~(v = u1)} *)
            (* Since properly ord u2 u1, we have ord u2 u1 /\ ~(u2 = u1) *)
            (* So u2 is in the UNIONS, meaning z1 NOT IN u2 *)
-           CHEAT_TAC;
+           UNDISCH_TAC `z1:A IN (Tn:num->(A->bool)->A->bool) n u1` THEN
+           EXPAND_TAC "Tn" THEN
+           CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+           REWRITE_TAC[IN_DIFF; IN_UNIONS; IN_ELIM_THM] THEN
+           REWRITE_TAC[NOT_EXISTS_THM; TAUT `~(a /\ b) <=> a ==> ~b`] THEN
+           DISCH_THEN(CONJUNCTS_THEN2 ASSUME_TAC MP_TAC) THEN
+           DISCH_THEN(MP_TAC o SPEC `u2:A->bool`) THEN
+           (* Need to prove ord u2 u1 /\ ~(u2 = u1) from properly ord u2 u1 *)
+           UNDISCH_TAC `properly ord (u2:A->bool) u1` THEN
+           REWRITE_TAC[properly] THEN
+           SIMP_TAC[];
            ALL_TAC] THEN
           (* Step 2: mball(z2, inv(&n)) SUBSET u2 *)
           SUBGOAL_THEN `mball m (z2:A, inv(&n)) SUBSET u2` ASSUME_TAC THENL
