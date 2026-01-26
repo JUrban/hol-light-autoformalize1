@@ -213,10 +213,17 @@ let METRIZABLE_IMP_PARACOMPACT = thm `;
         (!v. v IN V ==> ?w. w IN W /\ v SUBSET w) /\
         locally_finite_in top V [5]
         by 2, 4, MICHAEL_LEMMA;
+      !v. v IN V ==> ?u. u IN U /\ v SUBSET u [6]
+      proof
+        let v be A->bool;
+        assume v IN V [vV];
+        consider w such that w IN W /\ v SUBSET w [vw] by vV, 5;
+        consider u such that u IN U /\ w SUBSET u [wu] by vw, 4;
+      qed by vw, wu, SUBSET_TRANS;
       thus ?V. (!v. v IN V ==> open_in top v) /\
                topspace top SUBSET UNIONS V /\
                (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
                locally_finite_in top V
-        by 4, 5, CHEAT_TAC;
+        by 5, 6;
     end;
   qed by -, paracompact_space`;;
