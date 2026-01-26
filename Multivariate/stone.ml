@@ -367,17 +367,41 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    SUBGOAL_THEN `x:A IN (Sn:num->(A->bool)->A->bool) N u` ASSUME_TAC THENL
    [EXPAND_TAC "Sn" THEN REWRITE_TAC[IN_ELIM_THM] THEN ASM_REWRITE_TAC[];
     ALL_TAC] THEN
-   (* Use WOSET_MINIMAL_CONTAINING: get u_min minimal in U with x IN some set *)
-   (* First need to show there exists w IN U with x in Sn N w *)
-   SUBGOAL_THEN `?w:A->bool. w IN U /\ x IN (Sn:num->(A->bool)->A->bool) N w`
-     STRIP_ASSUME_TAC THENL
-   [EXISTS_TAC `u:A->bool` THEN ASM_REWRITE_TAC[]; ALL_TAC] THEN
-   (* Apply WOSET_MINIMAL_CONTAINING to get u_min *)
-   MP_TAC(ISPECL [`ord:(A->bool)->(A->bool)->bool`; `U:(A->bool)->bool`; `x:A`]
-     WOSET_MINIMAL_CONTAINING) THEN
-   (* Need to adjust - WOSET_MINIMAL_CONTAINING needs x IN u, not x IN Sn N u *)
-   (* Actually, we need a different approach. The minimal element should be
-      the one that contains x in its Sn set. Let me simplify with CHEAT_TAC *)
+   (* Use WOSET_WELL to get minimal u_min with x IN Sn N u_min *)
+   (* Let s = {w | w IN U /\ x IN Sn N w}. We have u IN s, so s is non-empty. *)
+   (* Since fld(ord) = U, s SUBSET fld(ord). Apply WOSET_WELL to get minimum. *)
+   UNDISCH_TAC `woset (ord:(A->bool)->(A->bool)->bool)` THEN
+   DISCH_THEN(MP_TAC o MATCH_MP WOSET_WELL) THEN
+   DISCH_THEN(MP_TAC o SPEC `\w:A->bool. w IN U /\ x IN (Sn:num->(A->bool)->A->bool) N w`) THEN
+   REWRITE_TAC[] THEN ANTS_TAC THENL
+   [CONJ_TAC THENL
+    [(* forall w. w IN U /\ x IN Sn N w ==> fld(ord) w *)
+     UNDISCH_TAC `fld (ord:(A->bool)->(A->bool)->bool) = U` THEN
+     DISCH_THEN(fun th -> REWRITE_TAC[GSYM th]) THEN
+     REWRITE_TAC[IN] THEN SIMP_TAC[];
+     (* exists w. w IN U /\ x IN Sn N w *)
+     EXISTS_TAC `u:A->bool` THEN ASM_REWRITE_TAC[]];
+    ALL_TAC] THEN
+   (* Get u_min with u_min IN U /\ x IN Sn N u_min /\ minimal *)
+   DISCH_THEN(X_CHOOSE_THEN `u_min:A->bool` STRIP_ASSUME_TAC) THEN
+   (* x IN Tn N u_min: x is in Sn N u_min and not in any ord-smaller set *)
+   SUBGOAL_THEN `x:A IN (Tn:num->(A->bool)->A->bool) N u_min` ASSUME_TAC THENL
+   [EXPAND_TAC "Tn" THEN REWRITE_TAC[IN_DIFF; IN_UNIONS; IN_ELIM_THM] THEN
+    ASM_REWRITE_TAC[] THEN
+    REWRITE_TAC[NOT_EXISTS_THM] THEN
+    X_GEN_TAC `v:A->bool` THEN
+    DISCH_THEN(CONJUNCTS_THEN2 (CONJUNCTS_THEN2 ASSUME_TAC ASSUME_TAC) ASSUME_TAC) THEN
+    (* v is ord-smaller than u_min and x IN v *)
+    (* By minimality of u_min, ~(v IN U /\ x IN Sn N v) *)
+    (* Since ord v u_min implies fld ord v, we have v IN U *)
+    (* So ~(x IN Sn N v), which means x NOT IN Sn N v *)
+    (* But we need x NOT IN v (as a point), which is different *)
+    (* This is where the proof gets tricky - CHEAT_TAC for now *)
+    CHEAT_TAC;
+    ALL_TAC] THEN
+   (* x IN mball(x, inv(&3*&N)) since mdist(x,x) = 0 < inv(&3*&N) *)
+   (* Therefore x IN En N u_min = UNIONS{mball(y, inv(&3*&N)) | y IN Tn N u_min} *)
+   (* En N u_min is non-empty and in E_layer N *)
    CHEAT_TAC;
    (* Property 3: V refines U - each v in V is subset of some u in U
       v = En n u0 for some u0 IN U, and En n u0 SUBSET u0 by construction:
