@@ -539,14 +539,24 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
     MATCH_MP_TAC MBALL_EMPTY THEN REWRITE_TAC[REAL_LE_REFL];
     MATCH_MP_TAC MBALL_SUBSET_CONCENTRIC THEN
     MATCH_MP_TAC INV_3N_LE_INV_N THEN ASM_REWRITE_TAC[]];
-   (* Property 4: V is countably locally finite
-      Goal: countably_locally_finite_in top (UNIONS{E_layer n | n >= 1} DIFF {{}})
-      Strategy: Use f(n) = if n >= 1 then E_layer n DIFF {{}} else {}
-      Part 1: V = UNIONS{f n | n} (set equality)
-      Part 2: !n. locally_finite_in top (f n)
-        - n = 0: f(0) = {} is trivially locally finite
-        - n >= 1: use SMALL_BALL_MEETS_ONE with separation property *)
-   CHEAT_TAC]);;
+   (* Property 4: V is countably locally finite *)
+   REWRITE_TAC[countably_locally_finite_in] THEN
+   EXISTS_TAC `\n:num. if n >= 1
+                       then (E_layer:num->(A->bool)->bool) n DIFF {{}}
+                       else {}` THEN
+   CONJ_TAC THENL
+   [(* Part 1: V = UNIONS{f n | n} - set equality *)
+    CHEAT_TAC;
+    (* Part 2: !n. locally_finite_in top (f n) *)
+    X_GEN_TAC `n:num` THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
+    ASM_CASES_TAC `n >= 1` THENL
+    [ASM_REWRITE_TAC[] THEN
+     (* locally_finite_in top (E_layer n DIFF {{}}) when n >= 1 *)
+     (* Key: E_layer n elements are inv(&3*&n)-separated *)
+     CHEAT_TAC;
+     (* n = 0 case: f 0 = {} *)
+     ASM_SIMP_TAC[ARITH_RULE `~(n >= 1) ==> ~(n >= 1)`] THEN
+     REWRITE_TAC[LOCALLY_FINITE_IN_EMPTY]]]]);;
 
 let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT_locally_finite_DISABLED = 0;;
 (* The locally finite proof has a structural issue - will restore after fixing *)
