@@ -83,7 +83,14 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = thm `;
             topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
             countably_locally_finite_in top V
-  by CHEAT_TAC`;;
+  proof
+    let top be A topology;
+    let U be (A->bool)->bool;
+    assume metrizable_space top [1];
+    assume (!u. u IN U ==> open_in top u) [2];
+    assume topspace top SUBSET UNIONS U [3];
+    consider m such that top = mtopology m [4] by 1, metrizable_space;
+  qed by 1, 2, 3, 4, CHEAT_TAC`;;
 
 (* ------------------------------------------------------------------------- *)
 (* Lemma 41.3 (Michael's Lemma): For a regular space, countably locally      *)
