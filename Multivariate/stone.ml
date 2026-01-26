@@ -294,8 +294,23 @@ let MICHAEL_STEP_1_2 = prove
   EXISTS_TAC `UNIONS {IMAGE (\u. u DIFF UNIONS {UNIONS ((B:num->(A->bool)->bool) i) | i < n}) (B n) | n IN (:num)}` THEN
   REPEAT CONJ_TAC THENL
   [(* Coverage: topspace SUBSET UNIONS V *)
-   CHEAT_TAC;
-   (* Refinement: each v refines some u *)
+   REWRITE_TAC[SUBSET] THEN X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+   (* x is in topspace, so x is in UNIONS U = UNIONS (UNIONS {B n | n IN (:num)}) *)
+   SUBGOAL_THEN `x:A IN UNIONS (UNIONS {(B:num->(A->bool)->bool) n | n IN (:num)})` MP_TAC THENL
+   [UNDISCH_TAC `topspace top SUBSET UNIONS (U:(A->bool)->bool)` THEN
+    ASM_REWRITE_TAC[SUBSET] THEN DISCH_THEN MATCH_MP_TAC THEN ASM_REWRITE_TAC[];
+    ALL_TAC] THEN
+   DISCH_THEN(MP_TAC o MATCH_MP SHRINK_COVERS_HELPER) THEN
+   DISCH_THEN(X_CHOOSE_THEN `n:num` (X_CHOOSE_THEN `u:A->bool` STRIP_ASSUME_TAC)) THEN
+   (* x IN u DIFF UNIONS {...}, and u IN B n, so x is in the shrunk set *)
+   REWRITE_TAC[IN_UNIONS; IN_ELIM_THM; IN_UNIV] THEN
+   EXISTS_TAC `u DIFF UNIONS {UNIONS ((B:num->(A->bool)->bool) i) | i < n}` THEN
+   ASM_REWRITE_TAC[] THEN
+   EXISTS_TAC `IMAGE (\u:A->bool. u DIFF UNIONS {UNIONS ((B:num->(A->bool)->bool) i) | i < n}) (B n)` THEN
+   CONJ_TAC THENL
+   [EXISTS_TAC `n:num` THEN REWRITE_TAC[IN_UNIV]; ALL_TAC] THEN
+   REWRITE_TAC[IN_IMAGE] THEN EXISTS_TAC `u:A->bool` THEN ASM_REWRITE_TAC[];
+   (* Refinement: each v refines some u in U *)
    CHEAT_TAC;
    (* Local finiteness *)
    CHEAT_TAC])
