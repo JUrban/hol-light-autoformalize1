@@ -667,12 +667,9 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
          (* GSPEC issue: IN_ELIM_THM quantifies over all free vars including n *)
          SUBGOAL_THEN `?z1:A. z1 IN (Tn:num->(A->bool)->A->bool) n u1 /\
                               y1 IN mball m (z1, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* Use IN_UNIONS_MBALL to extract witness from y1 IN En n u1 *)
-          UNDISCH_TAC `y1:A IN (En:num->(A->bool)->A->bool) n u1` THEN
-          EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-          (* Goal: y1 IN UNIONS{mball m (x, r) | x IN Tn n u1} ==> ?z1. ... *)
-          REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
-          PRINT_GOAL_TAC THEN CHEAT_TAC;
+         [(* GSPEC issue: IN_ELIM_THM quantifies n variable *)
+          (* TODO: fix GSPEC variable capture - use custom lemma *)
+          CHEAT_TAC;
           ALL_TAC] THEN
          (* Step 3: Extract z2 IN Tn n u2 with y2 IN mball(z2, inv(&3*&n)) *)
          SUBGOAL_THEN `?z2:A. z2 IN (Tn:num->(A->bool)->A->bool) n u2 /\
