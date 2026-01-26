@@ -555,14 +555,27 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
      REWRITE_TAC[IN_UNIONS; IN_DIFF; IN_ELIM_THM; IN_SING] THEN
      STRIP_TAC THEN
      (* e IN t where t = E_layer n' for some n' >= 1, and e != {} *)
-     (* Witness: use the layer containing e *)
-     CHEAT_TAC;
+     (* Witness: E_layer n DIFF {{}} where n is the layer containing e *)
+     EXISTS_TAC `(E_layer:num->(A->bool)->bool) n DIFF {{}}` THEN
+     CONJ_TAC THENL
+     [EXISTS_TAC `n:num` THEN REWRITE_TAC[IN_UNIV] THEN ASM_REWRITE_TAC[];
+      REWRITE_TAC[IN_DIFF; IN_SING] THEN
+      FIRST_X_ASSUM(SUBST1_TAC o SYM) THEN ASM_REWRITE_TAC[]];
      (* RHS ==> LHS *)
      REWRITE_TAC[IN_UNIONS; IN_DIFF; IN_ELIM_THM; IN_SING] THEN
      STRIP_TAC THEN
      (* e IN f n' for some n', need e IN UNIONS{E_layer n | n >= 1} and e != {} *)
      (* Strategy: case split on n' >= 1, use E_layer n' as witness, handle n'=0 contradiction *)
-     CHEAT_TAC];
+     ASM_CASES_TAC `n >= 1` THENL
+     [(* n >= 1: e IN E_layer n DIFF {{}}, so e IN E_layer n and e != {} *)
+      UNDISCH_TAC `e:A->bool IN t` THEN ASM_REWRITE_TAC[IN_DIFF; IN_SING] THEN
+      STRIP_TAC THEN CONJ_TAC THENL
+      [EXISTS_TAC `(E_layer:num->(A->bool)->bool) n` THEN CONJ_TAC THENL
+       [EXISTS_TAC `n:num` THEN ASM_REWRITE_TAC[];
+        ASM_REWRITE_TAC[]];
+       ASM_REWRITE_TAC[]];
+      (* n = 0: e IN {} which is false *)
+      UNDISCH_TAC `e:A->bool IN t` THEN ASM_REWRITE_TAC[NOT_IN_EMPTY]]];
     (* Part 2: !n. locally_finite_in top (f n) *)
     X_GEN_TAC `n:num` THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
     ASM_CASES_TAC `n >= 1` THENL
