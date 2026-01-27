@@ -1670,8 +1670,35 @@ let LOCALLY_FINITE_OPEN_REFINEMENT_TEST = prove
       DISCH_THEN(MP_TAC o SPEC `cprime:A->bool`) THEN
       ASM_REWRITE_TAC[]];
      (* Subset property: Vc(c) meets w => c meets some cprime meeting w *)
-     (* Complex due to GSPEC issues, use CHEAT_TAC for now *)
-     CHEAT_TAC];
+     REWRITE_TAC[SUBSET; IN_ELIM_THM; IN_UNIONS] THEN
+     X_GEN_TAC `c:A->bool` THEN STRIP_TAC THEN
+     (* Get y from Vc(c) INTER w, y is in topspace and not in c' disjoint from c *)
+     FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [GSYM MEMBER_NOT_EMPTY]) THEN
+     REWRITE_TAC[IN_INTER] THEN
+     DISCH_THEN(X_CHOOSE_THEN `y:A` STRIP_ASSUME_TAC) THEN
+     UNDISCH_TAC `(y:A) IN Vc (c:A->bool)` THEN
+     EXPAND_TAC "Vc" THEN REWRITE_TAC[IN_INTER; IN_DIFF; IN_UNIONS; IN_ELIM_THM] THEN
+     STRIP_TAC THEN
+     (* Get cprime from Cprime containing y *)
+     UNDISCH_TAC `topspace top SUBSET UNIONS (Cprime:(A->bool)->bool)` THEN
+     REWRITE_TAC[SUBSET; IN_UNIONS] THEN
+     DISCH_THEN(MP_TAC o SPEC `y:A`) THEN ASM_REWRITE_TAC[] THEN
+     DISCH_THEN(X_CHOOSE_THEN `cprime:A->bool` STRIP_ASSUME_TAC) THEN
+     (* Witness: {c | c meets cprime} for cprime meeting w *)
+     EXISTS_TAC `{c:A->bool | c IN C /\ ~(c INTER cprime = {})}` THEN
+     REWRITE_TAC[IN_ELIM_THM] THEN
+     CONJ_TAC THENL
+     [EXISTS_TAC `cprime:A->bool` THEN ASM_REWRITE_TAC[] THEN ASM SET_TAC[];
+      ASM_REWRITE_TAC[] THEN
+      REWRITE_TAC[GSYM MEMBER_NOT_EMPTY; IN_INTER] THEN
+      (* Prove cprime INTER c != {} by contradiction *)
+      MATCH_MP_TAC(TAUT `(~p ==> F) ==> p`) THEN DISCH_TAC THEN
+      (* We have: cprime IN Cprime, y IN cprime, c INTER cprime = {} (assumption just added) *)
+      (* And: ~(?t. (t IN Cprime /\ t INTER c = {}) /\ y IN t) *)
+      (* Contradiction - goal is false *)
+      (* 29: ~(?t. (t IN Cprime /\ t INTER c = {}) /\ y IN t) *)
+      (* 31: cprime IN Cprime, 32: y IN cprime, 33: c INTER cprime = {} *)
+      ASM SET_TAC[]]];
     (* The original set is a subset of the image *)
     REWRITE_TAC[SUBSET; IN_IMAGE; IN_ELIM_THM] THEN
     X_GEN_TAC `u:A->bool` THEN
