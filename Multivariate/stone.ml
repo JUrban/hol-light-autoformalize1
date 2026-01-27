@@ -326,7 +326,7 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
   ABBREV_TAC `Tn = \(n:num) (u:A->bool).
     (Sn:num->(A->bool)->A->bool) n u DIFF UNIONS {v:A->bool | (ord:(A->bool)->(A->bool)->bool) v u /\ ~(v = u)}` THEN
   ABBREV_TAC `En = \(n:num) (u:A->bool).
-    UNIONS {mball m (x:A, inv(&3 * &n)) | x IN (Tn:num->(A->bool)->A->bool) n u}` THEN
+    UNIONS (IMAGE (\x. mball m (x:A, inv(&3 * &n))) ((Tn:num->(A->bool)->A->bool) n u))` THEN
   ABBREV_TAC `E_layer = \(n:num). {(En:num->(A->bool)->A->bool) n u | u IN U}` THEN
   (* V = UNIONS{E_layer n | n >= 1} but removing empty sets *)
   EXISTS_TAC `UNIONS {E_layer n | n >= 1} DIFF {{}}:(A->bool)->bool` THEN
@@ -356,8 +356,8 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    (* Now goal is: open_in (mtopology m) (UNIONS {...}) *)
    (* Use OPEN_IN_UNIONS: each element in the set is an open ball *)
    MATCH_MP_TAC OPEN_IN_UNIONS THEN
-   REWRITE_TAC[FORALL_IN_GSPEC] THEN
-   REPEAT GEN_TAC THEN DISCH_TAC THEN
+   REWRITE_TAC[FORALL_IN_IMAGE] THEN
+   GEN_TAC THEN DISCH_TAC THEN
    REWRITE_TAC[OPEN_IN_MBALL];
    (* Property 2: V covers topspace
       KEY INSIGHT: First find v_0 = <-minimal set containing x as a POINT,
@@ -477,26 +477,12 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
     (* ~(En N v0 = {}) - it contains x *)
     REWRITE_TAC[GSYM MEMBER_NOT_EMPTY] THEN
     EXISTS_TAC `x:A` THEN
-    (* x IN En N v0 - need to show x IN UNIONS{mball(y, 1/3N) | y IN Tn N v0} *)
+    (* x IN En N v0 - need to show x IN UNIONS(IMAGE...) *)
     (* The key: x IN Tn N v0, and x IN mball(x, 1/3N) since mdist(x,x) = 0 *)
-    EXPAND_TAC "En" THEN EXPAND_TAC "Tn" THEN
-    CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-    REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
-    EXISTS_TAC `mball m (x:A, inv(&3 * &N))` THEN
-    (* Goal: (exists x' n. x' IN Sn n v0 DIFF ... /\ ball = ball) /\ x IN ball *)
-    CONJ_TAC THENL
-    [(* exists x' n. x' IN Sn n v0 DIFF ... /\ ball = ball - witness x' = x, n = N *)
-     EXISTS_TAC `x:A` THEN EXISTS_TAC `N:num` THEN
-     (* Goal: x IN Sn N v0 DIFF UNIONS {...} /\ ball = ball *)
-     (* Split into two subgoals BEFORE any rewriting *)
-     CONJ_TAC THENL
-     [(* x IN Sn N v0 DIFF UNIONS {v | ord v v0 /\ ~(v = v0)} *)
-      (* We have x IN Tn N v0 by assumption 24, and Tn = Sn DIFF UNIONS{...} *)
-      UNDISCH_TAC `x:A IN (Tn:num->(A->bool)->A->bool) N v0` THEN
-      EXPAND_TAC "Tn" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-      SIMP_TAC[];
-      (* ball = ball *)
-      REFL_TAC];
+    EXPAND_TAC "En" THEN REWRITE_TAC[IN_UNIONS_IMAGE_MBALL] THEN
+    (* Goal: ?z. z IN Tn N v0 /\ x IN mball(z, inv(&3*&N)) - witness z = x *)
+    EXISTS_TAC `x:A` THEN CONJ_TAC THENL
+    [ASM_REWRITE_TAC[];
      (* x IN mball(x, inv(&3*&N)) *)
      REWRITE_TAC[IN_MBALL] THEN
      ASM_SIMP_TAC[MDIST_REFL] THEN
@@ -506,20 +492,9 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
       REWRITE_TAC[REAL_OF_NUM_LT] THEN
       UNDISCH_TAC `~(N = 0)` THEN ARITH_TAC]];
     (* x IN En N v0 - same proof *)
-    EXPAND_TAC "En" THEN EXPAND_TAC "Tn" THEN
-    CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-    REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
-    EXISTS_TAC `mball m (x:A, inv(&3 * &N))` THEN
-    CONJ_TAC THENL
-    [(* exists x' n. x' IN Sn n v0 DIFF ... /\ ball = ball *)
-     EXISTS_TAC `x:A` THEN EXISTS_TAC `N:num` THEN
-     (* Split into two subgoals BEFORE any rewriting *)
-     CONJ_TAC THENL
-     [(* x IN Sn N v0 DIFF UNIONS {...} *)
-      UNDISCH_TAC `x:A IN (Tn:num->(A->bool)->A->bool) N v0` THEN
-      EXPAND_TAC "Tn" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-      SIMP_TAC[];
-      REFL_TAC];
+    EXPAND_TAC "En" THEN REWRITE_TAC[IN_UNIONS_IMAGE_MBALL] THEN
+    EXISTS_TAC `x:A` THEN CONJ_TAC THENL
+    [ASM_REWRITE_TAC[];
      REWRITE_TAC[IN_MBALL] THEN
      ASM_SIMP_TAC[MDIST_REFL] THEN
      MATCH_MP_TAC REAL_LT_INV THEN
@@ -546,30 +521,25 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
    EXISTS_TAC `u0:A->bool` THEN ASM_REWRITE_TAC[] THEN
    (* Need: En n u0 SUBSET u0 *)
    ASM_REWRITE_TAC[] THEN
-   EXPAND_TAC "En" THEN REWRITE_TAC[UNIONS_SUBSET; FORALL_IN_GSPEC] THEN
-   (* After FORALL_IN_GSPEC, goal: !x n. x IN Tn n u0 ==> mball SUBSET u0 *)
-   (* Note: both x and n are universally quantified here *)
-   X_GEN_TAC `y:A` THEN X_GEN_TAC `n':num` THEN DISCH_TAC THEN
-   (* From y IN Tn n' u0, get y IN Sn n' u0 (Tn is Sn DIFF something) *)
-   SUBGOAL_THEN `y:A IN (Sn:num->(A->bool)->A->bool) n' u0` ASSUME_TAC THENL
-   [UNDISCH_TAC `y:A IN (Tn:num->(A->bool)->A->bool) n' u0` THEN
+   EXPAND_TAC "En" THEN REWRITE_TAC[UNIONS_SUBSET; FORALL_IN_IMAGE] THEN
+   (* After FORALL_IN_IMAGE, goal: !x. x IN Tn n u0 ==> mball(x, inv(&3*&n)) SUBSET u0 *)
+   (* n is the fixed outer n (not quantified like with GSPEC) *)
+   X_GEN_TAC `y:A` THEN DISCH_TAC THEN
+   (* From y IN Tn n u0, get y IN Sn n u0 (Tn is Sn DIFF something) *)
+   SUBGOAL_THEN `y:A IN (Sn:num->(A->bool)->A->bool) n u0` ASSUME_TAC THENL
+   [UNDISCH_TAC `y:A IN (Tn:num->(A->bool)->A->bool) n u0` THEN
     EXPAND_TAC "Tn" THEN REWRITE_TAC[IN_DIFF] THEN SIMP_TAC[];
     ALL_TAC] THEN
-   (* From y IN Sn n' u0, get y IN mspace m and mball(y, 1/n') SUBSET u0 *)
-   UNDISCH_TAC `y:A IN (Sn:num->(A->bool)->A->bool) n' u0` THEN
+   (* From y IN Sn n u0, get y IN mspace m and mball(y, 1/n) SUBSET u0 *)
+   UNDISCH_TAC `y:A IN (Sn:num->(A->bool)->A->bool) n u0` THEN
    EXPAND_TAC "Sn" THEN REWRITE_TAC[IN_ELIM_THM] THEN STRIP_TAC THEN
-   (* mball(y, 1/3n') SUBSET mball(y, 1/n') SUBSET u0 *)
+   (* mball(y, 1/3n) SUBSET mball(y, 1/n) SUBSET u0 *)
    MATCH_MP_TAC SUBSET_TRANS THEN
-   EXISTS_TAC `mball m (y:A, inv(&n'))` THEN ASM_REWRITE_TAC[] THEN
-   (* Need: inv(&3*&n') <= inv(&n') which requires n' >= 1 *)
-   (* For n' = 0: inv(&0) = &0, so mball(y, 0) = {} SUBSET u0 trivially *)
-   (* For n' >= 1: use INV_3N_LE_INV_N *)
-   ASM_CASES_TAC `n' = 0` THENL
-   [ASM_REWRITE_TAC[REAL_MUL_RZERO; REAL_INV_0] THEN
-    MATCH_MP_TAC(SET_RULE `s = {} ==> s SUBSET t`) THEN
-    MATCH_MP_TAC MBALL_EMPTY THEN REWRITE_TAC[REAL_LE_REFL];
-    MATCH_MP_TAC MBALL_SUBSET_CONCENTRIC THEN
-    MATCH_MP_TAC INV_3N_LE_INV_N THEN ASM_REWRITE_TAC[]];
+   EXISTS_TAC `mball m (y:A, inv(&n))` THEN ASM_REWRITE_TAC[] THEN
+   (* Need: inv(&3*&n) <= inv(&n); n >= 1 from assumption *)
+   MATCH_MP_TAC MBALL_SUBSET_CONCENTRIC THEN
+   MATCH_MP_TAC INV_3N_LE_INV_N THEN
+   UNDISCH_TAC `n >= 1` THEN ARITH_TAC;
    (* Property 4: V is countably locally finite *)
    REWRITE_TAC[countably_locally_finite_in] THEN
    EXISTS_TAC `\n:num. if n >= 1
@@ -620,8 +590,8 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
       EXPAND_TAC "E_layer" THEN REWRITE_TAC[IN_ELIM_THM] THEN
       DISCH_THEN(X_CHOOSE_THEN `u0:A->bool` (CONJUNCTS_THEN2 ASSUME_TAC SUBST_ALL_TAC)) THEN
       EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-      REWRITE_TAC[UNIONS_SUBSET; FORALL_IN_GSPEC] THEN
-      X_GEN_TAC `y:A` THEN X_GEN_TAC `n':num` THEN DISCH_TAC THEN
+      REWRITE_TAC[UNIONS_SUBSET; FORALL_IN_IMAGE] THEN
+      X_GEN_TAC `y:A` THEN DISCH_TAC THEN
       UNDISCH_TAC `mtopology m:A topology = top` THEN
       DISCH_THEN(SUBST1_TAC o SYM) THEN REWRITE_TAC[TOPSPACE_MTOPOLOGY; MBALL_SUBSET_MSPACE];
       (* For each x, find neighborhood meeting finitely many elements *)
@@ -693,17 +663,20 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
                                  <=> ?x. x IN s /\ y IN mball m (x,r) *)
          SUBGOAL_THEN `?z1:A. z1 IN (Tn:num->(A->bool)->A->bool) n u1 /\
                               y1 IN mball m (z1, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* z1 extraction: BLOCKED by HOL Light GSPEC variable capture.
-            GSPEC {mball m(x,inv(&3*&n)) | x IN Tn n u1} internally quantifies BOTH x AND n.
-            Tried: IN_UNIONS_MBALL, UNIONS_MBALL_IMAGE, ISPECL, GEN_REWRITE_TAC, SET_TAC, MESON_TAC.
-            Goal is trivially true; only GSPEC syntactic matching blocks the proof. *)
-          CHEAT_TAC;
+         [(* z1 extraction: y1 IN En n u1 ==> ?z1. z1 IN Tn n u1 /\ y1 IN mball... *)
+          (* En now uses IMAGE form, so IN_UNIONS_IMAGE_MBALL applies directly *)
+          UNDISCH_TAC `y1:A IN (En:num->(A->bool)->A->bool) n u1` THEN
+          EXPAND_TAC "En" THEN REWRITE_TAC[IN_UNIONS_IMAGE_MBALL] THEN
+          STRIP_TAC THEN EXISTS_TAC `x:A` THEN ASM_REWRITE_TAC[];
           ALL_TAC] THEN
          (* Step 3: Extract z2 IN Tn n u2 with y2 IN mball(z2, inv(&3*&n)) *)
          SUBGOAL_THEN `?z2:A. z2 IN (Tn:num->(A->bool)->A->bool) n u2 /\
                               y2 IN mball m (z2, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* z2 extraction: same GSPEC variable capture issue as z1 *)
-          CHEAT_TAC;
+         [(* z2 extraction: y2 IN En n u2 ==> ?z2. z2 IN Tn n u2 /\ y2 IN mball... *)
+          (* En now uses IMAGE form, so IN_UNIONS_IMAGE_MBALL applies directly *)
+          UNDISCH_TAC `y2:A IN (En:num->(A->bool)->A->bool) n u2` THEN
+          EXPAND_TAC "En" THEN REWRITE_TAC[IN_UNIONS_IMAGE_MBALL] THEN
+          STRIP_TAC THEN EXISTS_TAC `x:A` THEN ASM_REWRITE_TAC[];
           ALL_TAC] THEN
          (* Now have z1, z2. Use woset trichotomy and SHRINK_SEPARATION *)
          (* Step 1: Use woset trichotomy to get ord u1 u2 or ord u2 u1 *)
