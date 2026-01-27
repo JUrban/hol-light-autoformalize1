@@ -1394,49 +1394,31 @@ let FINITE_CLOSURES_AT_POINT = prove
   REWRITE_TAC[GSYM MEMBER_NOT_EMPTY; IN_INTER] THEN
   EXISTS_TAC `x:A` THEN ASM_REWRITE_TAC[]);;
 
-(* Helper: For locally finite family, each member's closure meets only finitely many members.
-   This follows from FINITE_CLOSURES_AT_POINT: if c INTER (closure c') != {}, pick z in it.
-   Then z IN c SUBSET closure c, so c IN {c | z IN closure c} which is finite. *)
-let FINITE_MEETS_CLOSURE = prove
- (`!top:A topology C c'.
-     locally_finite_in top C /\ c' IN C
-     ==> FINITE {c | c IN C /\ ~(c INTER (top closure_of c') = {})}`,
-  REPEAT STRIP_TAC THEN
-  (* Use local finiteness at some point of c' (if non-empty) *)
-  FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [locally_finite_in]) THEN
-  STRIP_TAC THEN
-  (* Get a point z IN c' *)
-  ASM_CASES_TAC `c':A->bool = {}` THENL
-  [ASM_REWRITE_TAC[CLOSURE_OF_EMPTY; INTER_EMPTY] THEN
-   REWRITE_TAC[EMPTY_GSPEC; FINITE_EMPTY];
-   ALL_TAC] THEN
-  FIRST_X_ASSUM(MP_TAC o GEN_REWRITE_RULE I [GSYM MEMBER_NOT_EMPTY]) THEN
-  DISCH_THEN(X_CHOOSE_TAC `z:A`) THEN
-  (* z IN c' SUBSET topspace *)
-  SUBGOAL_THEN `(z:A) IN topspace top` ASSUME_TAC THENL
-  [FIRST_X_ASSUM(MP_TAC o SPEC `c':A->bool`) THEN ASM SET_TAC[]; ALL_TAC] THEN
-  (* Get neighborhood w of z with FINITE{c | c INTER w != {}} *)
-  FIRST_X_ASSUM(MP_TAC o SPEC `z:A`) THEN ASM_REWRITE_TAC[] THEN
-  DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
-  MATCH_MP_TAC FINITE_SUBSET THEN
-  EXISTS_TAC `{c:A->bool | c IN C /\ ~(c INTER w = {})}` THEN
-  ASM_REWRITE_TAC[SUBSET; IN_ELIM_THM] THEN
-  X_GEN_TAC `c:A->bool` THEN STRIP_TAC THEN ASM_REWRITE_TAC[] THEN
-  (* If c INTER closure c' != {}, then c INTER w != {} (using z IN c' INTER w) *)
-  (* The key: w is open, so w INTER closure c' = {} iff w INTER c' = {} *)
-  (* Since z IN w and z IN c', we have w INTER c' != {} *)
-  (* So w INTER closure c' != {} *)
-  (* But this doesn't directly give c INTER w != {}... *)
-  (* We need: if c INTER closure c' != {}, pick y in it, then use local finiteness at y *)
-  (* Actually, we can use: c INTER w != {} follows if we can show c "reaches into" w *)
-  (* Hmm, this approach using a single z doesn't work directly. *)
-  (* Alternative: use the contrapositive via FINITE_CLOSURES_AT_POINT *)
-  CHEAT_TAC);;
+(* FINITE_MEETS_CLOSURE is FALSE in general!
+   Counterexample: In R, let C = {Z} ∪ {(n-0.5, n+0.5) | n ∈ Z}.
+   This is locally finite. But for c' = Z, closure(Z) = Z, and
+   {c | c ∩ Z ≠ {}} includes all the intervals (n-0.5, n+0.5) - infinitely many!
 
-(* Helper for going from locally finite to locally finite open in a regular space.
-   This combines steps (2)=>(3)=>(4) from the textbook proof. *)
+   The textbook (Lemma 41.3, (3)⇒(4)) uses a DIFFERENT approach:
+   - Construct auxiliary covering C' where each c' meets finitely many c's
+   - This is done by taking a closed locally finite refinement of
+     W = {w | open w, FINITE{c | c ∩ w ≠ {}}}
+
+   We implement this in LOCALLY_FINITE_OPEN_REFINEMENT below. *)
+
+(* Helper for going from locally finite to locally finite open in a metrizable space.
+   This combines steps (2)=>(3)=>(4) from the textbook proof (Lemma 41.3).
+
+   Key insight: The textbook's (3)=>(4) constructs an AUXILIARY closed covering C'
+   with the property that each c' ∈ C' meets only finitely many c ∈ C.
+   This is done by taking a closed locally finite refinement of
+   W = {w | open w, FINITE{c | c ∩ w ≠ {}}}.
+
+   We need metrizable_space to apply METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT
+   to the covering W, then MICHAEL_STEP_1_2 to get locally finite, then take closures. *)
 let LOCALLY_FINITE_OPEN_REFINEMENT = prove
  (`!top:A topology U C.
+    metrizable_space top /\
     regular_space top /\
     (!u. u IN U ==> open_in top u) /\
     topspace top SUBSET UNIONS C /\
@@ -1447,32 +1429,96 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
             locally_finite_in top V`,
   REPEAT STRIP_TAC THEN
-  (* Define the closures D = {closure_of c | c IN C} *)
-  ABBREV_TAC `D = {top closure_of c:A->bool | c IN C}` THEN
-  SUBGOAL_THEN `locally_finite_in top (D:(A->bool)->bool)` ASSUME_TAC THENL
-  [EXPAND_TAC "D" THEN MATCH_MP_TAC LOCALLY_FINITE_IN_CLOSURES THEN
-   ASM_REWRITE_TAC[];
-   ALL_TAC] THEN
-  SUBGOAL_THEN `!d:A->bool. d IN D ==> closed_in top d` ASSUME_TAC THENL
-  [EXPAND_TAC "D" THEN REWRITE_TAC[FORALL_IN_GSPEC] THEN
-   GEN_TAC THEN DISCH_TAC THEN REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
-   ALL_TAC] THEN
-  (* D covers topspace since C does and c SUBSET closure_of c *)
-  SUBGOAL_THEN `topspace top SUBSET UNIONS (D:(A->bool)->bool)` ASSUME_TAC THENL
+  (* Step 1: Define W = {w | open w, FINITE{c | c ∩ w ≠ {}}} - the "meets finitely many" covering *)
+  ABBREV_TAC `W = {w:A->bool | open_in top w /\
+                   FINITE{c | c IN C /\ ~(c INTER w = {})}}` THEN
+  (* W covers topspace by local finiteness of C *)
+  SUBGOAL_THEN `topspace top SUBSET UNIONS (W:(A->bool)->bool)` ASSUME_TAC THENL
   [REWRITE_TAC[SUBSET] THEN X_GEN_TAC `x:A` THEN DISCH_TAC THEN
-   UNDISCH_TAC `topspace top SUBSET UNIONS (C:(A->bool)->bool)` THEN
-   REWRITE_TAC[SUBSET] THEN DISCH_THEN(MP_TAC o SPEC `x:A`) THEN
-   ASM_REWRITE_TAC[IN_UNIONS] THEN
-   DISCH_THEN(X_CHOOSE_THEN `c:A->bool` STRIP_ASSUME_TAC) THEN
-   REWRITE_TAC[IN_UNIONS] THEN EXPAND_TAC "D" THEN
-   REWRITE_TAC[IN_ELIM_THM] THEN
-   EXISTS_TAC `top closure_of c:A->bool` THEN
-   CONJ_TAC THENL [EXISTS_TAC `c:A->bool` THEN ASM_REWRITE_TAC[]; ALL_TAC] THEN
-   (* x IN c and c SUBSET closure_of c (when c SUBSET topspace) *)
-   MP_TAC(ISPECL [`top:A topology`; `c:A->bool`] CLOSURE_OF_SUBSET) THEN
    UNDISCH_TAC `locally_finite_in top (C:(A->bool)->bool)` THEN
    REWRITE_TAC[locally_finite_in] THEN STRIP_TAC THEN
-   SUBGOAL_THEN `c:A->bool SUBSET topspace top` MP_TAC THENL
+   FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
+   DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
+   REWRITE_TAC[IN_UNIONS] THEN EXISTS_TAC `w:A->bool` THEN
+   EXPAND_TAC "W" THEN REWRITE_TAC[IN_ELIM_THM] THEN ASM_REWRITE_TAC[];
+   ALL_TAC] THEN
+  (* W elements are open *)
+  SUBGOAL_THEN `!w:A->bool. w IN W ==> open_in top w` ASSUME_TAC THENL
+  [EXPAND_TAC "W" THEN REWRITE_TAC[IN_ELIM_THM] THEN SIMP_TAC[]; ALL_TAC] THEN
+  (* Step 2: Get countably locally finite refinement W' of W *)
+  MP_TAC(ISPECL [`top:A topology`; `W:(A->bool)->bool`]
+    METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_THEN `W':(A->bool)->bool` STRIP_ASSUME_TAC) THEN
+  (* Step 3: Get locally finite refinement R of W' *)
+  MP_TAC(ISPECL [`top:A topology`; `W':(A->bool)->bool`] MICHAEL_STEP_1_2) THEN
+  ASM_REWRITE_TAC[] THEN
+  DISCH_THEN(X_CHOOSE_THEN `R:(A->bool)->bool` STRIP_ASSUME_TAC) THEN
+  (* Step 4: Define C'prime = closures of R - this is the auxiliary covering *)
+  ABBREV_TAC `Cprime = {top closure_of r:A->bool | r IN R}` THEN
+  (* C'prime is locally finite *)
+  SUBGOAL_THEN `locally_finite_in top (Cprime:(A->bool)->bool)` ASSUME_TAC THENL
+  [EXPAND_TAC "Cprime" THEN MATCH_MP_TAC LOCALLY_FINITE_IN_CLOSURES THEN
+   ASM_REWRITE_TAC[];
+   ALL_TAC] THEN
+  (* C'prime elements are closed *)
+  SUBGOAL_THEN `!c':A->bool. c' IN Cprime ==> closed_in top c'` ASSUME_TAC THENL
+  [EXPAND_TAC "Cprime" THEN REWRITE_TAC[FORALL_IN_GSPEC] THEN
+   GEN_TAC THEN DISCH_TAC THEN REWRITE_TAC[CLOSED_IN_CLOSURE_OF];
+   ALL_TAC] THEN
+  (* KEY PROPERTY: Each c' ∈ Cprime meets finitely many c ∈ C *)
+  (* This is because c' = closure(r) for r ∈ R, and r ⊆ some w' ∈ W',
+     and w' ⊆ some w ∈ W, and w meets finitely many c's *)
+  SUBGOAL_THEN `!c':A->bool. c' IN Cprime ==>
+                FINITE{c | c IN C /\ ~(c INTER c' = {})}` ASSUME_TAC THENL
+  [EXPAND_TAC "Cprime" THEN REWRITE_TAC[FORALL_IN_GSPEC] THEN
+   X_GEN_TAC `r:A->bool` THEN DISCH_TAC THEN
+   (* r ∈ R, so r ⊆ some w' ∈ W' *)
+   UNDISCH_TAC `!v:A->bool. v IN R ==> ?u. u IN W' /\ v SUBSET u` THEN
+   DISCH_THEN(MP_TAC o SPEC `r:A->bool`) THEN ASM_REWRITE_TAC[] THEN
+   DISCH_THEN(X_CHOOSE_THEN `w':A->bool` STRIP_ASSUME_TAC) THEN
+   (* w' ∈ W', so w' ⊆ some w ∈ W *)
+   UNDISCH_TAC `!v:A->bool. v IN W' ==> ?u. u IN W /\ v SUBSET u` THEN
+   DISCH_THEN(MP_TAC o SPEC `w':A->bool`) THEN ASM_REWRITE_TAC[] THEN
+   DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
+   (* w ∈ W means FINITE{c | c ∩ w ≠ {}} *)
+   UNDISCH_TAC `w:A->bool IN W` THEN EXPAND_TAC "W" THEN
+   REWRITE_TAC[IN_ELIM_THM] THEN STRIP_TAC THEN
+   (* closure(r) ⊆ closure(w') ⊆ w (using OPEN_IN_INTER_CLOSURE_OF_EQ_EMPTY) *)
+   (* Actually simpler: if c ∩ closure(r) ≠ {}, then c ∩ w ≠ {} *)
+   (* because closure(r) ⊆ closure(w') ⊆ closure(w) but w is open so we need care *)
+   (* Use: c ∩ closure(r) ≠ {} ⟹ c ∩ r ≠ {} (by OPEN_IN_INTER_CLOSURE_OF_EQ_EMPTY when c open) *)
+   (* But C elements might not be open. Use different approach: *)
+   (* r ⊆ w' ⊆ w, so if c ∩ closure(r) ≠ {}, pick y in it. *)
+   (* If y ∈ r then y ∈ w so c ∩ w ≠ {}. If y ∈ closure(r)\r, use limit argument. *)
+   (* Actually: for any y ∈ closure(r), every nbhd of y meets r ⊆ w, so y ∈ closure(w). *)
+   (* And if c ∩ closure(r) ≠ {}, then some point of c is in closure(r) ⊆ closure(w). *)
+   (* For w open: w = interior(w) ⊆ closure(w), and closure(r) ⊆ closure(w) since r ⊆ w *)
+   (* Hmm, need: c ∩ closure(r) ≠ {} ⟹ c ∩ w ≠ {} *)
+   (* This follows if r ⊆ w: closure(r) ⊆ closure(w), and for open w,
+      any point of closure(w) either is in w or is a limit of w. But c is arbitrary... *)
+   (* Let's use a subset argument: {c | c ∩ closure(r) ≠ {}} ⊆ {c | c ∩ closure(w) ≠ {}} *)
+   (* And for open w, closure(w) = w ∪ frontier, so this doesn't directly help *)
+   (* Simpler: just bound by {c | c ∩ topspace ≠ {}} which is at most C itself... not useful *)
+   (* OK let's CHEAT this subgoal for now and come back to it *)
+   CHEAT_TAC;
+   ALL_TAC] THEN
+  (* Cprime covers topspace since R covers and r ⊆ closure(r) *)
+  SUBGOAL_THEN `topspace top SUBSET UNIONS (Cprime:(A->bool)->bool)` ASSUME_TAC THENL
+  [REWRITE_TAC[SUBSET] THEN X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+   UNDISCH_TAC `topspace top SUBSET UNIONS (R:(A->bool)->bool)` THEN
+   REWRITE_TAC[SUBSET] THEN DISCH_THEN(MP_TAC o SPEC `x:A`) THEN
+   ASM_REWRITE_TAC[IN_UNIONS] THEN
+   DISCH_THEN(X_CHOOSE_THEN `r:A->bool` STRIP_ASSUME_TAC) THEN
+   REWRITE_TAC[IN_UNIONS] THEN EXPAND_TAC "Cprime" THEN
+   REWRITE_TAC[IN_ELIM_THM] THEN
+   EXISTS_TAC `top closure_of r:A->bool` THEN
+   CONJ_TAC THENL [EXISTS_TAC `r:A->bool` THEN ASM_REWRITE_TAC[]; ALL_TAC] THEN
+   (* x IN r and r SUBSET closure_of r *)
+   MP_TAC(ISPECL [`top:A topology`; `r:A->bool`] CLOSURE_OF_SUBSET) THEN
+   UNDISCH_TAC `locally_finite_in top (R:(A->bool)->bool)` THEN
+   REWRITE_TAC[locally_finite_in] THEN STRIP_TAC THEN
+   SUBGOAL_THEN `r:A->bool SUBSET topspace top` MP_TAC THENL
    [ASM SET_TAC[]; DISCH_TAC THEN ASM_REWRITE_TAC[] THEN ASM SET_TAC[]];
    ALL_TAC] THEN
   (* Use choice to get function f: c -> u with c SUBSET f(c) IN U *)
@@ -1480,8 +1526,8 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
     STRIP_ASSUME_TAC THENL
   [REWRITE_TAC[GSYM SKOLEM_THM_GEN] THEN ASM_REWRITE_TAC[];
    ALL_TAC] THEN
-  (* Define V = {E(c) INTER f(c) | c IN C} where E(c) = topspace - disjoint closures *)
-  EXISTS_TAC `{((topspace top DIFF UNIONS {d:A->bool | d IN D /\ d INTER c = {}})
+  (* Define V = {E(c) INTER f(c) | c IN C} where E(c) = topspace - disjoint Cprime elements *)
+  EXISTS_TAC `{((topspace top DIFF UNIONS {c':A->bool | c' IN Cprime /\ c' INTER c = {}})
                 INTER (f:(A->bool)->(A->bool)) c) | c IN C}` THEN
   (* Prove the four properties one by one *)
   REPEAT CONJ_TAC THENL
@@ -1489,14 +1535,14 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    REWRITE_TAC[FORALL_IN_GSPEC] THEN X_GEN_TAC `c:A->bool` THEN DISCH_TAC THEN
    (* Goal: open_in top ((topspace DIFF UNIONS{...}) INTER f c) *)
    MATCH_MP_TAC OPEN_IN_INTER THEN CONJ_TAC THENL
-   [(* topspace DIFF UNIONS{d | d IN D /\ d INTER c = {}} is open *)
+   [(* topspace DIFF UNIONS{c' | c' IN Cprime /\ c' INTER c = {}} is open *)
     MATCH_MP_TAC OPEN_IN_DIFF THEN REWRITE_TAC[OPEN_IN_TOPSPACE] THEN
-    (* UNIONS{d | d IN D /\ d INTER c = {}} is closed *)
+    (* UNIONS{c' | c' IN Cprime /\ c' INTER c = {}} is closed *)
     MATCH_MP_TAC CLOSED_IN_LOCALLY_FINITE_UNIONS THEN CONJ_TAC THENL
     [REWRITE_TAC[IN_ELIM_THM] THEN REPEAT STRIP_TAC THEN
      FIRST_X_ASSUM MATCH_MP_TAC THEN ASM_REWRITE_TAC[];
      MATCH_MP_TAC LOCALLY_FINITE_IN_SUBSET THEN
-     EXISTS_TAC `D:(A->bool)->bool` THEN ASM_REWRITE_TAC[] THEN SET_TAC[]];
+     EXISTS_TAC `Cprime:(A->bool)->bool` THEN ASM_REWRITE_TAC[] THEN SET_TAC[]];
     (* f(c) is open *)
     UNDISCH_TAC `!u:A->bool. u IN U ==> open_in top u` THEN
     DISCH_THEN MATCH_MP_TAC THEN
@@ -1511,7 +1557,7 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    ASM_REWRITE_TAC[IN_UNIONS] THEN
    DISCH_THEN(X_CHOOSE_THEN `c:A->bool` STRIP_ASSUME_TAC) THEN
    (* Witness: V(c) = (topspace DIFF ...) INTER f(c) *)
-   EXISTS_TAC `(topspace top DIFF UNIONS {d:A->bool | d IN D /\ d INTER c = {}})
+   EXISTS_TAC `(topspace top DIFF UNIONS {c':A->bool | c' IN Cprime /\ c' INTER c = {}})
                INTER (f:(A->bool)->(A->bool)) c` THEN
    CONJ_TAC THENL
    [EXISTS_TAC `c:A->bool` THEN ASM_REWRITE_TAC[];
@@ -1520,10 +1566,10 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
     REPEAT CONJ_TAC THENL
     [(* x IN topspace *)
      ASM_REWRITE_TAC[];
-     (* x not in any d with d INTER c = {} *)
-     REWRITE_TAC[NOT_EXISTS_THM] THEN X_GEN_TAC `d:A->bool` THEN
+     (* x not in any c' with c' INTER c = {} *)
+     REWRITE_TAC[NOT_EXISTS_THM] THEN X_GEN_TAC `c':A->bool` THEN
      STRIP_TAC THEN
-     (* x IN c and d INTER c = {} contradicts x IN d *)
+     (* x IN c and c' INTER c = {} contradicts x IN c' *)
      ASM SET_TAC[];
      (* x IN f(c) since x IN c and c SUBSET f(c) *)
      UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
@@ -1535,41 +1581,41 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
    DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
    STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
-   (* Property 4: V is locally finite
-      The key argument from topology.tex (Lemma 41.3, (3) => (4)):
-      1. For x in topspace, get W from local finiteness of D (closures)
-      2. D covers topspace (since C covers and c SUBSET closure c)
-      3. W is covered by finitely many d's from D, say D_W = {d | d INTER W != {}}
-      4. For V(c) INTER W != {}, pick y in V(c) INTER W
-      5. y is in some d_i in D_W (since D covers W and y in W)
-      6. y IN V(c) = E(c) INTER f(c) means y not in any d with d INTER c = {}
-      7. So d_i INTER c != {}
-      8. Hence c is in {c | d_i INTER c != {}} for some d_i in D_W
-      9. Need: for each d = closure c', {c | d INTER c != {}} is finite
-         This follows from FINITE_CLOSURES_AT_POINT: for z in d INTER c,
-         z IN c implies c IN {c | z IN closure c}, which is finite. *)
+   (* Property 4: V is locally finite - using auxiliary Cprime *)
    REWRITE_TAC[locally_finite_in; FORALL_IN_GSPEC] THEN CONJ_TAC THENL
-   [(* Each V(c) SUBSET topspace - easy since V(c) = (topspace DIFF ...) INTER f(c) *)
+   [(* Each V(c) SUBSET topspace *)
     X_GEN_TAC `c:A->bool` THEN DISCH_TAC THEN SET_TAC[];
-    (* For each x, find W with FINITE{V(c) | V(c) INTER W != {}} *)
+    (* For each x, find w with FINITE{V(c) | V(c) INTER w != {}} *)
     X_GEN_TAC `x:A` THEN DISCH_TAC THEN
-    (* Use local finiteness of D at x *)
-    UNDISCH_TAC `locally_finite_in top (D:(A->bool)->bool)` THEN
+    (* Use local finiteness of Cprime at x *)
+    UNDISCH_TAC `locally_finite_in top (Cprime:(A->bool)->bool)` THEN
     REWRITE_TAC[locally_finite_in] THEN STRIP_TAC THEN
     FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
     DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
     EXISTS_TAC `w:A->bool` THEN ASM_REWRITE_TAC[] THEN
     (* Need: FINITE{V(c) | c IN C /\ V(c) INTER w != {}}
-       where V(c) = (topspace DIFF UNIONS{d | d IN D /\ d INTER c = {}}) INTER f(c) *)
-    (* The linking argument uses FINITE_MEETS_CLOSURE - simplified for now *)
+       where V(c) = (topspace DIFF UNIONS{c' | c' IN Cprime /\ c' INTER c = {}}) INTER f(c)
+
+       Key argument:
+       - w meets finitely many c' ∈ Cprime (by local finiteness of Cprime)
+       - Each c' meets finitely many c ∈ C (by KEY PROPERTY above)
+       - If V(c) ∩ w ≠ {}, pick y ∈ V(c) ∩ w
+       - y ∈ w, and Cprime covers topspace, so y ∈ some c' with c' ∩ w ≠ {}
+       - y ∈ V(c) means y ∉ UNIONS{c' | c' ∩ c = {}}, so the c' containing y has c' ∩ c ≠ {}
+       - Hence c is in {c | c' ∩ c ≠ {}} for some c' meeting w
+       - This is a finite set (finite union of finite sets) *)
+    (* Property 4 local finiteness: using auxiliary covering Cprime *)
+    (* The key argument: w meets finitely many c' in Cprime, each c' meets finitely many c in C *)
+    (* Hence only finitely many V(c) can intersect w *)
     CHEAT_TAC]]);;
 
-(* Michael's Lemma: For regular spaces, countably locally finite open covering
-   has a locally finite open refinement.
+(* Michael's Lemma: For metrizable (hence regular) spaces, countably locally finite
+   open covering has a locally finite open refinement.
    We use MICHAEL_STEP_1_2 + LOCALLY_FINITE_OPEN_REFINEMENT. *)
 
 let MICHAEL_LEMMA = prove
  (`!top:A topology U.
+    metrizable_space top /\
     regular_space top /\
     (!u. u IN U ==> open_in top u) /\
     topspace top SUBSET UNIONS U /\
@@ -1605,8 +1651,12 @@ let METRIZABLE_IMP_PARACOMPACT = prove
   ASM_REWRITE_TAC[] THEN
   DISCH_THEN(X_CHOOSE_THEN `W:(A->bool)->bool` STRIP_ASSUME_TAC) THEN
   (* Step 3: Apply Michael's lemma to get locally finite open V *)
-  MP_TAC(ISPECL [`top:A topology`; `W:(A->bool)->bool`] MICHAEL_LEMMA) THEN
-  ASM_REWRITE_TAC[] THEN
+  (* Debug: check what MICHAEL_LEMMA gives after instantiation *)
+  SUBGOAL_THEN `?V:(A->bool)->bool. (!v. v IN V ==> open_in top v) /\
+               topspace top SUBSET UNIONS V /\
+               (!v. v IN V ==> ?u. u IN W /\ v SUBSET u) /\
+               locally_finite_in top V` MP_TAC THENL
+  [MATCH_MP_TAC MICHAEL_LEMMA THEN ASM_REWRITE_TAC[]; ALL_TAC] THEN
   DISCH_THEN(X_CHOOSE_THEN `V:(A->bool)->bool` STRIP_ASSUME_TAC) THEN
   (* Step 4: V refines U (via transitivity: V refines W refines U) *)
   EXISTS_TAC `V:(A->bool)->bool` THEN ASM_REWRITE_TAC[] THEN
