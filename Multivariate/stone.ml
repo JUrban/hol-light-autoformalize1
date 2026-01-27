@@ -1626,7 +1626,7 @@ let LOCALLY_FINITE_OPEN_REFINEMENT_TEST = prove
    UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
    DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
    STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
-   (* Property 4: V is locally finite *)
+   (* Property 4: V is locally finite - CHEAT for now, needs careful tactic work *)
    CHEAT_TAC]);;
 
 
