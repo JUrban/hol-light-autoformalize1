@@ -1673,7 +1673,13 @@ let LOCALLY_FINITE_OPEN_REFINEMENT_TEST = prove
      (* Complex due to GSPEC issues, use CHEAT_TAC for now *)
      CHEAT_TAC];
     (* The original set is a subset of the image *)
-    CHEAT_TAC]]);;
+    REWRITE_TAC[SUBSET; IN_IMAGE; IN_ELIM_THM] THEN
+    X_GEN_TAC `u:A->bool` THEN
+    DISCH_THEN(CONJUNCTS_THEN2 MP_TAC ASSUME_TAC) THEN
+    DISCH_THEN(X_CHOOSE_THEN `c':A->bool` STRIP_ASSUME_TAC) THEN
+    EXISTS_TAC `c':A->bool` THEN
+    ASM_REWRITE_TAC[IN_ELIM_THM] THEN
+    EXPAND_TAC "Vc" THEN CONJ_TAC THENL [REFL_TAC; ASM_MESON_TAC[]]]]);;
 
 
 (* Michael's Lemma: For metrizable (hence regular) spaces, countably locally finite
