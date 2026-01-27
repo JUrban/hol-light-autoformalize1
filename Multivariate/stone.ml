@@ -693,24 +693,17 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
                                  <=> ?x. x IN s /\ y IN mball m (x,r) *)
          SUBGOAL_THEN `?z1:A. z1 IN (Tn:num->(A->bool)->A->bool) n u1 /\
                               y1 IN mball m (z1, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* z1 extraction using IN_UNIONS_MBALL *)
+         [(* z1 extraction *)
           UNDISCH_TAC `y1:A IN (En:num->(A->bool)->A->bool) n u1` THEN
-          EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-          (* y1 IN UNIONS {mball m (x, inv(&3*&n)) | x IN Tn n u1} *)
-          (* Use IN_UNIONS and IN_ELIM_THM directly to unfold GSPEC *)
+          EXPAND_TAC "En" THEN
           REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
           PRINT_GOAL_TAC THEN CHEAT_TAC;
           ALL_TAC] THEN
          (* Step 3: Extract z2 IN Tn n u2 with y2 IN mball(z2, inv(&3*&n)) *)
          SUBGOAL_THEN `?z2:A. z2 IN (Tn:num->(A->bool)->A->bool) n u2 /\
                               y2 IN mball m (z2, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* z2 extraction using IN_UNIONS and IN_ELIM_THM - same approach as z1 *)
-          UNDISCH_TAC `y2:A IN (En:num->(A->bool)->A->bool) n u2` THEN
-          EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-          REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
-          DISCH_THEN(X_CHOOSE_THEN `t:A->bool` STRIP_ASSUME_TAC) THEN
-          FIRST_X_ASSUM(X_CHOOSE_THEN `z2:A` STRIP_ASSUME_TAC) THEN
-          EXISTS_TAC `z2:A` THEN ASM_REWRITE_TAC[];
+         [(* z2 extraction *)
+          CHEAT_TAC;
           ALL_TAC] THEN
          (* Now have z1, z2. Use woset trichotomy and SHRINK_SEPARATION *)
          (* Step 1: Use woset trichotomy to get ord u1 u2 or ord u2 u1 *)
