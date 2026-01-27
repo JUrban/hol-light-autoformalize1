@@ -1429,18 +1429,52 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
             locally_finite_in top V`,
   REPEAT STRIP_TAC THEN
-  (* Step 1: Define W = {w | open w, FINITE{c | c ∩ w ≠ {}}} - the "meets finitely many" covering *)
+  (* Step 1: Define W = {w | open w, FINITE{c | c ∩ closure(w) ≠ {}}}
+     Using closure(w) is KEY: when we take closure(r) for r SUBSET w,
+     we get closure(r) SUBSET closure(w), so the subset relation works. *)
   ABBREV_TAC `W = {w:A->bool | open_in top w /\
-                   FINITE{c | c IN C /\ ~(c INTER w = {})}}` THEN
-  (* W covers topspace by local finiteness of C *)
+                   FINITE{c | c IN C /\ ~(c INTER (top closure_of w) = {})}}` THEN
+  (* W covers topspace by local finiteness of C + regularity *)
   SUBGOAL_THEN `topspace top SUBSET UNIONS (W:(A->bool)->bool)` ASSUME_TAC THENL
   [REWRITE_TAC[SUBSET] THEN X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+   (* By local finiteness, get open neighborhood u with FINITE{c | c ∩ u ≠ {}} *)
    UNDISCH_TAC `locally_finite_in top (C:(A->bool)->bool)` THEN
    REWRITE_TAC[locally_finite_in] THEN STRIP_TAC THEN
    FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
-   DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
-   REWRITE_TAC[IN_UNIONS] THEN EXISTS_TAC `w:A->bool` THEN
-   EXPAND_TAC "W" THEN REWRITE_TAC[IN_ELIM_THM] THEN ASM_REWRITE_TAC[];
+   DISCH_THEN(X_CHOOSE_THEN `u:A->bool` STRIP_ASSUME_TAC) THEN
+   (* By REGULAR_SPACE: for closed (topspace DIFF u) and x outside it, get open v with
+      x IN v and closure(v) DISJOINT from (topspace DIFF u), i.e., closure(v) SUBSET u *)
+   UNDISCH_TAC `regular_space (top:A topology)` THEN
+   REWRITE_TAC[REGULAR_SPACE] THEN
+   DISCH_THEN(MP_TAC o SPECL [`topspace top DIFF u:A->bool`; `x:A`]) THEN
+   ANTS_TAC THENL
+   [CONJ_TAC THENL
+    [MATCH_MP_TAC CLOSED_IN_DIFF THEN REWRITE_TAC[CLOSED_IN_TOPSPACE] THEN
+     ASM_REWRITE_TAC[];
+     REWRITE_TAC[IN_DIFF] THEN ASM_REWRITE_TAC[]];
+    ALL_TAC] THEN
+   DISCH_THEN(X_CHOOSE_THEN `v:A->bool` STRIP_ASSUME_TAC) THEN
+   (* DISJOINT (topspace DIFF u) (closure(v)) means closure(v) SUBSET u *)
+   SUBGOAL_THEN `top closure_of v SUBSET (u:A->bool)` ASSUME_TAC THENL
+   [UNDISCH_TAC `DISJOINT (topspace top DIFF u) (top closure_of v:A->bool)` THEN
+    MP_TAC(ISPECL [`top:A topology`; `v:A->bool`] CLOSURE_OF_SUBSET_TOPSPACE) THEN
+    SET_TAC[];
+    ALL_TAC] THEN
+   (* v is in W: open_in v and FINITE{c | c ∩ closure(v) ≠ {}} *)
+   REWRITE_TAC[IN_UNIONS] THEN EXISTS_TAC `v:A->bool` THEN
+   EXPAND_TAC "W" THEN REWRITE_TAC[IN_ELIM_THM] THEN
+   ASM_REWRITE_TAC[] THEN
+   MATCH_MP_TAC FINITE_SUBSET THEN
+   EXISTS_TAC `{c:A->bool | c IN C /\ ~(c INTER u = {})}` THEN
+   ASM_REWRITE_TAC[SUBSET; IN_ELIM_THM] THEN
+   X_GEN_TAC `c:A->bool` THEN STRIP_TAC THEN ASM_REWRITE_TAC[] THEN
+   (* c ∩ closure(v) ≠ {} and closure(v) ⊆ u implies c ∩ u ≠ {} *)
+   FIRST_X_ASSUM(MP_TAC o check (fun th ->
+     let tm = concl th in can (find_term ((=) `top closure_of v:A->bool`)) tm)) THEN
+   FIRST_X_ASSUM(MP_TAC o check (fun th ->
+     let tm = concl th in can (find_term ((=) `top closure_of v:A->bool`)) tm)) THEN
+   REWRITE_TAC[GSYM MEMBER_NOT_EMPTY; IN_INTER; SUBSET] THEN
+   MESON_TAC[];
    ALL_TAC] THEN
   (* W elements are open *)
   SUBGOAL_THEN `!w:A->bool. w IN W ==> open_in top w` ASSUME_TAC THENL
