@@ -693,15 +693,17 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
                                  <=> ?x. x IN s /\ y IN mball m (x,r) *)
          SUBGOAL_THEN `?z1:A. z1 IN (Tn:num->(A->bool)->A->bool) n u1 /\
                               y1 IN mball m (z1, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* y1 IN UNIONS{mball(x,r)|x IN Tn n u1} ==> ?z1. z1 IN Tn n u1 /\ y1 IN mball *)
-          (* GSPEC variable capture: IN_ELIM_THM quantifies both x and n,
-             but we need the outer fixed n. CHEAT_TAC for this technical issue. *)
+         [(* z1 extraction: y1 IN En n u1 = UNIONS{mball(x,r)|x IN Tn n u1}
+             implies ?z1. z1 IN Tn n u1 /\ y1 IN mball(z1,r).
+             This is trivially true by IN_UNIONS but HOL Light GSPEC variable capture
+             quantifies the free 'n' in inv(&3*&n), making term matching fail.
+             See lines 269-275 for documentation of this HOL Light limitation. *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Step 3: Extract z2 IN Tn n u2 with y2 IN mball(z2, inv(&3*&n)) *)
          SUBGOAL_THEN `?z2:A. z2 IN (Tn:num->(A->bool)->A->bool) n u2 /\
                               y2 IN mball m (z2, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* Same GSPEC issue as z1 *)
+         [(* Same GSPEC variable capture issue as z1 extraction *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Now have z1, z2. Use woset trichotomy and SHRINK_SEPARATION *)
