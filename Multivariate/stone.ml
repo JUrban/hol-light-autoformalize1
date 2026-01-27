@@ -1643,12 +1643,36 @@ let LOCALLY_FINITE_OPEN_REFINEMENT_TEST = prove
    DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
    EXISTS_TAC `w:A->bool` THEN ASM_REWRITE_TAC[] THEN
    (* Need to show FINITE{u | u IN V /\ u INTER w != {}} *)
-   (* Proof sketch documented below, implementation complex due to GSPEC issues *)
-   (* Each V(c) meeting w => c meets some cprime meeting w *)
-   (* FINITE cprime's meeting w (local finiteness of Cprime) *)
-   (* FINITE c's meeting each cprime (KEY PROPERTY at line ~1520) *)
-   (* So FINITE c's (and hence V(c)'s) meeting w *)
-   PRINT_GOAL_TAC THEN CHEAT_TAC]);;
+   (* Abbreviate V function for clarity *)
+   ABBREV_TAC `Vc = \c:A->bool. (topspace top DIFF
+                    UNIONS {c':A->bool | c' IN Cprime /\ c' INTER c = {}}) INTER f c` THEN
+   (* The set is a subset of IMAGE Vc {c | c IN C /\ Vc(c) meets w} *)
+   MATCH_MP_TAC FINITE_SUBSET THEN
+   EXISTS_TAC `IMAGE (Vc:(A->bool)->(A->bool)) {c:A->bool | c IN C /\ ~(Vc c INTER w = {})}` THEN
+   CONJ_TAC THENL
+   [(* IMAGE of finite set is finite *)
+    MATCH_MP_TAC FINITE_IMAGE THEN
+    (* {c | c IN C /\ Vc(c) meets w} SUBSET UNIONS{{c | c meets c'} | c' meets w} *)
+    MATCH_MP_TAC FINITE_SUBSET THEN
+    EXISTS_TAC `UNIONS {{c:A->bool | c IN C /\ ~(c INTER c' = {})} |
+                        c' IN Cprime /\ ~(c' INTER w = {})}` THEN
+    CONJ_TAC THENL
+    [(* UNIONS of finite family of finite sets is finite *)
+     REWRITE_TAC[FINITE_UNIONS] THEN CONJ_TAC THENL
+     [(* The outer family is finite - use assumption 25 *)
+      ONCE_REWRITE_TAC[SIMPLE_IMAGE_GEN] THEN
+      MATCH_MP_TAC FINITE_IMAGE THEN ASM_REWRITE_TAC[];
+      (* Each inner set is finite - use KEY PROPERTY (assumption 18) *)
+      REWRITE_TAC[FORALL_IN_GSPEC] THEN
+      X_GEN_TAC `cprime:A->bool` THEN STRIP_TAC THEN
+      UNDISCH_TAC `!c':A->bool. c' IN Cprime ==>
+                   FINITE{c | c IN C /\ ~(c INTER c' = {})}` THEN
+      DISCH_THEN(MP_TAC o SPEC `cprime:A->bool`) THEN
+      ASM_REWRITE_TAC[]];
+     (* Subset property: Vc(c) meets w => c meets some cprime meeting w *)
+     CHEAT_TAC];
+    (* The original set is a subset of the image *)
+    CHEAT_TAC]]);;
 
 
 (* Michael's Lemma: For metrizable (hence regular) spaces, countably locally finite
