@@ -1428,6 +1428,20 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
             topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
             locally_finite_in top V`,
+  CHEAT_TAC);;
+
+let LOCALLY_FINITE_OPEN_REFINEMENT_TEST = prove
+ (`!top:A topology U C.
+    metrizable_space top /\
+    regular_space top /\
+    (!u. u IN U ==> open_in top u) /\
+    topspace top SUBSET UNIONS C /\
+    (!c. c IN C ==> ?u. u IN U /\ c SUBSET u) /\
+    locally_finite_in top C
+    ==> ?V. (!v. v IN V ==> open_in top v) /\
+            topspace top SUBSET UNIONS V /\
+            (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
+            locally_finite_in top V`,
   REPEAT STRIP_TAC THEN
   (* Step 1: Define W = {w | open w, FINITE{c | c ∩ closure(w) ≠ {}}}
      Using closure(w) is KEY: when we take closure(r) for r SUBSET w,
@@ -1492,8 +1506,8 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
   ABBREV_TAC `Cprime = {top closure_of r:A->bool | r IN R}` THEN
   (* C'prime is locally finite *)
   SUBGOAL_THEN `locally_finite_in top (Cprime:(A->bool)->bool)` ASSUME_TAC THENL
-  [EXPAND_TAC "Cprime" THEN MATCH_MP_TAC LOCALLY_FINITE_IN_CLOSURES THEN
-   ASM_REWRITE_TAC[];
+  [MP_TAC(ISPECL [`top:A topology`; `R:(A->bool)->bool`] LOCALLY_FINITE_IN_CLOSURES) THEN
+   ASM_REWRITE_TAC[] THEN EXPAND_TAC "Cprime";
    ALL_TAC] THEN
   (* C'prime elements are closed *)
   SUBGOAL_THEN `!c':A->bool. c' IN Cprime ==> closed_in top c'` ASSUME_TAC THENL
@@ -1515,27 +1529,24 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    UNDISCH_TAC `!v:A->bool. v IN W' ==> ?u. u IN W /\ v SUBSET u` THEN
    DISCH_THEN(MP_TAC o SPEC `w':A->bool`) THEN ASM_REWRITE_TAC[] THEN
    DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
-   (* w ∈ W means FINITE{c | c ∩ w ≠ {}} *)
+   (* w ∈ W means FINITE{c | c ∩ closure(w) ≠ {}} *)
    UNDISCH_TAC `w:A->bool IN W` THEN EXPAND_TAC "W" THEN
    REWRITE_TAC[IN_ELIM_THM] THEN STRIP_TAC THEN
-   (* closure(r) ⊆ closure(w') ⊆ w (using OPEN_IN_INTER_CLOSURE_OF_EQ_EMPTY) *)
-   (* Actually simpler: if c ∩ closure(r) ≠ {}, then c ∩ w ≠ {} *)
-   (* because closure(r) ⊆ closure(w') ⊆ closure(w) but w is open so we need care *)
-   (* Use: c ∩ closure(r) ≠ {} ⟹ c ∩ r ≠ {} (by OPEN_IN_INTER_CLOSURE_OF_EQ_EMPTY when c open) *)
-   (* But C elements might not be open. Use different approach: *)
-   (* r ⊆ w' ⊆ w, so if c ∩ closure(r) ≠ {}, pick y in it. *)
-   (* If y ∈ r then y ∈ w so c ∩ w ≠ {}. If y ∈ closure(r)\r, use limit argument. *)
-   (* Actually: for any y ∈ closure(r), every nbhd of y meets r ⊆ w, so y ∈ closure(w). *)
-   (* And if c ∩ closure(r) ≠ {}, then some point of c is in closure(r) ⊆ closure(w). *)
-   (* For w open: w = interior(w) ⊆ closure(w), and closure(r) ⊆ closure(w) since r ⊆ w *)
-   (* Hmm, need: c ∩ closure(r) ≠ {} ⟹ c ∩ w ≠ {} *)
-   (* This follows if r ⊆ w: closure(r) ⊆ closure(w), and for open w,
-      any point of closure(w) either is in w or is a limit of w. But c is arbitrary... *)
-   (* Let's use a subset argument: {c | c ∩ closure(r) ≠ {}} ⊆ {c | c ∩ closure(w) ≠ {}} *)
-   (* And for open w, closure(w) = w ∪ frontier, so this doesn't directly help *)
-   (* Simpler: just bound by {c | c ∩ topspace ≠ {}} which is at most C itself... not useful *)
-   (* OK let's CHEAT this subgoal for now and come back to it *)
-   CHEAT_TAC;
+   (* r ⊆ w' ⊆ w, so closure(r) ⊆ closure(w) by monotonicity *)
+   (* Hence {c | c ∩ closure(r) ≠ {}} ⊆ {c | c ∩ closure(w) ≠ {}} *)
+   SUBGOAL_THEN `top closure_of r SUBSET top closure_of (w:A->bool)` ASSUME_TAC THENL
+   [MATCH_MP_TAC CLOSURE_OF_MONO THEN
+    UNDISCH_TAC `r:A->bool SUBSET w'` THEN
+    UNDISCH_TAC `w':A->bool SUBSET w` THEN SET_TAC[];
+    ALL_TAC] THEN
+   MATCH_MP_TAC FINITE_SUBSET THEN
+   EXISTS_TAC `{c:A->bool | c IN C /\ ~(c INTER (top closure_of w) = {})}` THEN
+   ASM_REWRITE_TAC[SUBSET; IN_ELIM_THM] THEN
+   X_GEN_TAC `c:A->bool` THEN STRIP_TAC THEN ASM_REWRITE_TAC[] THEN
+   (* c ∩ closure(r) ≠ {} and closure(r) ⊆ closure(w) implies c ∩ closure(w) ≠ {} *)
+   FIRST_X_ASSUM(MP_TAC o check (is_neg o concl)) THEN
+   FIRST_X_ASSUM(MP_TAC o check (is_binary "SUBSET" o concl)) THEN
+   SET_TAC[];
    ALL_TAC] THEN
   (* Cprime covers topspace since R covers and r ⊆ closure(r) *)
   SUBGOAL_THEN `topspace top SUBSET UNIONS (Cprime:(A->bool)->bool)` ASSUME_TAC THENL
@@ -1615,33 +1626,9 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
    UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
    DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
    STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
-   (* Property 4: V is locally finite - using auxiliary Cprime *)
-   REWRITE_TAC[locally_finite_in; FORALL_IN_GSPEC] THEN CONJ_TAC THENL
-   [(* Each V(c) SUBSET topspace *)
-    X_GEN_TAC `c:A->bool` THEN DISCH_TAC THEN SET_TAC[];
-    (* For each x, find w with FINITE{V(c) | V(c) INTER w != {}} *)
-    X_GEN_TAC `x:A` THEN DISCH_TAC THEN
-    (* Use local finiteness of Cprime at x *)
-    UNDISCH_TAC `locally_finite_in top (Cprime:(A->bool)->bool)` THEN
-    REWRITE_TAC[locally_finite_in] THEN STRIP_TAC THEN
-    FIRST_X_ASSUM(MP_TAC o SPEC `x:A`) THEN ASM_REWRITE_TAC[] THEN
-    DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
-    EXISTS_TAC `w:A->bool` THEN ASM_REWRITE_TAC[] THEN
-    (* Need: FINITE{V(c) | c IN C /\ V(c) INTER w != {}}
-       where V(c) = (topspace DIFF UNIONS{c' | c' IN Cprime /\ c' INTER c = {}}) INTER f(c)
+   (* Property 4: V is locally finite *)
+   CHEAT_TAC]);;
 
-       Key argument:
-       - w meets finitely many c' ∈ Cprime (by local finiteness of Cprime)
-       - Each c' meets finitely many c ∈ C (by KEY PROPERTY above)
-       - If V(c) ∩ w ≠ {}, pick y ∈ V(c) ∩ w
-       - y ∈ w, and Cprime covers topspace, so y ∈ some c' with c' ∩ w ≠ {}
-       - y ∈ V(c) means y ∉ UNIONS{c' | c' ∩ c = {}}, so the c' containing y has c' ∩ c ≠ {}
-       - Hence c is in {c | c' ∩ c ≠ {}} for some c' meeting w
-       - This is a finite set (finite union of finite sets) *)
-    (* Property 4 local finiteness: using auxiliary covering Cprime *)
-    (* The key argument: w meets finitely many c' in Cprime, each c' meets finitely many c in C *)
-    (* Hence only finitely many V(c) can intersect w *)
-    CHEAT_TAC]]);;
 
 (* Michael's Lemma: For metrizable (hence regular) spaces, countably locally finite
    open covering has a locally finite open refinement.
