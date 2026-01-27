@@ -1632,8 +1632,23 @@ let LOCALLY_FINITE_OPEN_REFINEMENT_TEST = prove
     REWRITE_TAC[FORALL_IN_GSPEC] THEN
     X_GEN_TAC `c:A->bool` THEN DISCH_TAC THEN
     REWRITE_TAC[SUBSET; IN_INTER; IN_DIFF] THEN MESON_TAC[];
-    (* Part 2: Local finiteness property - simplified with CHEAT *)
-    CHEAT_TAC]]);;
+    ALL_TAC] THEN
+   (* Part 2: Local finiteness property *)
+   X_GEN_TAC `x:A` THEN DISCH_TAC THEN
+   (* Use local finiteness of Cprime *)
+   UNDISCH_TAC `locally_finite_in top (Cprime:(A->bool)->bool)` THEN
+   REWRITE_TAC[locally_finite_in] THEN
+   DISCH_THEN(CONJUNCTS_THEN2 ASSUME_TAC (MP_TAC o SPEC `x:A`)) THEN
+   ASM_REWRITE_TAC[] THEN
+   DISCH_THEN(X_CHOOSE_THEN `w:A->bool` STRIP_ASSUME_TAC) THEN
+   EXISTS_TAC `w:A->bool` THEN ASM_REWRITE_TAC[] THEN
+   (* Need to show FINITE{u | u IN V /\ u INTER w != {}} *)
+   (* Proof sketch documented below, implementation complex due to GSPEC issues *)
+   (* Each V(c) meeting w => c meets some cprime meeting w *)
+   (* FINITE cprime's meeting w (local finiteness of Cprime) *)
+   (* FINITE c's meeting each cprime (KEY PROPERTY at line ~1520) *)
+   (* So FINITE c's (and hence V(c)'s) meeting w *)
+   CHEAT_TAC]);;
 
 
 (* Michael's Lemma: For metrizable (hence regular) spaces, countably locally finite
