@@ -1670,6 +1670,7 @@ let LOCALLY_FINITE_OPEN_REFINEMENT_TEST = prove
       DISCH_THEN(MP_TAC o SPEC `cprime:A->bool`) THEN
       ASM_REWRITE_TAC[]];
      (* Subset property: Vc(c) meets w => c meets some cprime meeting w *)
+     (* Complex due to GSPEC issues, use CHEAT_TAC for now *)
      CHEAT_TAC];
     (* The original set is a subset of the image *)
     CHEAT_TAC]]);;
