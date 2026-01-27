@@ -1428,20 +1428,6 @@ let LOCALLY_FINITE_OPEN_REFINEMENT = prove
             topspace top SUBSET UNIONS V /\
             (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
             locally_finite_in top V`,
-  CHEAT_TAC);;
-
-let LOCALLY_FINITE_OPEN_REFINEMENT_TEST = prove
- (`!top:A topology U C.
-    metrizable_space top /\
-    regular_space top /\
-    (!u. u IN U ==> open_in top u) /\
-    topspace top SUBSET UNIONS C /\
-    (!c. c IN C ==> ?u. u IN U /\ c SUBSET u) /\
-    locally_finite_in top C
-    ==> ?V. (!v. v IN V ==> open_in top v) /\
-            topspace top SUBSET UNIONS V /\
-            (!v. v IN V ==> ?u. u IN U /\ v SUBSET u) /\
-            locally_finite_in top V`,
   REPEAT STRIP_TAC THEN
   (* Step 1: Define W = {w | open w, FINITE{c | c ∩ closure(w) ≠ {}}}
      Using closure(w) is KEY: when we take closure(r) for r SUBSET w,
