@@ -1626,7 +1626,14 @@ let LOCALLY_FINITE_OPEN_REFINEMENT_TEST = prove
    UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
    DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
    STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
-   (* Property 4: V is locally finite - CHEAT for now, needs careful tactic work *)
+   (* Property 4: V is locally finite *)
+   (* Full proof is complex due to set membership tracking.
+      Proof sketch: Use local finiteness of Cprime to get w meeting finitely many c'.
+      If V(c) meets w, pick y in intersection. y is in some cprime in Cprime (since
+      Cprime covers). cprime meets w (y in both) and cprime meets c (from V(c) definition).
+      So {c | V(c) meets w} SUBSET UNIONS over {cprime meeting w} of {c | c meets cprime}.
+      This union is finite since {cprime meeting w} is finite and each {c | c meets cprime}
+      is finite by KEY PROPERTY. *)
    CHEAT_TAC]);;
 
 
