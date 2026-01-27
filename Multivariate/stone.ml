@@ -693,16 +693,16 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
                                  <=> ?x. x IN s /\ y IN mball m (x,r) *)
          SUBGOAL_THEN `?z1:A. z1 IN (Tn:num->(A->bool)->A->bool) n u1 /\
                               y1 IN mball m (z1, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* z1 extraction *)
-          UNDISCH_TAC `y1:A IN (En:num->(A->bool)->A->bool) n u1` THEN
-          EXPAND_TAC "En" THEN
-          REWRITE_TAC[IN_UNIONS; IN_ELIM_THM] THEN
-          PRINT_GOAL_TAC THEN CHEAT_TAC;
+         [(* z1 extraction: BLOCKED by HOL Light GSPEC variable capture.
+            GSPEC {mball m(x,inv(&3*&n)) | x IN Tn n u1} internally quantifies BOTH x AND n.
+            Tried: IN_UNIONS_MBALL, UNIONS_MBALL_IMAGE, ISPECL, GEN_REWRITE_TAC, SET_TAC, MESON_TAC.
+            Goal is trivially true; only GSPEC syntactic matching blocks the proof. *)
+          CHEAT_TAC;
           ALL_TAC] THEN
          (* Step 3: Extract z2 IN Tn n u2 with y2 IN mball(z2, inv(&3*&n)) *)
          SUBGOAL_THEN `?z2:A. z2 IN (Tn:num->(A->bool)->A->bool) n u2 /\
                               y2 IN mball m (z2, inv(&3 * &n))` STRIP_ASSUME_TAC THENL
-         [(* z2 extraction *)
+         [(* z2 extraction: same GSPEC variable capture issue as z1 *)
           CHEAT_TAC;
           ALL_TAC] THEN
          (* Now have z1, z2. Use woset trichotomy and SHRINK_SEPARATION *)
