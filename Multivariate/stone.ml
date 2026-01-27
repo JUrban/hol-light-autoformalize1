@@ -1626,8 +1626,14 @@ let LOCALLY_FINITE_OPEN_REFINEMENT_TEST = prove
    UNDISCH_TAC `!c:A->bool. c IN C ==> (f:(A->bool)->(A->bool)) c IN U /\ c SUBSET f c` THEN
    DISCH_THEN(MP_TAC o SPEC `c:A->bool`) THEN ASM_REWRITE_TAC[] THEN
    STRIP_TAC THEN ASM_REWRITE_TAC[] THEN SET_TAC[];
-   (* Property 4: V is locally finite - DEBUG *)
-   REWRITE_TAC[locally_finite_in] THEN PRINT_GOAL_TAC THEN CHEAT_TAC]);;
+   (* Property 4: V is locally finite *)
+   REWRITE_TAC[locally_finite_in] THEN CONJ_TAC THENL
+   [(* Part 1: All V elements are subsets of topspace - easy *)
+    REWRITE_TAC[FORALL_IN_GSPEC] THEN
+    X_GEN_TAC `c:A->bool` THEN DISCH_TAC THEN
+    REWRITE_TAC[SUBSET; IN_INTER; IN_DIFF] THEN MESON_TAC[];
+    (* Part 2: Local finiteness property - simplified with CHEAT *)
+    CHEAT_TAC]]);;
 
 
 (* Michael's Lemma: For metrizable (hence regular) spaces, countably locally finite
