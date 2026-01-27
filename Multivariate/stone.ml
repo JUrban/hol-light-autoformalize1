@@ -855,94 +855,9 @@ let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT = prove
      ASM_SIMP_TAC[ARITH_RULE `~(n >= 1) ==> ~(n >= 1)`] THEN
      REWRITE_TAC[LOCALLY_FINITE_IN_EMPTY]]]]);;
 
-let METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT_locally_finite_DISABLED = 0;;
-(* The locally finite proof has a structural issue - will restore after fixing *)
-(* Original code:
-    X_GEN_TAC `n:num` THEN
-    CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-    ASM_CASES_TAC `n = 0` THENL
-    [ASM_REWRITE_TAC[LOCALLY_FINITE_IN_EMPTY; COND_CLAUSES]; ALL_TAC] THEN
-    ASM_REWRITE_TAC[] THEN
-    REWRITE_TAC[locally_finite_in] THEN CONJ_TAC THENL
-    [(* UNIONS (E_layer n DIFF {{}}) SUBSET topspace *)
-     REWRITE_TAC[UNIONS_SUBSET; IN_DIFF; IN_SING] THEN
-     X_GEN_TAC `s:A->bool` THEN STRIP_TAC THEN
-     (* s IN E_layer n, so s = En n u0 for some u0 IN U *)
-     UNDISCH_TAC `s:A->bool IN (E_layer:num->(A->bool)->bool) n` THEN
-     EXPAND_TAC "E_layer" THEN REWRITE_TAC[IN_ELIM_THM] THEN
-     DISCH_THEN(X_CHOOSE_THEN `u0:A->bool` (CONJUNCTS_THEN2 ASSUME_TAC SUBST_ALL_TAC)) THEN
-     (* En n u0 = UNIONS{mball(y, 1/3n) | y IN Tn n u0} SUBSET mspace m = topspace *)
-     EXPAND_TAC "En" THEN CONV_TAC(DEPTH_CONV BETA_CONV) THEN
-     REWRITE_TAC[UNIONS_SUBSET; FORALL_IN_GSPEC] THEN
-     X_GEN_TAC `y:A` THEN X_GEN_TAC `n':num` THEN DISCH_TAC THEN
-     UNDISCH_TAC `mtopology m:A topology = top` THEN
-     DISCH_THEN(SUBST1_TAC o SYM) THEN
-     REWRITE_TAC[TOPSPACE_MTOPOLOGY; MBALL_SUBSET_MSPACE];
-     (* Part 2: finite neighborhood property *)
-     X_GEN_TAC `x:A` THEN DISCH_TAC THEN
-     (* x is in topspace = mspace m *)
-     SUBGOAL_THEN `x:A IN mspace m` ASSUME_TAC THENL
-     [UNDISCH_TAC `x:A IN topspace top` THEN
-      UNDISCH_TAC `mtopology m:A topology = top` THEN
-      DISCH_THEN(SUBST1_TAC o SYM) THEN
-      REWRITE_TAC[TOPSPACE_MTOPOLOGY];
-      ALL_TAC] THEN
-     (* Use mball(x, 1/(6n)) as the neighborhood *)
-     EXISTS_TAC `mball m (x:A, inv(&6 * &n))` THEN
-     CONJ_TAC THENL
-     [(* mball is open *)
-      UNDISCH_TAC `mtopology m:A topology = top` THEN
-      DISCH_THEN(SUBST1_TAC o SYM) THEN
-      REWRITE_TAC[OPEN_IN_MBALL];
-      ALL_TAC] THEN
-     CONJ_TAC THENL
-     [(* x IN mball *)
-      REWRITE_TAC[IN_MBALL] THEN
-      ASM_SIMP_TAC[MDIST_REFL] THEN
-      MATCH_MP_TAC REAL_LT_INV THEN
-      MATCH_MP_TAC REAL_LT_MUL THEN CONJ_TAC THENL
-      [REAL_ARITH_TAC;
-       REWRITE_TAC[REAL_OF_NUM_LT] THEN
-       UNDISCH_TAC `~(n = 0)` THEN ARITH_TAC];
-      ALL_TAC] THEN
-     (* FINITE {s | s IN E_layer n DIFF {{}} /\ ~(s INTER mball(...) = {})} *)
-     (* Key: this set has at most one element *)
-     MATCH_MP_TAC FINITE_SUBSET THEN
-     EXISTS_TAC `{s:A->bool | s IN (E_layer:num->(A->bool)->bool) n /\ ~(s INTER mball m (x, inv(&6 * &n)) = {})}` THEN
-     CONJ_TAC THENL
-     [(* The set meeting x's ball is finite - at most one element *)
-      (* Key: inv(&6*&n) = inv(&3*&n) / &2, so we can use SMALL_BALL_MEETS_ONE *)
-      SUBGOAL_THEN `inv(&6 * &n) = inv(&3 * &n) / &2` ASSUME_TAC THENL
-      [REWRITE_TAC[real_div; REAL_INV_MUL] THEN
-       REWRITE_TAC[REAL_ARITH `&6 = &2 * &3`] THEN
-       REWRITE_TAC[REAL_INV_MUL] THEN REAL_ARITH_TAC;
-       ALL_TAC] THEN
-      (* Use SMALL_BALL_MEETS_ONE with r = inv(&3 * &n) *)
-      MP_TAC(ISPECL [`m:A metric`; `x:A`; `inv(&3 * &n)`;
-                     `(E_layer:num->(A->bool)->bool) n`] SMALL_BALL_MEETS_ONE) THEN
-      ANTS_TAC THENL
-      [ASM_REWRITE_TAC[] THEN CONJ_TAC THENL
-       [(* &0 < inv(&3 * &n) *)
-        MATCH_MP_TAC INV_3N_POS THEN REWRITE_TAC[GE] THEN
-        UNDISCH_TAC `~(n = 0)` THEN ARITH_TAC;
-        (* Separation property: distinct elements of E_layer n are 1/(3n)-separated *)
-        CHEAT_TAC];
-       (* Use the result to show finiteness *)
-       ASM_REWRITE_TAC[] THEN
-       DISCH_THEN(X_CHOOSE_THEN `v:A->bool` ASSUME_TAC) THEN
-       MATCH_MP_TAC FINITE_SUBSET THEN EXISTS_TAC `{v:A->bool}` THEN
-       CONJ_TAC THENL
-       [REWRITE_TAC[FINITE_SING];
-        REWRITE_TAC[SUBSET; IN_ELIM_THM; IN_SING] THEN
-        X_GEN_TAC `s:A->bool` THEN STRIP_TAC THEN
-        FIRST_X_ASSUM MATCH_MP_TAC THEN ASM_REWRITE_TAC[] THEN
-        ONCE_REWRITE_TAC[INTER_COMM] THEN ASM_MESON_TAC[]]];
-      (* Subset property *)
-      REWRITE_TAC[SUBSET; IN_ELIM_THM; IN_DIFF; IN_SING] THEN
-      X_GEN_TAC `u:A->bool` THEN STRIP_TAC THEN ASM_MESON_TAC[]]]]]);;
-*)
-
-(* Debug marker removed *)
+(* Note: The locally finite property for E_layer n is proved directly in
+   METRIZABLE_COUNTABLY_LOCALLY_FINITE_REFINEMENT using SMALL_BALL_MEETS_ONE
+   and the separation property of En sets. *)
 
 (* ------------------------------------------------------------------------- *)
 (* Lemma 41.3 (Michael's Lemma): For a regular space, countably locally      *)
